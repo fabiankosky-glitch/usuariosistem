@@ -4,70 +4,95 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Caminos Nuevos</title>
+    <!-- 1. CARGAMOS FIREBASE DE FORMA SIMPLE (SIN IMPORTS) -->
+    <script src="https://gstatic.com"></script>
+    <script src="https://gstatic.com"></script>
+
     <style>
         body { font-family: sans-serif; text-align: center; background: #f4f7f6; padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
-        video { width: 100%; border-radius: 10px; background: #000; }
-        button { width: 100%; padding: 15px; margin: 10px 0; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: white; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        video { width: 100%; border-radius: 10px; background: #000; margin-bottom: 10px; }
+        input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 16px; }
+        button { background: #27ae60; color: white; border: none; font-weight: bold; cursor: pointer; }
         #btnCapturar { background: #2980b9; }
-        #btnGuardar { background: #27ae60; }
+        canvas { display: none; }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h2>Registro</h2>
-        <input type="text" id="nombreP" placeholder="Nombre completo" style="width:90%; padding:10px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;">
-        <video id="video" autoplay playsinline></video>
-        <button id="btnCapturar">📸 TOMAR FOTO</button>
-        <button id="btnGuardar">🚀 GUARDAR EN LA NUBE</button>
-        <canvas id="canvas" style="display:none;"></canvas>
-    </div>
 
-    <!-- USAREMOS UNA VERSION QUE NO SE CORTA -->
-    <script type="module">
-        import { initializeApp } from "https://gstatic.com";
-        import { getFirestore, collection, addDoc, doc, setDoc } from "https://gstatic.com";
+<div class="card">
+    <h2>Registro de Paciente</h2>
+    <input type="text" id="nombreP" placeholder="Nombre completo">
+    <video id="video" autoplay playsinline></video>
+    <button id="btnCapturar">📸 TOMAR FOTO</button>
+    <button id="btnGuardar">🚀 GUARDAR Y CREAR CARPETAS</button>
+    <canvas id="canvas"></canvas>
+</div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyC78y2K4T9rMFMVsG_UQxTmPANzV7Yapf8",
-            authDomain: "://firebaseapp.com",
-            projectId: "caminosnuevosdatabase",
-            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
-            appId: "1:907500835423:web:f50b459a84f5d7d92a81ea"
-        };
+<script>
+    // 2. CONFIGURACIÓN
+    const firebaseConfig = {
+        apiKey: "AIzaSyC78y2K4T9rMFMVsG_UQxTmPANzV7Yapf8",
+        authDomain: "://firebaseapp.com",
+        projectId: "caminosnuevosdatabase",
+        storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+        appId: "1:907500835423:web:f50b459a84f5d7d92a81ea"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        let fotoBase64 = null;
+    // Inicializar Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    let fotoBase64 = null;
 
-        // ENCENDER CÁMARA
-        const video = document.getElementById('video');
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(s => { video.srcObject = s; })
-            .catch(e => alert("Error: Activa la cámara en el candado de arriba"));
+    // 3. ENCENDER CÁMARA
+    const video = document.getElementById('video');
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => { video.srcObject = stream; })
+        .catch(err => alert("Error: Activa la cámara en el candado de la URL"));
 
-        // TOMAR FOTO
-        document.getElementById('btnCapturar').onclick = () => {
-            const canvas = document.getElementById('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            fotoBase64 = canvas.toDataURL('image/jpeg', 0.5);
-            alert("✅ Foto capturada");
-        };
+    // 4. TOMAR FOTO
+    document.getElementById('btnCapturar').onclick = function() {
+        const canvas = document.getElementById('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        fotoBase64 = canvas.toDataURL('image/jpeg', 0.5);
+        alert("✅ Foto capturada con éxito");
+    };
 
-        // GUARDAR
-        document.getElementById('btnGuardar').onclick = async () => {
-            const nombre = document.getElementById('nombreP').value;
-            if(!nombre || !fotoBase64) return alert("Falta nombre o foto");
-            try {
-                const docRef = await addDoc(collection(db, "pacientes"), {
-                    nombre: nombre, foto: fotoBase64, fecha: new Date().toLocaleString()
+    // 5. GUARDAR Y CREAR CARPETAS
+    document.getElementById('btnGuardar').onclick = async function() {
+        const nombre = document.getElementById('nombreP').value;
+        if(!nombre || !fotoBase64) return alert("Falta el nombre o la foto");
+
+        this.innerText = "⏳ Guardando...";
+        this.disabled = true;
+
+        try {
+            // Guardar paciente
+            const res = await db.collection("pacientes").add({
+                nombre: nombre,
+                foto: fotoBase64,
+                fecha: new Date().toLocaleString()
+            });
+
+            // Crear las 3 carpetas automáticamente
+            const carpetas = ["Clinica", "Terapeutica", "Psicologica"];
+            for (let c of carpetas) {
+                await db.collection("pacientes").doc(res.id).collection("carpetas").doc(c).set({
+                    creado: true,
+                    fecha: new Date().toISOString()
                 });
-                alert("🚀 GUARDADO EXITOSO");
-                location.reload();
-            } catch(e) { alert("Error: " + e.message); }
-        };
-    </script>
+            }
+
+            alert("🚀 ¡TODO GUARDADO! Paciente y carpetas listas.");
+            location.reload();
+        } catch(e) {
+            alert("Error: " + e.message);
+            this.innerText = "🚀 GUARDAR Y CREAR CARPETAS";
+            this.disabled = false;
+        }
+    };
+</script>
 </body>
 </html>
