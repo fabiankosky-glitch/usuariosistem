@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Menú de Pacientes</title>
+    <script src="https://gstatic.com"></script>
+    <script src="https://gstatic.com"></script>
+    <style>
+        body { font-family: sans-serif; background: #f4f7f6; margin: 0; }
+        nav { background: #2c3e50; padding: 15px; display: flex; justify-content: center; gap: 20px; }
+        nav a { color: white; text-decoration: none; font-weight: bold; }
+        .container { padding: 20px; max-width: 800px; margin: auto; }
+        .paciente-card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .paciente-card img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; }
+        .info { flex-grow: 1; }
+        .btn-ver { background: #2980b9; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="index.html">📝 Registro</a>
+    <a href="menu.html">📋 Ver Pacientes</a>
+</nav>
+
+<div class="container">
+    <h2>Pacientes Registrados</h2>
+    <div id="listaPacientes">Cargando...</div>
+</div>
+
+<script>
+    const firebaseConfig = {
+        apiKey: "AIzaSyC78y2K4T9rMFMVsG_UQxTmPANzV7Yapf8",
+        authDomain: "://firebaseapp.com",
+        projectId: "caminosnuevosdatabase",
+        storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+        appId: "1:907500835423:web:f50b459a84f5d7d92a81ea"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    db.collection("pacientes").orderBy("fecha", "desc").onSnapshot((snapshot) => {
+        const lista = document.getElementById("listaPacientes");
+        lista.innerHTML = "";
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            lista.innerHTML += `
+                <div class="paciente-card">
+                    <img src="${data.foto}">
+                    <div class="info">
+                        <strong>${data.nombre}</strong><br>
+                        <small>${data.fecha}</small>
+                    </div>
+                    <button onclick="alert('Abriendo carpetas de ${data.nombre}')" class="btn-ver">📂 Ver Carpetas</button>
+                </div>`;
+        });
+    });
+</script>
+</body>
+</html>
