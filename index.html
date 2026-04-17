@@ -29,37 +29,36 @@
     <canvas id="canvas"></canvas>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://gstatic.com";
-    import { getFirestore, collection, addDoc, doc, setDoc } from "https://gstatic.com";
+    <script type="module">
+        import { initializeApp } from "https://gstatic.com";
+        import { getFirestore, collection, addDoc, doc, setDoc } from "https://gstatic.com";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyC78y2K4T9rMFMVsG_UQxTmPANzV7Yapf8",
-        authDomain: "://firebaseapp.com",
-        projectId: "caminosnuevosdatabase",
-        storageBucket: "caminosnuevosdatabase.firebasestorage.app",
-        appId: "1:907500835423:web:f50b459a84f5d7d92a81ea"
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyC78y2K4T9rMFMVsG_UQxTmPANzV7Yapf8",
+            authDomain: "://firebaseapp.com",
+            projectId: "caminosnuevosdatabase",
+            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+            appId: "1:907500835423:web:f50b459a84f5d7d92a81ea"
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    let fotoBase64 = null;
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        let fotoBase64 = null;
 
-    const video = document.getElementById('video');
+        // ENCENDER CÁMARA
+        const video = document.getElementById('video');
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(s => { video.srcObject = s; })
+            .catch(e => alert("Error: Activa la cámara en el candado de arriba"));
 
-    // 1. Encender Cámara (Ya sabemos que funciona)
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then(s => video.srcObject = s)
-        .catch(e => alert("Error de cámara"));
-
-    // 2. Lógica para Tomar la Foto
-    document.getElementById('btnCapturar').addEventListener('click', () => {
-        const canvas = document.getElementById('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0);
-        fotoBase64 = canvas.toDataURL('image/jpeg', 0.5); // Comprime al 50% para que suba rápido
-        alert("✅ ¡Foto capturada correctamente!");
+        // TOMAR FOTO
+        document.getElementById('btnCapturar').onclick = () => {
+            const canvas = document.getElementById('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            fotoBase64 = canvas.toDataURL('image/jpeg', 0.5);
+            alert("✅ Foto capturada");
     });
 
     // 3. Lógica para Guardar y Crear las 3 Carpetas
