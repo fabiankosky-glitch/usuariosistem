@@ -3,40 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Caminos Nuevos - Sistema</title>
+    <title>Sistema Caminos Nuevos</title>
     <style>
-        body { font-family: sans-serif; text-align: center; padding: 20px; background: #f4f7f6; }
-        .card { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        body { font-family: sans-serif; text-align: center; background: #f4f7f6; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
         video { width: 100%; border-radius: 10px; background: #000; }
-        button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: white; }
+        button { width: 100%; padding: 15px; margin: 10px 0; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; color: white; }
         #btnCapturar { background: #2980b9; }
+        #btnGuardar { background: #27ae60; }
     </style>
 </head>
 <body>
+    <div class="card">
+        <h2>Registro</h2>
+        <input type="text" id="nombreP" placeholder="Nombre completo" style="width:90%; padding:10px; margin-bottom:10px; border-radius:5px; border:1px solid #ccc;">
+        <video id="video" autoplay playsinline></video>
+        <button id="btnCapturar">📸 TOMAR FOTO</button>
+        <button id="btnGuardar">🚀 GUARDAR EN LA NUBE</button>
+        <canvas id="canvas" style="display:none;"></canvas>
+    </div>
 
-<div class="card">
-    <h2>Registro de Paciente</h2>
-    <video id="video" autoplay playsinline></video>
-    <button id="btnCapturar">📸 PROBAR CÁMARA</button>
-    <canvas id="canvas" style="display:none;"></canvas>
-</div>
+    <!-- USAREMOS UNA VERSION QUE NO SE CORTA -->
+    <script type="module">
+        import { initializeApp } from "https://gstatic.com";
+        import { getFirestore, collection, addDoc, doc, setDoc } from "https://gstatic.com";
 
-<script>
-    const video = document.getElementById('video');
+        const firebaseConfig = {
+            apiKey: "AIzaSyC78y2K4T9rMFMVsG_UQxTmPANzV7Yapf8",
+            authDomain: "://firebaseapp.com",
+            projectId: "caminosnuevosdatabase",
+            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+            appId: "1:907500835423:web:f50b459a84f5d7d92a81ea"
+        };
 
-    // ESTO ENCIENDE LA CÁMARA SIN ERRORES DE FIREBASE
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => { 
-            video.srcObject = stream; 
-            console.log("Cámara encendida");
-        })
-        .catch(err => {
-            alert("Error: Dale permiso a la cámara en el candado de arriba.");
-        });
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        let fotoBase64 = null;
 
-    document.getElementById('btnCapturar').onclick = () => {
-        alert("¡Botón funcionando! La cámara está lista.");
-    };
-</script>
+        // ENCENDER CÁMARA
+        const video = document.getElementById('video');
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(s => { video.srcObject = s; })
+            .catch(e => alert("Error: Activa la cámara en el candado de arriba"));
+
+        // TOMAR FOTO
+        document.getElementById('btnCapturar').onclick = () => {
+            const canvas = document.getElementById('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            fotoBase64 = canvas.toDataURL('image/jpeg', 0.5);
+            alert("✅ Foto capturada");
+        };
+
+        // GUARDAR
+        document.getElementById('btnGuardar').onclick = async () => {
+            const nombre = document.getElementById('nombreP').value;
+            if(!nombre || !fotoBase64) return alert("Falta nombre o foto");
+            try {
+                const docRef = await addDoc(collection(db, "pacientes"), {
+                    nombre: nombre, foto: fotoBase64, fecha: new Date().toLocaleString()
+                });
+                alert("🚀 GUARDADO EXITOSO");
+                location.reload();
+            } catch(e) { alert("Error: " + e.message); }
+        };
+    </script>
 </body>
 </html>
