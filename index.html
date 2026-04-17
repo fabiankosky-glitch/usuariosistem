@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Caminos Nuevos</title>
+    <style>
+        :root { --primary: #2c3e50; --success: #27ae60; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; display: flex; justify-content: center; padding: 20px; }
+        .card { background: white; padding: 2rem; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
+        video { width: 100%; border-radius: 10px; background: #000; transform: scaleX(-1); } /* Efecto espejo */
+        input, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        button { background: var(--success); color: white; border: none; font-weight: bold; cursor: pointer; }
+        canvas { display: none; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Registro de Paciente</h2>
+    <input type="text" id="nombreP" placeholder="Nombre completo">
+    <video id="video" autoplay playsinline></video>
+    <button id="btnCapturar" style="background: #2980b9;">📸 Tomar Foto</button>
+    <button id="btnGuardar">🚀 Guardar en la Nube</button>
+    <canvas id="canvas"></canvas>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://gstatic.com";
+    import { getFirestore, collection, addDoc, doc, setDoc } from "https://gstatic.com";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC78y2K4T9rMFMVsG_UQxTmPANzV7Yapf8",
+        authDomain: "://firebaseapp.com",
+        projectId: "caminosnuevosdatabase",
+        storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+        messagingSenderId: "907500835423",
+        appId: "1:907500835423:web:f50b459a84f5d7d92a81ea"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    let fotoBase64 = null;
+
+    const video = document.getElementById('video');
+    
+    // Iniciar cámara
+    navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
+        .then(s => video.srcObject = s)
+        .catch(e => alert("Error: Activa los permisos de cámara en tu navegador."));
+
+    // Capturar
+    document.getElementById('btnCapturar').addEventListener('click', () => {
+        const canvas = document.getElementById('canvas');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        canvas.getContext('2d').drawImage(video, 0, 0);
+        fotoBase64 = canvas.toDataURL('image/jpeg', 0.6);
+        alert("✅ Foto capturada");
+    });
+
+    // Guardar
+    document.getElementById('btnGuardar').addEventListener('click', async () => {
+        const nombre = document.getElementById('nombreP').value;
+        if(!nombre || !fotoBase64) return alert("Faltan datos o foto");
+        
+        try {
+            const docRef = await addDoc(collection(db, "pacientes"), {
+                nombre, foto: fotoBase64, fecha: new Date().toLocaleString()
+            });
+            // Crear subcarpetas
+            for (let c of ["Clinica", "Terapeutica", "Psicologica"]) {
+                await setDoc(doc(db, `pacientes/${docRef.id}/carpetas`, c), { creado: true });
+            }
+            alert("🚀 Guardado correctamente");
+            location.reload();
+        } catch (e) { alert("Error: " + e.message); }
+    });
+</script>
+</body>
+</html>
