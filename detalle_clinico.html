@@ -149,32 +149,41 @@
 
         // 4. VER HISTORIAL MÉDICO
         window.verHistorial = async () => {
+            if(!idPaciente) return alert("Error: ID no encontrado.");
             document.getElementById("menuPrincipal").style.display = "none";
             document.getElementById("seccionHistorial").style.display = "block";
             const lista = document.getElementById("listaMedica");
-            lista.innerHTML = "Cargando registros...";
+            lista.innerHTML = "Buscando...";
 
             try {
-                const q = query(collection(db, "evoluciones_medicas"), where("idPaciente", "==", idPaciente), orderBy("fecha", "desc"));
+                // Simplificamos la consulta para evitar errores de índice inicial
+                const q = query(collection(db, "evoluciones_medicas"), where("idPaciente", "==", idPaciente));
                 const snap = await getDocs(q);
-                lista.innerHTML = snap.empty ? "No hay consultas médicas registradas." : "";
                 
-                snap.forEach((doc) => {
-                    const d = doc.data();
+                lista.innerHTML = snap.empty ? "Sin registros médicos aún." : "";
+                
+                // Ordenamos manualmente en el código para que Firebase no se queje
+                const registros = [];
+                snap.forEach(doc => registros.push({id: doc.id, ...doc.data()}));
+                registros.sort((a, b) => b.fecha - a.fecha); // Del más nuevo al más viejo
+
+                registros.forEach(d => {
                     const fecha = new Date(d.fecha).toLocaleString();
                     lista.innerHTML += `
-                        <div class="registro-item">
-                            <div>
-                                <strong>📅 ${fecha}</strong><br>
-                                <small>🩺 ${d.signos}</small>
+                        <div class="registro-item" style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee; background:white; margin-bottom:5px; border-radius:8px;">
+                            <div style="text-align:left;">
+                                <strong>📅 ${fecha}</strong><br><small>🩺 ${d.signos || 'Sin signos'}</small>
                             </div>
                             <button onclick="verDetalleMedico('${d.signos}', '${d.fecha}', \`${d.texto}\`, '${d.fotoDoc || ""}')" 
-                                    style="background:#2980b9; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer; font-weight:bold;">
+                                    style="background:#2980b9; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer;">
                                 👁️ Ver
                             </button>
                         </div>`;
                 });
-            } catch (e) { lista.innerHTML = "Error al cargar historial médico."; }
+            } catch (e) { 
+                console.error("Error detallado:", e);
+                lista.innerHTML = "Error de conexión con la nube: " + e.message; 
+            }
         };
 
         window.volver = () => {
