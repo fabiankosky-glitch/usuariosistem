@@ -108,22 +108,29 @@
         cargarDatosPaciente();
 
         // 2. NAVEGACIÓN: ABRIR FORMULARIO Y PRENDER CÁMARA
-        window.abrirFormulario = () => {
-            document.getElementById("menuPrincipal").style.display = "none";
-            document.getElementById("seccionAgregar").style.display = "block";
-            
-            // Solo pedimos la cámara AQUÍ para que los botones no se bloqueen antes
-            const video = document.getElementById('video');
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(stream => { 
-                    streamActivo = stream;
-                    video.srcObject = stream; 
-                })
-                .catch(err => {
-                    alert("Cámara bloqueada. Por favor permite el acceso en el candado de la barra de direcciones.");
-                });
-        };
+window.abrirFormulario = () => {
+    document.getElementById("menuPrincipal").style.display = "none";
+    document.getElementById("seccionAgregar").style.display = "block";
+    
+    const video = document.getElementById('video');
 
+    // CONFIGURACIÓN SENCILLA: Forzar cámara trasera (environment)
+    navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: "environment" } 
+    })
+    .then(stream => { 
+        streamActivo = stream;
+        video.srcObject = stream; 
+    })
+    .catch(err => {
+        // Si falla la trasera (ej. en PC), intenta con cualquier cámara disponible
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => { 
+                streamActivo = stream;
+                video.srcObject = stream; 
+            });
+    });
+};
         // 3. NAVEGACIÓN: VER HISTORIAL
         window.verHistorial = async () => {
             document.getElementById("menuPrincipal").style.display = "none";
