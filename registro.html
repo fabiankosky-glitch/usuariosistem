@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registro de Paciente</title>
+    <style>
+        body { font-family: sans-serif; text-align: center; background: #f4f7f6; padding: 20px; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
+        video { width: 100%; border-radius: 10px; background: #000; margin-bottom: 10px; }
+        input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; font-weight: bold; }
+        button { background: #27ae60; color: white; border: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Registro de Paciente</h2>
+        <input type="text" id="nombre" placeholder="Nombre completo">
+        <video id="video" autoplay playsinline></video>
+        <button id="btnCapturar">📸 TOMAR FOTO</button>
+        <button id="btnGuardar" style="background: #2ecc71;">🚀 GUARDAR Y CREAR CARPETAS</button>
+        <button onclick="window.location.href='index.html'" style="background: #95a5a6;">⬅ VOLVER</button>
+    </div>
+
+    <script type="module">
+        // AQUÍ VA TU CONFIGURACIÓN DE FIREBASE QUE YA TENÍAS
+        // ... (Cámara y lógica de guardado)
+    </script>
+</body>
+</html>
