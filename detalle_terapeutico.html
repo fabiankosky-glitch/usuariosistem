@@ -190,19 +190,59 @@
             window.location.reload(); 
         };
 
-        // 5. REPORTE DETALLADO (Popup)
+        // 5. REPORTE DETALLADO (Con opción de impresión)
         window.verDetalleCompleto = (mod, fechaRaw, texto, foto) => {
-            const win = window.open("", "_blank", "width=600,height=800");
+            const win = window.open("", "_blank", "width=800,height=900");
             const fecha = new Date(Number(fechaRaw)).toLocaleString();
+            const nombre = document.getElementById("nombrePaciente").innerText;
+
             win.document.write(`
-                <html><body style="font-family:sans-serif; padding:20px; background:#f4f7f6;">
-                    <div style="background:white; padding:20px; border-radius:10px;">
-                        <h2 style="color:#2980b9;">Reporte de Evolución</h2>
-                        <p><b>Fecha:</b> ${fecha} | <b>Modalidad:</b> ${mod}</p>
-                        <hr><p style="white-space:pre-wrap;">${texto}</p>
-                        ${foto ? `<img src="${foto}" style="width:100%; border-radius:10px; margin-top:10px;">` : ""}
-                        <br><button onclick="window.close()" style="margin-top:20px; padding:10px; cursor:pointer;">Cerrar</button>
+                <html>
+                <head>
+                    <title>Reporte_Clinico_${nombre}</title>
+                    <style>
+                        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 40px; background: #fff; color: #333; }
+                        .container { max-width: 700px; margin: auto; border: 1px solid #eee; padding: 30px; border-radius: 8px; position: relative; }
+                        .header { text-align: center; border-bottom: 3px solid #2980b9; margin-bottom: 20px; padding-bottom: 10px; }
+                        h2 { color: #2980b9; margin: 0; text-transform: uppercase; }
+                        .meta { display: flex; justify-content: space-between; margin-bottom: 20px; font-size: 14px; color: #7f8c8d; }
+                        .contenido { background: #f9f9f9; padding: 20px; border-radius: 5px; min-height: 150px; margin-bottom: 20px; white-space: pre-wrap; line-height: 1.6; }
+                        .foto-evidencia { width: 100%; border-radius: 8px; margin-top: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+                        .no-print { text-align: center; margin-top: 30px; }
+                        button { padding: 10px 25px; cursor: pointer; border: none; border-radius: 5px; font-weight: bold; margin: 0 10px; }
+                        .btn-print { background: #27ae60; color: white; }
+                        .btn-close { background: #95a5a6; color: white; }
+                        
+                        /* Estilos para la impresión */
+                        @media print {
+                            .no-print { display: none; }
+                            body { padding: 0; }
+                            .container { border: none; }
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h2>Reporte de Evolución Terapéutica</h2>
+                            <p style="margin: 5px 0;">Paciente: <b>${nombre}</b></p>
+                        </div>
+                        
+                        <div class="meta">
+                            <span><b>Fecha:</b> ${fecha}</span>
+                            <span><b>Modalidad:</b> ${mod}</span>
+                        </div>
+                        
+                        <div class="contenido">${texto}</div>
+                        
+                        ${foto ? `<div style="text-align:center;"><p><b>Evidencia Fotográfica:</b></p><img src="${foto}" class="foto-evidencia"></div>` : ""}
+                        
+                        <div class="no-print">
+                            <button class="btn-print" onclick="window.print()">🖨️ Imprimir Reporte</button>
+                            <button class="btn-close" onclick="window.close()">Cerrar</button>
+                        </div>
                     </div>
-                </body></html>`);
+                </body>
+                </html>`);
         };
     </script>
