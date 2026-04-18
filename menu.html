@@ -3,79 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Menú de Pacientes</title>
-    <!-- Librerías estables -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <title>Panel de Control - Sistema Médico</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; }
-        nav { background: #2c3e50; padding: 15px; display: flex; justify-content: center; gap: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        nav a { color: white; text-decoration: none; font-weight: bold; }
-        .container { padding: 20px; max-width: 600px; margin: auto; }
-        .paciente-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 5px solid #2980b9; }
-        .paciente-card img { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid #ddd; }
-        .info { flex-grow: 1; }
-        .info strong { font-size: 18px; color: #2c3e50; }
-        .btn-ver { background: #2980b9; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        
+        /* Encabezado */
+        .header { background: #2c3e50; color: white; width: 100%; padding: 20px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
+        .btn-exit { background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; text-decoration: none; font-weight: bold; }
+
+        /* Botón Principal de Registro */
+        .registro-container { margin: 30px 0; }
+        .btn-registro { 
+            background: #27ae60; color: white; border: none; padding: 20px 40px; 
+            font-size: 20px; font-weight: bold; border-radius: 50px; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4); transition: 0.3s;
+        }
+        .btn-registro:hover { transform: scale(1.05); background: #219150; }
+
+        /* Cuadrícula de Opciones */
+        .grid-container { 
+            display: grid; grid-template-columns: repeat(2, 1fr); 
+            gap: 20px; max-width: 600px; width: 90%; 
+        }
+        .option-card { 
+            background: white; padding: 40px 20px; border-radius: 15px; 
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; 
+            transition: 0.3s; text-align: center; border-bottom: 5px solid #3498db;
+        }
+        .option-card:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+        .option-card h3 { margin: 0; color: #2c3e50; font-size: 18px; }
+        .option-card i { font-size: 30px; display: block; margin-bottom: 10px; }
+
+        /* Colores por sección */
+        .libros { border-color: #f1c40f; }
+        .historias { border-color: #3498db; }
+        .ingresos { border-color: #e67e22; }
+        .admin { border-color: #95a5a6; }
     </style>
 </head>
 <body>
 
-<nav>
-    <a href="index.html">📝 Registro</a>
-    <a href="menu.html">📋 Ver Pacientes</a>
-</nav>
-
-<div class="container">
-    <h2 style="text-align: center; color: #2c3e50;">Pacientes Registrados</h2>
-    <div id="listaPacientes" style="text-align: center; color: #7f8c8d; font-style: italic;">Buscando en la base de datos...</div>
+<div class="header">
+    <h2>🏥 Sistema de Gestión</h2>
+    <a href="https://google.com" class="btn-exit">Cerrar Sesión</a>
 </div>
 
-<script>
-    const firebaseConfig = {
-        apiKey: "AIzaSyC78y2K4T9rMFMVsG_UQxTmPANzV7Yapf8",
-        authDomain: "://firebaseapp.com",
-        projectId: "caminosnuevosdatabase",
-        storageBucket: "caminosnuevosdatabase.firebasestorage.app",
-        appId: "1:907500835423:web:f50b459a84f5d7d92a81ea"
-    };
+<!-- Botón de Registro (Lleva a la Cámara) -->
+<div class="registro-container">
+    <button class="btn-registro" onclick="window.location.href='index.html'">
+        ➕ AGREGAR PACIENTE
+    </button>
+</div>
 
-    // Inicializar Firebase
-    if (!firebase.apps.length) {
-        firebase.initializeApp(firebaseConfig);
-    }
-    const db = firebase.firestore();
+<!-- Cuadrícula de las 4 opciones principales -->
+<div class="grid-container">
+    <div class="option-card libros" onclick="window.location.href='libros.html'">
+        <h3>📚 Libros</h3>
+    </div>
+    <div class="option-card historias" onclick="window.location.href='carpetas.html'">
+        <h3>📋 Historias Clínicas</h3>
+    </div>
+    <div class="option-card ingresos" onclick="window.location.href='ingresos.html'">
+        <h3>📝 Libro de Ingresos</h3>
+    </div>
+    <div class="option-card admin" onclick="window.location.href='administracion.html'">
+        <h3>⚙️ Administración</h3>
+    </div>
+</div>
 
-    // Función para leer pacientes
-    db.collection("pacientes").onSnapshot((snapshot) => {
-        const lista = document.getElementById("listaPacientes");
-        
-        if (snapshot.empty) {
-            lista.innerHTML = "No hay pacientes registrados aún.";
-            return;
-        }
-
-        lista.innerHTML = ""; // Limpiar el "Cargando"
-        
-        snapshot.forEach((doc) => {
-            const p = doc.data();
-            lista.innerHTML += `
-                <div class="paciente-card">
-                    <img src="${p.foto || 'https://placeholder.com'}" alt="Foto">
-                    <div class="info">
-                        <strong>${p.nombre}</strong><br>
-                        <small>Registrado el: ${p.fecha || 'N/A'}</small>
-                    </div>
-                    <button class="btn-ver" onclick="location.href='carpetas.html?id=${doc.id}'">📂 Ver</button>
-                </div>
-            `;
-        });
-    }, (error) => {
-        console.error("Error de Firebase:", error);
-        document.getElementById("listaPacientes").innerHTML = "Error de conexión: " + error.message;
-    });
-</script>
-</body>
-</html>
 </body>
 </html>
