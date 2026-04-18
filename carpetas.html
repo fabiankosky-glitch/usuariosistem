@@ -41,16 +41,16 @@
 </div>
 
 <script type="module">
-    import { initializeApp } from "https://gstatic.com";
+     import { initializeApp } from "https://gstatic.com";
     import { getFirestore, collection, getDocs } from "https://gstatic.com";
 
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
     const firebaseConfig = {
-        apiKey: "AIzaSy...", // Tu clave real que empieza por AIza
+        apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
         authDomain: "://firebaseapp.com",
         projectId: "caminosnuevosdatabase",
         storageBucket: "caminosnuevosdatabase.firebasestorage.app",
-        appId: "1:907500835423:web:f56b459ab4d57de218abcc" 
+        messagingSenderId: "907500835423",
+        appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -60,42 +60,41 @@
         const lista = document.getElementById("listaPacientes");
         try {
             const querySnapshot = await getDocs(collection(db, "pacientes"));
+            lista.innerHTML = ""; 
+
             if (querySnapshot.empty) {
-                lista.innerHTML = "<p>No hay pacientes registrados aún.</p>";
+                lista.innerHTML = "<p>No hay pacientes registrados.</p>";
                 return;
             }
-            lista.innerHTML = "";
+
             querySnapshot.forEach((doc) => {
                 const p = doc.data();
                 const id = doc.id;
                 lista.innerHTML += `
-                    <div class="paciente-item" style="border: 1px solid #ddd; margin: 10px; padding: 10px; border-radius: 10px; background: white;">
-                        <div class="paciente-header" onclick="toggleFolders('${id}')" style="cursor:pointer; display:flex; align-items:center;">
-                            <img src="${p.foto || 'https://placeholder.com'}" width="60" style="border-radius:50%; margin-right:15px;">
+                    <div style="border:1px solid #ccc; margin:10px; padding:15px; border-radius:12px; background:white; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                        <div onclick="toggleFolders('${id}')" style="cursor:pointer; display:flex; align-items:center;">
+                            <img src="${p.foto || 'https://placeholder.com'}" width="50" height="50" style="border-radius:50%; margin-right:15px; object-fit: cover;">
                             <div style="text-align:left;">
-                                <h3 style="margin:0;">${p.nombre}</h3>
-                                <small>ID: ${p.cedula || 'N/A'}</small>
+                                <strong style="font-size:16px;">${p.nombre}</strong><br>
+                                <small style="color: #666;">ID: ${p.cedula || 'N/A'}</small>
                             </div>
                         </div>
-                        <div id="folders-${id}" style="display:none; margin-top:10px; gap:5px; justify-content:center;">
-                            <button onclick="window.location.href='detalle_clinico.html?id=${id}'" style="background:#3498db; color:white; border:none; padding:10px; border-radius:5px;">Clínico</button>
-                            <button onclick="window.location.href='detalle_terapeutico.html?id=${id}'" style="background:#27ae60; color:white; border:none; padding:10px; border-radius:5px;">Terapéutico</button>
-                            <button onclick="window.location.href='detalle_psicologico.html?id=${id}'" style="background:#8e44ad; color:white; border:none; padding:10px; border-radius:5px;">Psicológico</button>
+                        <div id="folders-${id}" style="display:none; margin-top:15px; border-top:1px solid #eee; padding-top:10px;">
+                            <button onclick="window.location.href='detalle_clinico.html?id=${id}'" style="background:#3498db; color:white; border:none; padding:8px 12px; margin:3px; border-radius:5px; cursor:pointer;">📁 Clínico</button>
+                            <button onclick="window.location.href='detalle_terapeutico.html?id=${id}'" style="background:#27ae60; color:white; border:none; padding:8px 12px; margin:3px; border-radius:5px; cursor:pointer;">📁 Terapéutico</button>
+                            <button onclick="window.location.href='detalle_psicologico.html?id=${id}'" style="background:#8e44ad; color:white; border:none; padding:8px 12px; margin:3px; border-radius:5px; cursor:pointer;">📁 Psicológico</button>
                         </div>
                     </div>`;
             });
-        } catch (e) { 
+        } catch (e) {
+            lista.innerHTML = "Error al conectar con la base de datos.";
             console.error(e);
-            lista.innerHTML = "Error de conexión con Firebase."; 
         }
     }
 
     window.toggleFolders = (id) => {
         const div = document.getElementById(`folders-${id}`);
-        div.style.display = (div.style.display === 'flex') ? 'none' : 'flex';
+        div.style.display = (div.style.display === 'block') ? 'none' : 'block';
     };
 
     cargarPacientes();
-</script>
-</body>
-</html>
