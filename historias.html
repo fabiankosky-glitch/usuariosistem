@@ -69,7 +69,7 @@
                 
                 grupos[cat].forEach(p => {
                     // Usamos fotoID que es el campo donde guardas la imagen
-                    const imagenUrl = p.fotoID || 'https://placeholder.com👤';
+                    const imagenUrl = p.fotoID || p.foto || 'https://placeholder.com👤';
                     
                     div.innerHTML += `
                         <div class="paciente-card" style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
