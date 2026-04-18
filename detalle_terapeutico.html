@@ -5,48 +5,75 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Folder Terapéutico</title>
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; padding: 20px; text-align: center; }
-        .header { background: #27ae60; color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
-        .btn-accion { width: 80%; max-width: 300px; padding: 15px; margin: 10px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .btn-add { background: #2ecc71; }
-        .btn-show { background: #34495e; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; text-align: center; padding: 20px; }
+        .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 500px; margin: 0 auto; }
+        h2, h3 { color: #2c3e50; }
         
-        /* Contenedor de Formulario (Oculto al inicio) */
-        #seccionAgregar { display: none; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-top: 20px; }
-        textarea { width: 100%; height: 100px; margin-top: 10px; border-radius: 5px; border: 1px solid #ddd; padding: 10px; }
+        /* Botones de Menú Principal */
+        .btn-menu { width: 90%; max-width: 350px; padding: 20px; margin: 10px; border: none; border-radius: 12px; color: white; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-add { background: #27ae60; }
+        .btn-show { background: #2980b9; }
+        .btn-menu:hover { opacity: 0.9; transform: scale(1.02); }
+
+        /* Formulario y Inputs */
+        select, textarea { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
+        textarea { height: 120px; resize: none; }
+        .preview-camera { background: black; width: 100%; height: 200px; border-radius: 10px; margin: 10px 0; display: flex; align-items: center; justify-content: center; color: white; overflow: hidden; }
         
-        /* Estilo para el historial */
-        #historial { margin-top: 20px; text-align: left; max-width: 500px; margin-left: auto; margin-right: auto; }
-        .registro-card { background: #fff; padding: 15px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid #27ae60; position: relative; }
-        .lock-icon { position: absolute; right: 10px; top: 10px; font-size: 18px; }
+        /* Botones de acción dentro de secciones */
+        .btn-accion { width: 100%; padding: 15px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        
+        /* Historial */
+        .registro-item { background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: left; border-left: 6px solid #27ae60; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h2 id="nombrePaciente">Cargando...</h2>
-        <p>📁 Folder Terapéutico</p>
+    <div id="header">
+        <h2 id="nombrePaciente">Cargando Paciente...</h2>
+        <hr style="width: 50%; border: 1px solid #ddd;">
     </div>
 
-    <!-- BOTONES PRINCIPALES -->
-    <button class="btn-accion btn-add" onclick="mostrarFormulario()">➕ Agregar Evolución</button>
-    <button class="btn-accion btn-show" onclick="cargarHistorial()">👁️ Mostrar Historial</button>
-
-    <!-- SECCIÓN PARA AGREGAR (Cámara + Texto) -->
-    <div id="seccionAgregar">
-        <h3>Nueva Entrada</h3>
-        <p>1. Capture Documento/Evidencia:</p>
-        <input type="file" accept="image/*" capture="camera" id="fotoEvidencia" style="margin-bottom: 15px;">
-        
-        <p>2. Redacte la Evolución:</p>
-        <textarea id="textoEvolucion" placeholder="Escriba aquí los avances..."></textarea>
-        
-        <button class="btn-accion btn-add" style="width:100%" onclick="guardarEnNube()">✅ Guardar y Bloquear</button>
-        <button onclick="cerrarFormulario()" style="background:none; border:none; color:red; cursor:pointer;">Cancelar</button>
+    <!-- 1. MENÚ DE INICIO (Los dos botones comunes) -->
+    <div id="menuPrincipal">
+        <button class="btn-menu btn-add" onclick="abrirFormulario()">➕ Nueva Evolución</button>
+        <button class="btn-menu btn-show" onclick="verHistorial()">👁️ Ver Historial Terapéutico</button>
+        <br><br>
+        <a href="historias.html" style="text-decoration:none; color:#7f8c8d; font-weight:bold;">⬅ Volver a Pacientes</a>
     </div>
 
-    <!-- SECCIÓN PARA MOSTRAR DATOS -->
-    <div id="historial"></div>
+    <!-- 2. SECCIÓN AGREGAR (Cámara + Evolución) -->
+    <div id="seccionAgregar" style="display: none;" class="card">
+        <h3>📓 Nueva Evolución</h3>
+        
+        <label>Modalidad de Terapia:</label>
+        <select id="modalidad">
+            <option>Individual</option>
+            <option>De Grupo</option>
+            <option>Confrontación</option>
+            <option>Feedback</option>
+        </select>
+
+        <div class="preview-camera">
+            <span id="txtCamara">Cámara no iniciada</span>
+            <img id="imgPreview" style="width:100%; height:100%; object-fit:cover; display:none;">
+        </div>
+
+        <input type="file" accept="image/*" capture="camera" id="inputCamara" style="display:none;" onchange="previsualizarFoto(event)">
+        <button class="btn-accion" style="background:#3498db" onclick="document.getElementById('inputCamara').click()">📸 Tomar Foto de Documento</button>
+
+        <textarea id="textoEvolucion" placeholder="Escriba aquí la evolución del paciente..."></textarea>
+
+        <button class="btn-accion" style="background:#27ae60" onclick="guardarRegistro()">🚀 Guardar Registro Protegido</button>
+        <button class="btn-accion" style="background:#95a5a6" onclick="volver()">Cancelar</button>
+    </div>
+
+    <!-- 3. SECCIÓN MOSTRAR (Historial) -->
+    <div id="seccionHistorial" style="display: none;" class="card">
+        <h3>📋 Evoluciones Guardadas</h3>
+        <div id="listaEvoluciones">Buscando registros...</div>
+        <button class="btn-accion" style="background:#95a5a6" onclick="volver()">Volver al Menú</button>
+    </div>
 
     <script type="module">
         import { initializeApp } from "https://gstatic.com";
@@ -63,73 +90,94 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Obtener ID del paciente desde la URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const pacienteId = urlParams.get('id');
+        // Obtener el ID del paciente de la URL
+        const params = new URLSearchParams(window.location.search);
+        const idPaciente = params.get("id");
 
-        // Cargar nombre del paciente al iniciar
-        async function obtenerNombre() {
-            const docRef = doc(db, "pacientes", pacienteId);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-                document.getElementById("nombrePaciente").innerText = docSnap.data().nombre;
+        // Cargar nombre del paciente
+        async function cargarDatosPaciente() {
+            if (!idPaciente) return;
+            const snap = await getDoc(doc(db, "pacientes", idPaciente));
+            if (snap.exists()) {
+                document.getElementById("nombrePaciente").innerText = snap.data().nombre;
             }
         }
-        obtenerNombre();
+        cargarDatosPaciente();
 
-        // Funciones de Interfaz
-        window.mostrarFormulario = () => {
+        // --- NAVEGACIÓN ---
+        window.abrirFormulario = () => {
+            document.getElementById("menuPrincipal").style.display = "none";
             document.getElementById("seccionAgregar").style.display = "block";
-            document.getElementById("historial").innerHTML = "";
         };
-        window.cerrarFormulario = () => document.getElementById("seccionAgregar").style.display = "none";
 
-        // GUARDAR EN LA NUBE
-        window.guardarEnNube = async () => {
+        window.verHistorial = async () => {
+            document.getElementById("menuPrincipal").style.display = "none";
+            document.getElementById("seccionHistorial").style.display = "block";
+            
+            const lista = document.getElementById("listaEvoluciones");
+            lista.innerHTML = "Cargando...";
+
+            const q = query(collection(db, "evoluciones_terapeuticas"), where("idPaciente", "==", idPaciente), orderBy("fecha", "desc"));
+            const querySnapshot = await getDocs(q);
+            
+            lista.innerHTML = "";
+            if (querySnapshot.empty) {
+                lista.innerHTML = "No hay evoluciones registradas.";
+                return;
+            }
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const fecha = new Date(data.fecha).toLocaleString();
+                lista.innerHTML += `
+                    <div class="registro-item">
+                        <strong>📅 ${fecha}</strong> | 🏷️ ${data.modalidad}<br>
+                        <p style="margin:10px 0;">${data.texto}</p>
+                        <small style="color:green;">🔒 Registro Protegido</small>
+                    </div>`;
+            });
+        };
+
+        window.volver = () => {
+            document.getElementById("menuPrincipal").style.display = "block";
+            document.getElementById("seccionAgregar").style.display = "none";
+            document.getElementById("seccionHistorial").style.display = "none";
+        };
+
+        // --- LÓGICA DE CÁMARA Y GUARDADO ---
+        window.previsualizarFoto = (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById("imgPreview").src = e.target.result;
+                    document.getElementById("imgPreview").style.display = "block";
+                    document.getElementById("txtCamara").style.display = "none";
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+
+        window.guardarRegistro = async () => {
             const texto = document.getElementById("textoEvolucion").value;
-            if(!texto) return alert("Por favor escriba la evolución");
+            const mod = document.getElementById("modalidad").value;
+
+            if (!texto) return alert("Escriba la evolución antes de guardar.");
 
             try {
                 await addDoc(collection(db, "evoluciones_terapeuticas"), {
-                    idPaciente: pacienteId,
-                    evolucion: texto,
+                    idPaciente: idPaciente,
+                    modalidad: mod,
+                    texto: texto,
                     fecha: Date.now(),
-                    tipo: "Terapéutico",
                     bloqueado: true
                 });
-                alert("Registro Guardado Exitosamente");
-                location.reload(); // Recargar para limpiar todo
+                alert("✅ Registro guardado y bloqueado en la nube.");
+                volver();
             } catch (e) {
                 alert("Error al guardar: " + e.message);
             }
         };
-
-        // CARGAR HISTORIAL
-        window.cargarHistorial = async () => {
-            const container = document.getElementById("historial");
-            container.innerHTML = "Cargando historial...";
-            document.getElementById("seccionAgregar").style.display = "none";
-
-            const q = query(
-                collection(db, "evoluciones_terapeuticas"), 
-                where("idPaciente", "==", pacienteId),
-                orderBy("fecha", "desc")
-            );
-
-            const querySnapshot = await getDocs(q);
-            container.innerHTML = "";
-
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                const fecha = new Date(data.fecha).toLocaleDateString();
-                container.innerHTML += `
-                    <div class="registro-card">
-                        <span class="lock-icon">🔒</span>
-                        <strong>Fecha: ${fecha}</strong><br>
-                        <p>${data.evolucion}</p>
-                    </div>`;
-            });
-        });
     </script>
 </body>
 </html>
