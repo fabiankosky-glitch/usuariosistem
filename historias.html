@@ -33,18 +33,17 @@
         <div class="categoria-section"><div class="categoria-header movilizaciones" onclick="toggleLista('lista-movilizaciones')"><span>🔵 MOVILIZACIONES</span><span id="count-movilizaciones">0</span></div><div id="lista-movilizaciones" class="paciente-lista"></div></div>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://gstatic.com";
-        // AQUÍ ESTÁ EL CAMBIO: Se agregó onSnapshot a la lista
-        import { getFirestore, collection, onSnapshot } from "https://gstatic.com";
-
+   <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore,  onSnapshot, collection, addDoc, query, where, getDocs, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
-            authDomain: "://firebaseapp.com",
+            authDomain: "caminosnuevosdatabase.firebaseapp.com",
             projectId: "caminosnuevosdatabase",
             storageBucket: "caminosnuevosdatabase.firebasestorage.app",
             appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
         };
+
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
