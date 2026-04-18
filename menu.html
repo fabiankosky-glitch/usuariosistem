@@ -2,18 +2,21 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Menú de Pacientes</title>
+    <!-- Librerías estables -->
     <script src="https://gstatic.com"></script>
     <script src="https://gstatic.com"></script>
     <style>
-        body { font-family: sans-serif; background: #f4f7f6; margin: 0; }
-        nav { background: #2c3e50; padding: 15px; display: flex; justify-content: center; gap: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; }
+        nav { background: #2c3e50; padding: 15px; display: flex; justify-content: center; gap: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         nav a { color: white; text-decoration: none; font-weight: bold; }
-        .container { padding: 20px; max-width: 800px; margin: auto; }
-        .paciente-card { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; align-items: center; gap: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .paciente-card img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; }
+        .container { padding: 20px; max-width: 600px; margin: auto; }
+        .paciente-card { background: white; padding: 15px; border-radius: 12px; margin-bottom: 15px; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-left: 5px solid #2980b9; }
+        .paciente-card img { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid #ddd; }
         .info { flex-grow: 1; }
-        .btn-ver { background: #2980b9; color: white; padding: 8px 15px; border-radius: 5px; text-decoration: none; font-size: 14px; }
+        .info strong { font-size: 18px; color: #2c3e50; }
+        .btn-ver { background: #2980b9; color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -24,8 +27,8 @@
 </nav>
 
 <div class="container">
-    <h2>Pacientes Registrados</h2>
-    <div id="listaPacientes">Cargando...</div>
+    <h2 style="text-align: center; color: #2c3e50;">Pacientes Registrados</h2>
+    <div id="listaPacientes" style="text-align: center; color: #7f8c8d; font-style: italic;">Buscando en la base de datos...</div>
 </div>
 
 <script>
@@ -36,25 +39,43 @@
         storageBucket: "caminosnuevosdatabase.firebasestorage.app",
         appId: "1:907500835423:web:f50b459a84f5d7d92a81ea"
     };
-    firebase.initializeApp(firebaseConfig);
+
+    // Inicializar Firebase
+    if (!firebase.apps.length) {
+        firebase.initializeApp(firebaseConfig);
+    }
     const db = firebase.firestore();
 
-    db.collection("pacientes").orderBy("fecha", "desc").onSnapshot((snapshot) => {
+    // Función para leer pacientes
+    db.collection("pacientes").onSnapshot((snapshot) => {
         const lista = document.getElementById("listaPacientes");
-        lista.innerHTML = "";
+        
+        if (snapshot.empty) {
+            lista.innerHTML = "No hay pacientes registrados aún.";
+            return;
+        }
+
+        lista.innerHTML = ""; // Limpiar el "Cargando"
+        
         snapshot.forEach((doc) => {
-            const data = doc.data();
+            const p = doc.data();
             lista.innerHTML += `
                 <div class="paciente-card">
-                    <img src="${data.foto}">
+                    <img src="${p.foto || 'https://placeholder.com'}" alt="Foto">
                     <div class="info">
-                        <strong>${data.nombre}</strong><br>
-                        <small>${data.fecha}</small>
+                        <strong>${p.nombre}</strong><br>
+                        <small>Registrado el: ${p.fecha || 'N/A'}</small>
                     </div>
-                    <button onclick="alert('Abriendo carpetas de ${data.nombre}')" class="btn-ver">📂 Ver Carpetas</button>
-                </div>`;
+                    <button class="btn-ver" onclick="location.href='carpetas.html?id=${doc.id}'">📂 Ver</button>
+                </div>
+            `;
         });
+    }, (error) => {
+        console.error("Error de Firebase:", error);
+        document.getElementById("listaPacientes").innerHTML = "Error de conexión: " + error.message;
     });
 </script>
+</body>
+</html>
 </body>
 </html>
