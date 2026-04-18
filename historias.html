@@ -60,12 +60,30 @@
                 const estado = p.estado || "activos";
                 if (grupos[estado]) grupos[estado].push(p);
             });
-            Object.keys(grupos).forEach(cat => {
+    Object.keys(grupos).forEach(cat => {
                 const div = document.getElementById(`lista-${cat}`);
-                document.getElementById(`count-${cat}`).innerText = grupos[cat].length;
+                const count = document.getElementById(`count-${cat}`);
+                count.innerText = grupos[cat].length;
+                
                 div.innerHTML = grupos[cat].length === 0 ? "<p style='color:gray; padding:10px;'>Vacio</p>" : "";
+                
                 grupos[cat].forEach(p => {
-                    div.innerHTML += `<div class="paciente-card"><div><strong>${p.nombre}</strong></div><button class="btn-ver" onclick="window.location.href='perfil_paciente.html?id=${p.id}'">📂 Abrir</button></div>`;
+                    // Usamos fotoID que es el campo donde guardas la imagen
+                    const imagenUrl = p.fotoID || 'https://placeholder.com👤';
+                    
+                    div.innerHTML += `
+                        <div class="paciente-card" style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
+                            <div style="display:flex; align-items:center; text-align:left;">
+                                <img src="${imagenUrl}" style="width:45px; height:45px; border-radius:50%; object-fit:cover; margin-right:12px; border:2px solid #ddd;">
+                                <div>
+                                    <strong>${p.nombre}</strong>
+                                </div>
+                            </div>
+                            <button class="btn-ver" onclick="window.location.href='perfil_paciente.html?id=${p.id}'" 
+                                    style="background:#2c3e50; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer; font-weight:bold;">
+                                📂 Abrir
+                            </button>
+                        </div>`;
                 });
             });
         });
