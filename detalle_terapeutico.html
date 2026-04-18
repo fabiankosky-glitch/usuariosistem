@@ -54,26 +54,27 @@
             <option>Feedback</option>
         </select>
 
-  <div class="preview-camera">
-            <span id="txtCamara">Cámara no iniciada</span>
+        <!-- 1. CÁMARA CORREGIDA: Usamos <video> para ver la imagen en vivo -->
+        <div class="preview-camera" style="background: #000; border-radius: 10px; overflow: hidden; height: 250px; display: flex; align-items: center; justify-content: center;">
+            <video id="video" autoplay playsinline style="width:100%; height:100%; object-fit:cover;"></video>
             <img id="imgPreview" style="width:100%; height:100%; object-fit:cover; display:none;">
+            <canvas id="canvas" style="display:none;"></canvas>
         </div>
 
-        <input type="file" accept="image/*" capture="camera" id="inputCamara" style="display:none;" onchange="window.previsualizarFoto(event)">
-        
-        <button class="btn-accion" style="background:#3498db" onclick="document.getElementById('inputCamara').click()">📸 Tomar Foto de Documento</button>
+        <!-- El botón ahora ejecuta la captura del video -->
+        <button class="btn-accion" style="background:#3498db" onclick="window.tomarFoto()">📸 Tomar Foto de Documento</button>
 
         <textarea id="textoEvolucion" placeholder="Escriba aquí la evolución del paciente..."></textarea>
 
-        <button class="btn-accion" style="background:#27ae60" onclick="guardarRegistro()">🚀 Guardar Registro Protegido</button>
-        <button class="btn-accion" style="background:#95a5a6" onclick="volver()">Cancelar</button>
+        <button class="btn-accion" style="background:#27ae60" onclick="window.guardarRegistro()">🚀 Guardar Registro Protegido</button>
+        <button class="btn-accion" style="background:#95a5a6" onclick="window.volver()">Cancelar</button>
     </div>
 
     <!-- 3. SECCIÓN MOSTRAR (Historial) -->
     <div id="seccionHistorial" style="display: none;" class="card">
         <h3>📋 Evoluciones Guardadas</h3>
         <div id="listaEvoluciones">Buscando registros...</div>
-        <button class="btn-accion" style="background:#95a5a6" onclick="volver()">Volver al Menú</button>
+        <button class="btn-accion" style="background:#95a5a6" onclick="window.volver()">Volver al Menú</button>
     </div>
 
    <script type="module">
@@ -81,7 +82,7 @@
         import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
-            authDomain: "://firebaseapp.com",
+            authDomain: "caminosnuevosdatabase.firebaseapp.com",
             projectId: "caminosnuevosdatabase",
             storageBucket: "caminosnuevosdatabase.firebasestorage.app",
             appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
@@ -90,11 +91,34 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Obtener el ID del paciente de la URL
         const params = new URLSearchParams(window.location.search);
         const idPaciente = params.get("id");
 
-        // Cargar nombre del paciente
+        // --- LÓGICA DE CÁMARA INTEGRADA ---
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const imgPreview = document.getElementById('imgPreview');
+        let fotoBase64 = null;
+
+        // Encender cámara al entrar
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => { video.srcObject = stream; })
+            .catch(err => console.error("Error al iniciar cámara:", err));
+
+        window.tomarFoto = () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            fotoBase64 = canvas.toDataURL('image/jpeg', 0.5);
+            
+            // Mostrar vista previa y ocultar video
+            imgPreview.src = fotoBase64;
+            imgPreview.style.display = "block";
+            video.style.display = "none";
+            alert("📸 Foto del documento capturada");
+        };
+
+        // --- TU LÓGICA ORIGINAL DE PACIENTE ---
         async function cargarDatosPaciente() {
             if (!idPaciente) return;
             const snap = await getDoc(doc(db, "pacientes", idPaciente));
@@ -104,13 +128,34 @@
         }
         cargarDatosPaciente();
 
-        // --- NAVEGACIÓN ---
-        window.abrirFormulario = () => {
-            document.getElementById("menuPrincipal").style.display = "none";
-            document.getElementById("seccionAgregar").style.display = "block";
+        window.volver = () => { location.reload(); };
+
+        // --- TU LÓGICA DE GUARDADO (Ahora con la foto del video) ---
+        window.guardarRegistro = async () => {
+            const texto = document.getElementById("textoEvolucion").value;
+            const mod = document.getElementById("modalidad").value;
+
+            if (!texto) return alert("Escriba la evolución antes de guardar.");
+            if (!fotoBase64) return alert("Por favor tome una foto del documento.");
+
+            try {
+                await addDoc(collection(db, "evoluciones_terapeuticas"), {
+                    idPaciente: idPaciente,
+                    modalidad: mod,
+                    texto: texto,
+                    fotoDoc: fotoBase64, // Usamos la foto capturada del video
+                    fecha: Date.now(),
+                    bloqueado: true
+                });
+                alert("✅ Registro y Foto guardados correctamente.");
+                window.location.reload();
+            } catch (e) {
+                alert("Error al guardar: " + e.message);
+            }
         };
 
-       window.verHistorial = async () => {
+        // --- TU LÓGICA DE HISTORIAL (Sin cambios) ---
+        window.verHistorial = async () => {
             document.getElementById("menuPrincipal").style.display = "none";
             document.getElementById("seccionHistorial").style.display = "block";
             const lista = document.getElementById("listaEvoluciones");
@@ -148,57 +193,22 @@
             } catch (e) { lista.innerHTML = "Error: " + e.message; }
         };
 
-        // 1. REEMPLAZA LA FUNCIÓN QUE ABRE EL DETALLE (PARA QUE MUESTRE LA FOTO)
         window.verDetalleCompleto = (mod, fechaRaw, texto, foto) => {
             const fecha = new Date(Number(fechaRaw)).toLocaleString();
             const nombre = document.getElementById("nombrePaciente").innerText;
             const win = window.open("", "_blank", "width=650,height=850");
-            
             win.document.write(`
                 <html>
-                <head><title>Detalle de Evolución</title></head>
-                <body style="font-family:sans-serif; padding:30px; line-height:1.6; background:#f4f7f6;">
-                    <div style="background:white; padding:20px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.1); max-width:600px; margin:auto;">
-                        <h2 style="color:#2980b9; text-align:center; border-bottom:2px solid #2980b9; padding-bottom:10px;">📄 REPORTE: ${nombre}</h2>
+                <body style="font-family:sans-serif; padding:30px; background:#f4f7f6;">
+                    <div style="background:white; padding:20px; border-radius:10px; max-width:600px; margin:auto;">
+                        <h2 style="color:#2980b9; border-bottom:2px solid #2980b9;">📄 REPORTE: ${nombre}</h2>
                         <p><strong>Fecha:</strong> ${fecha} | <strong>Modalidad:</strong> ${mod}</p>
                         <div style="background:#f9f9f9; padding:15px; border-radius:8px; border:1px solid #eee; white-space:pre-wrap;">${texto}</div>
-                        
-                        ${foto ? `
-                        <div style="margin-top:20px; text-align:center;">
-                            <p><strong>Evidencia del Documento:</strong></p>
-                            <img src="${foto}" style="width:100%; border-radius:10px; border:1px solid #ddd;">
-                        </div>` : "<p style='color:grey; text-align:center; margin-top:20px;'>Sin foto adjunta</p>"}
-                        
-                        <br><center><button onclick="window.close()" style="padding:10px 20px; cursor:pointer; background:#95a5a6; color:white; border:none; border-radius:5px; font-weight:bold;">Cerrar Documento</button></center>
+                        ${foto ? `<img src="${foto}" style="width:100%; margin-top:20px; border-radius:10px;">` : ""}
+                        <br><center><button onclick="window.close()" style="margin-top:20px; padding:10px; background:#95a5a6; color:white; border:none; border-radius:5px;">Cerrar</button></center>
                     </div>
                 </body>
                 </html>
             `);
         };
-
-        // --- LÓGICA DE CÁMARA Y GUARDADO ---
-window.guardarRegistro = async () => {
-    const texto = document.getElementById("textoEvolucion").value;
-    const mod = document.getElementById("modalidad").value;
-    const fotoData = document.getElementById("imgPreview").src; // Esto toma la foto de la cámara
-
-    if (!texto) return alert("Escriba la evolución antes de guardar.");
-
-    try {
-        await addDoc(collection(db, "evoluciones_terapeuticas"), {
-            idPaciente: idPaciente,
-            modalidad: mod,
-            texto: texto,
-            fotoDoc: fotoData, // Guardamos la foto como texto largo (Base64)
-            fecha: Date.now(),
-            bloqueado: true
-        });
-        alert("✅ Registro y Foto guardados correctamente.");
-        volver();
-    } catch (e) {
-        alert("Error al guardar: " + e.message);
-    }
-};
     </script>
-</body>
-</html>
