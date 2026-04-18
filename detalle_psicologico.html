@@ -91,28 +91,48 @@
         };
 
         window.verHistorial = async () => {
+            if(!idPaciente) return alert("Error: ID de paciente no encontrado.");
             document.getElementById("menuPrincipal").style.display = "none";
             document.getElementById("seccionHistorial").style.display = "block";
             const lista = document.getElementById("listaEvoluciones");
             lista.innerHTML = "Cargando...";
 
-            const q = query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente), orderBy("fecha", "desc"));
-            const snap = await getDocs(q);
-            lista.innerHTML = snap.empty ? "No hay registros aún." : "";
-            snap.forEach((doc) => {
-                const data = doc.data();
-                const fechaTexto = new Date(data.fecha).toLocaleString();
-                lista.innerHTML += `
-                    <div class="registro-item" style="display:flex; justify-content:space-between; align-items:center;">
-                        <div style="text-align:left;">
-                            <strong>📅 ${fechaTexto}</strong><br><small>🧠 ${data.aspectos}</small>
-                        </div>
-                        <button onclick="verDetalleCompleto('${data.aspectos}', '${data.fecha}', \`${data.texto}\`, '${data.fotoDoc || ""}')" 
-                                style="background:#2980b9; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;">👁️ Ver</button>
-                    </div>`;
-            });
-        };
+            try {
+                // 1. Consulta simple sin 'orderBy' para evitar bloqueos
+                const q = query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente));
+                const querySnapshot = await getDocs(q);
+                
+                lista.innerHTML = "";
+                if (querySnapshot.empty) {
+                    lista.innerHTML = "No hay registros psicológicos aún.";
+                    return;
+                }
 
+                // 2. Ordenamos manualmente por fecha (de más reciente a más antiguo)
+                const registros = [];
+                querySnapshot.forEach(doc => registros.push({id: doc.id, ...doc.data()}));
+                registros.sort((a, b) => b.fecha - a.fecha);
+
+                // 3. Mostramos los datos
+                registros.forEach((d) => {
+                    const fechaTexto = new Date(d.fecha).toLocaleString();
+                    lista.innerHTML += `
+                        <div class="registro-item" style="display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid #eee; background:white; margin-bottom:5px; border-radius:8px;">
+                            <div style="text-align:left;">
+                                <strong>📅 ${fechaTexto}</strong><br>
+                                <small style="color:#7f8c8d;">🧠 ${d.aspectos || "Sin observaciones"}</small>
+                            </div>
+                            <button onclick="verDetalleCompleto('${d.aspectos}', '${d.fecha}', \`${d.texto}\`, '${d.fotoDoc || ""}')" 
+                                    style="background:#2980b9; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;">
+                                👁️ Ver
+                            </button>
+                        </div>`;
+                });
+            } catch (e) { 
+                console.error("Error:", e);
+                lista.innerHTML = "Error al conectar: " + e.message; 
+            }
+        };
         // 3. CAPTURA Y GUARDADO
         window.tomarFoto = () => {
             const video = document.getElementById('video');
