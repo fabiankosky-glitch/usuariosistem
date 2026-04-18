@@ -94,31 +94,14 @@
         const params = new URLSearchParams(window.location.search);
         const idPaciente = params.get("id");
 
-        // --- LÓGICA DE CÁMARA INTEGRADA ---
+        // --- REFERENCIAS DE CÁMARA ---
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
         const imgPreview = document.getElementById('imgPreview');
         let fotoBase64 = null;
+        let streamCamara = null; // Para poder apagarla luego
 
-        // Encender cámara al entrar
-        navigator.mediaDevices.getUserMedia({ video: true })
-            .then(stream => { video.srcObject = stream; })
-            .catch(err => console.error("Error al iniciar cámara:", err));
-
-        window.tomarFoto = () => {
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            fotoBase64 = canvas.toDataURL('image/jpeg', 0.5);
-            
-            // Mostrar vista previa y ocultar video
-            imgPreview.src = fotoBase64;
-            imgPreview.style.display = "block";
-            video.style.display = "none";
-            alert("📸 Foto del documento capturada");
-        };
-
-        // --- TU LÓGICA ORIGINAL DE PACIENTE ---
+        // --- CARGAR DATOS INICIALES ---
         async function cargarDatosPaciente() {
             if (!idPaciente) return;
             const snap = await getDoc(doc(db, "pacientes", idPaciente));
@@ -128,33 +111,21 @@
         }
         cargarDatosPaciente();
 
-        window.volver = () => { location.reload(); };
-
-        // --- TU LÓGICA DE GUARDADO (Ahora con la foto del video) ---
-        window.guardarRegistro = async () => {
-            const texto = document.getElementById("textoEvolucion").value;
-            const mod = document.getElementById("modalidad").value;
-
-            if (!texto) return alert("Escriba la evolución antes de guardar.");
-            if (!fotoBase64) return alert("Por favor tome una foto del documento.");
-
-            try {
-                await addDoc(collection(db, "evoluciones_terapeuticas"), {
-                    idPaciente: idPaciente,
-                    modalidad: mod,
-                    texto: texto,
-                    fotoDoc: fotoBase64, // Usamos la foto capturada del video
-                    fecha: Date.now(),
-                    bloqueado: true
-                });
-                alert("✅ Registro y Foto guardados correctamente.");
-                window.location.reload();
-            } catch (e) {
-                alert("Error al guardar: " + e.message);
-            }
+        // --- FUNCIONES DE NAVEGACIÓN ---
+        window.abrirFormulario = () => {
+            // 1. Cambiamos de vista
+            document.getElementById("menuPrincipal").style.display = "none";
+            document.getElementById("seccionAgregar").style.display = "block";
+            
+            // 2. ENCENDER CÁMARA SOLO AQUÍ
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => { 
+                    streamCamara = stream;
+                    video.srcObject = stream; 
+                })
+                .catch(err => alert("Error: Por favor permite el uso de la cámara en el candado de arriba."));
         };
 
-        // --- TU LÓGICA DE HISTORIAL (Sin cambios) ---
         window.verHistorial = async () => {
             document.getElementById("menuPrincipal").style.display = "none";
             document.getElementById("seccionHistorial").style.display = "block";
@@ -193,6 +164,49 @@
             } catch (e) { lista.innerHTML = "Error: " + e.message; }
         };
 
+        window.volver = () => {
+            // Apagar cámara si estaba encendida para ahorrar batería
+            if (streamCamara) {
+                streamCamara.getTracks().forEach(track => track.stop());
+            }
+            window.location.reload(); 
+        };
+
+        // --- LÓGICA DE CAPTURA Y GUARDADO ---
+        window.tomarFoto = () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            fotoBase64 = canvas.toDataURL('image/jpeg', 0.5);
+            
+            imgPreview.src = fotoBase64;
+            imgPreview.style.display = "block";
+            video.style.display = "none";
+            alert("📸 Foto capturada correctamente");
+        };
+
+        window.guardarRegistro = async () => {
+            const texto = document.getElementById("textoEvolucion").value;
+            const mod = document.getElementById("modalidad").value;
+
+            if (!texto) return alert("Escriba la evolución antes de guardar.");
+            if (!fotoBase64) return alert("Tome una foto del documento.");
+
+            try {
+                await addDoc(collection(db, "evoluciones_terapeuticas"), {
+                    idPaciente: idPaciente,
+                    modalidad: mod,
+                    texto: texto,
+                    fotoDoc: fotoBase64,
+                    fecha: Date.now(),
+                    bloqueado: true
+                });
+                alert("✅ Registro guardado con éxito.");
+                window.location.reload();
+            } catch (e) { alert("Error al guardar: " + e.message); }
+        };
+
+        // Función para ver el reporte detallado
         window.verDetalleCompleto = (mod, fechaRaw, texto, foto) => {
             const fecha = new Date(Number(fechaRaw)).toLocaleString();
             const nombre = document.getElementById("nombrePaciente").innerText;
