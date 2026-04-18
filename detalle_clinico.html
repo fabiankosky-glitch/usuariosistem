@@ -100,18 +100,29 @@
         cargarNombre();
 
         // 2. NAVEGACIÓN Y CÁMARA (Lógica Inteligente)
-        window.abrirFormulario = () => {
-            document.getElementById("menuPrincipal").style.display = "none";
-            document.getElementById("seccionAgregar").style.display = "block";
-            
-            const video = document.getElementById('video');
-            navigator.mediaDevices.getUserMedia({ video: true })
-                .then(stream => { 
-                    streamActivo = stream;
-                    video.srcObject = stream; 
-                })
-                .catch(err => alert("Error de cámara: Por favor activa los permisos."));
-        };
+window.abrirFormulario = () => {
+    document.getElementById("menuPrincipal").style.display = "none";
+    document.getElementById("seccionAgregar").style.display = "block";
+    
+    const video = document.getElementById('video');
+
+    // CONFIGURACIÓN SENCILLA: Forzar cámara trasera (environment)
+    navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: "environment" } 
+    })
+    .then(stream => { 
+        streamActivo = stream;
+        video.srcObject = stream; 
+    })
+    .catch(err => {
+        // Si falla la trasera (ej. en PC), intenta con cualquier cámara disponible
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => { 
+                streamActivo = stream;
+                video.srcObject = stream; 
+            });
+    });
+};
 
         window.tomarFoto = () => {
             const video = document.getElementById('video');
