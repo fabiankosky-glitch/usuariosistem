@@ -2,13 +2,18 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Historias Clínicas</title>
     <style>
-        body { font-family: sans-serif; background: #f0f2f5; text-align: center; padding: 20px; }
-        .btn-volver { background: #95a5a6; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; margin-bottom: 20px; font-weight: bold; }
-        .paciente-card { background: white; border-radius: 12px; margin: 10px auto; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 450px; border-left: 5px solid #3498db; }
-        .folders { display: none; margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee; justify-content: center; gap: 5px; }
-        .btn-f { padding: 10px; border: none; border-radius: 5px; color: white; cursor: pointer; font-size: 12px; font-weight: bold; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; text-align: center; padding: 20px; color: #333; }
+        .btn-volver { background: #95a5a6; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; margin-bottom: 20px; font-weight: bold; transition: background 0.3s; }
+        .btn-volver:hover { background: #7f8c8d; }
+        .paciente-card { background: white; border-radius: 12px; margin: 15px auto; padding: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-width: 450px; border-left: 6px solid #3498db; transition: transform 0.2s; }
+        .paciente-card:hover { transform: translateY(-2px); }
+        .folders { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #eee; justify-content: space-around; gap: 8px; flex-wrap: wrap; }
+        .btn-f { padding: 12px; border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 13px; font-weight: bold; flex: 1; min-width: 100px; transition: opacity 0.2s; }
+        .btn-f:hover { opacity: 0.9; }
+        .avatar { border-radius: 50%; margin-right: 15px; object-fit: cover; background: #e0e0e0; border: 2px solid #3498db; }
     </style>
 </head>
 <body>
@@ -18,13 +23,9 @@
     <div id="listaPacientes">Cargando pacientes...</div>
 
     <script type="module">
-// LÍNEA 1 (Únela toda)
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// LÍNEA 2 (Únela toda)
-import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        // Configuración de tu base de datos
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
             authDomain: "caminosnuevosdatabase.firebaseapp.com",
@@ -33,13 +34,16 @@ import { getFirestore, collection, getDocs } from "https://www.gstatic.com/fireb
             appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
         };
 
-  const app = initializeApp(firebaseConfig);
+        const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
         async function cargarPacientes() {
             const lista = document.getElementById("listaPacientes");
             try {
-                const querySnapshot = await getDocs(collection(db, "pacientes"));
+                // He añadido "orderBy" para que salgan en orden alfabético
+                const q = query(collection(db, "pacientes"), orderBy("nombre", "asc"));
+                const querySnapshot = await getDocs(q);
+                
                 lista.innerHTML = ""; 
                 
                 if (querySnapshot.empty) {
@@ -50,19 +54,22 @@ import { getFirestore, collection, getDocs } from "https://www.gstatic.com/fireb
                 querySnapshot.forEach((doc) => {
                     const p = doc.data();
                     const id = doc.id;
+                    // Imagen por defecto si el paciente no tiene foto
+                    const fotoUrl = p.foto && p.foto !== "" ? p.foto : "https://flaticon.com";
+
                     lista.innerHTML += `
                         <div class="paciente-card">
                             <div onclick="window.toggleF('${id}')" style="cursor:pointer; display:flex; align-items:center;">
-                                <img src="${p.foto || ''}" width="50" height="50" style="border-radius:50%; margin-right:15px; object-fit:cover; background:#eee;">
+                                <img src="${fotoUrl}" class="avatar" width="55" height="55">
                                 <div style="text-align:left;">
-                                    <strong style="font-size:18px;">${p.nombre}</strong><br>
-                                    <small style="color:#3498db;">Ver Carpetas ▼</small>
+                                    <strong style="font-size:18px; color:#2c3e50;">${p.nombre}</strong><br>
+                                    <small style="color:#3498db; font-weight:bold;">Ver Carpetas ▼</small>
                                 </div>
                             </div>
                             <div id="f-${id}" class="folders">
-                                <button class="btn-f" style="background:#3498db" onclick="window.location.href='detalle_clinico.html?id=${id}'">📁 Clínico</button>
-                                <button class="btn-f" style="background:#27ae60" onclick="window.location.href='detalle_terapeutico.html?id=${id}'">📁 Terapéutico</button>
-                                <button class="btn-f" style="background:#8e44ad" onclick="window.location.href='detalle_psicologico.html?id=${id}'">📁 Psicológico</button>
+                                <button class="btn-f" style="background:#3498db" onclick="location.href='detalle_clinico.html?id=${id}'">📁 Clínico</button>
+                                <button class="btn-f" style="background:#27ae60" onclick="location.href='detalle_terapeutico.html?id=${id}'">📁 Terapéutico</button>
+                                <button class="btn-f" style="background:#8e44ad" onclick="location.href='detalle_psicologico.html?id=${id}'">📁 Psicológico</button>
                             </div>
                         </div>`;
                 });
@@ -72,13 +79,15 @@ import { getFirestore, collection, getDocs } from "https://www.gstatic.com/fireb
             }
         }
 
+        // Función para abrir/cerrar las carpetas
         window.toggleF = (id) => {
             const d = document.getElementById('f-' + id);
-            if (d.style.display === "flex") {
-                d.style.display = "none";
-            } else {
-                d.style.display = "flex";
-            }
+            const isVisible = d.style.display === "flex";
+            
+            // Opcional: Cerrar todas las demás antes de abrir la nueva
+            document.querySelectorAll('.folders').forEach(f => f.style.display = "none");
+            
+            d.style.display = isVisible ? "none" : "flex";
         };
 
         cargarPacientes();
