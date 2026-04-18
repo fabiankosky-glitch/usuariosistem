@@ -1,11 +1,46 @@
-   <script type="module">
-        // 1. CORRECCIÓN: Añadido 'onSnapshot' a la importación
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, query, where, getDocs, onSnapshot, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Historias Clínicas</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; text-align: center; }
+        .container { max-width: 800px; margin: auto; }
+        .categoria-section { margin-bottom: 15px; text-align: left; }
+        .categoria-header { 
+            padding: 12px 20px; border-radius: 10px; color: white; font-weight: bold; 
+            display: flex; justify-content: space-between; align-items: center;
+            cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .activos { background: #27ae60; }
+        .desprendimiento { background: #16a085; }
+        .abandonos { background: #f39c12; }
+        .fugas { background: #e74c3c; }
+        .movilizaciones { background: #3498db; }
+        .paciente-lista { background: white; border-radius: 0 0 10px 10px; padding: 5px 15px; margin-top: -5px; border: 1px solid #ddd; display: none; }
+        .paciente-card { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; align-items: center; }
+        .btn-ver { background: #2c3e50; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>📊 Control de Historias Clínicas</h2>
+        <p>Haz clic en una categoría para desplegar</p>
+        <div class="categoria-section"><div class="categoria-header activos" onclick="toggleLista('lista-activos')"><span>🟢 USUARIOS ACTIVOS</span><span id="count-activos">0</span></div><div id="lista-activos" class="paciente-lista"></div></div>
+        <div class="categoria-section"><div class="categoria-header desprendimiento" onclick="toggleLista('lista-desprendimiento')"><span>🤝 DESPRENDIMIENTO</span><span id="count-desprendimiento">0</span></div><div id="lista-desprendimiento" class="paciente-lista"></div></div>
+        <div class="categoria-section"><div class="categoria-header abandonos" onclick="toggleLista('lista-abandonos')"><span>🟠 ABANDONOS</span><span id="count-abandonos">0</span></div><div id="lista-abandonos" class="paciente-lista"></div></div>
+        <div class="categoria-section"><div class="categoria-header fugas" onclick="toggleLista('lista-fugas')"><span>🔴 FUGAS</span><span id="count-fugas">0</span></div><div id="lista-fugas" class="paciente-lista"></div></div>
+        <div class="categoria-section"><div class="categoria-header movilizaciones" onclick="toggleLista('lista-movilizaciones')"><span>🔵 MOVILIZACIONES</span><span id="count-movilizaciones">0</span></div><div id="lista-movilizaciones" class="paciente-lista"></div></div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://gstatic.com";
+        // AQUÍ ESTÁ EL CAMBIO: Se agregó onSnapshot a la lista
+        import { getFirestore, collection, onSnapshot } from "https://gstatic.com";
+
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
-            authDomain: "caminosnuevosdatabase.firebaseapp.com",
+            authDomain: "://firebaseapp.com",
             projectId: "caminosnuevosdatabase",
             storageBucket: "caminosnuevosdatabase.firebasestorage.app",
             appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
@@ -14,54 +49,28 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Función para abrir/cerrar las listas (Debe ser window para que el HTML la vea)
         window.toggleLista = (id) => {
             const el = document.getElementById(id);
-            if (el.style.display === "block") {
-                el.style.display = "none";
-            } else {
-                el.style.display = "block";
-            }
+            el.style.display = (el.style.display === "block") ? "none" : "block";
         };
 
-        // 2. LÓGICA DE ESCUCHA EN TIEMPO REAL
         onSnapshot(collection(db, "pacientes"), (snapshot) => {
             const grupos = { activos: [], desprendimiento: [], abandonos: [], fugas: [], movilizaciones: [] };
-
             snapshot.forEach((doc) => {
                 const p = { id: doc.id, ...doc.data() };
                 const estado = p.estado || "activos";
-                if (grupos[estado]) {
-                    grupos[estado].push(p);
-                }
+                if (grupos[estado]) grupos[estado].push(p);
             });
-
-            // Actualizar cada sección visual
-            Object.keys(grupos).forEach(cat => renderizarGrupo(cat, grupos[cat]));
+            Object.keys(grupos).forEach(cat => {
+                const div = document.getElementById(`lista-${cat}`);
+                document.getElementById(`count-${cat}`).innerText = grupos[cat].length;
+                div.innerHTML = grupos[cat].length === 0 ? "<p style='color:gray; padding:10px;'>Vacio</p>" : "";
+                grupos[cat].forEach(p => {
+                    div.innerHTML += `<div class="paciente-card"><div><strong>${p.nombre}</strong></div><button class="btn-ver" onclick="window.location.href='perfil_paciente.html?id=${p.id}'">📂 Abrir</button></div>`;
+                });
+            });
         });
-
-        function renderizarGrupo(cat, pacientes) {
-            const div = document.getElementById(`lista-${cat}`);
-            const count = document.getElementById(`count-${cat}`);
-            if (!div || !count) return;
-
-            count.innerText = pacientes.length;
-            div.innerHTML = pacientes.length === 0 ? "<p style='color:gray; padding:10px;'>Sin pacientes en esta categoría.</p>" : "";
-            
-            pacientes.forEach(p => {
-                div.innerHTML += `
-                    <div class="paciente-card" style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
-                        <div style="text-align:left;">
-                            <strong>${p.nombre}</strong><br>
-                            <small style="color:gray;">ID: ${p.id.substring(0,5)}</small>
-                        </div>
-                        <button class="btn-ver" onclick="window.location.href='perfil_paciente.html?id=${p.id}'" 
-                                style="background:#2c3e50; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer; font-weight:bold;">
-                            📂 Abrir
-                        </button>
-                    </div>`;
-            });
-        }
     </script>
 </body>
+</html>
 </html>
