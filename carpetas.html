@@ -96,9 +96,13 @@ import { getFirestore, collection, getDoc } from "https://www.gstatic.com/fireba
         }
     }
 
-    window.toggleFolders = (id) => {
-        const div = document.getElementById(`folders-${id}`);
-        div.style.display = (div.style.display === 'block') ? 'none' : 'block';
-    };
+window.toggleFolders = (id) => {
+    const div = document.getElementById('folders-' + id);
+    if (div.style.display === 'none' || div.style.display === '') {
+        div.style.display = 'block';
+    } else {
+        div.style.display = 'none';
+    }
+};
 
-    cargarPacientes();
+cargarPacientes();
