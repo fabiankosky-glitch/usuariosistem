@@ -109,17 +109,15 @@
             document.getElementById("seccionAgregar").style.display = "block";
         };
 
-        window.verHistorial = async () => {
+       window.verHistorial = async () => {
             document.getElementById("menuPrincipal").style.display = "none";
             document.getElementById("seccionHistorial").style.display = "block";
-            
             const lista = document.getElementById("listaEvoluciones");
             lista.innerHTML = "Cargando...";
 
             try {
                 const q = query(collection(db, "evoluciones_terapeuticas"), where("idPaciente", "==", idPaciente), orderBy("fecha", "desc"));
                 const querySnapshot = await getDocs(q);
-                
                 lista.innerHTML = "";
                 if (querySnapshot.empty) {
                     lista.innerHTML = "No hay registros aún.";
@@ -129,17 +127,15 @@
                 querySnapshot.forEach((doc) => {
                     const data = doc.data();
                     const fechaTexto = new Date(data.fecha).toLocaleString();
-                    
-                    // Miniatura de la foto si existe
-                    const fotoMini = data.fotoDoc ? `<img src="${data.fotoDoc}" style="width:40px; height:40px; border-radius:5px; object-fit:cover; margin-right:10px; border:1px solid #ddd;">` : "";
+                    const fotoMini = data.fotoDoc ? `<img src="${data.fotoDoc}" style="width:40px; height:40px; border-radius:5px; object-fit:cover; margin-right:10px; border:1px solid #ddd;">` : "📄 ";
 
                     lista.innerHTML += `
-                        <div class="registro-item" style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
+                        <div class="registro-item" style="display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid #eee; background:white; margin-bottom:5px; border-radius:8px;">
                             <div style="text-align:left; display:flex; align-items:center;">
                                 ${fotoMini}
                                 <div>
-                                    <strong>📅 ${fechaTexto}</strong><br>
-                                    <small>🏷️ ${data.modalidad}</small>
+                                    <strong style="font-size:14px;">📅 ${fechaTexto}</strong><br>
+                                    <small style="color:#7f8c8d;">🏷️ ${data.modalidad}</small>
                                 </div>
                             </div>
                             <button onclick="verDetalleCompleto('${data.modalidad}', '${data.fecha}', \`${data.texto}\`, '${data.fotoDoc || ""}')" 
@@ -148,11 +144,23 @@
                             </button>
                         </div>`;
                 });
-            } catch (e) {
-                lista.innerHTML = "Error al cargar: " + e.message;
-            }
+            } catch (e) { lista.innerHTML = "Error: " + e.message; }
         };
 
+        window.verDetalleCompleto = (mod, fechaRaw, texto, foto) => {
+            const fecha = new Date(Number(fechaRaw)).toLocaleString();
+            const win = window.open("", "_blank", "width=600,height=800");
+            win.document.write(`
+                <html>
+                <body style="font-family:sans-serif; padding:30px; line-height:1.6;">
+                    <h2 style="color:#2980b9; border-bottom:2px solid #2980b9;">📄 Detalle de Evolución</h2>
+                    <p><strong>Modalidad:</strong> ${mod} | <strong>Fecha:</strong> ${fecha}</p>
+                    <div style="background:#f9f9f9; padding:15px; border-radius:8px; white-space:pre-wrap;">${texto}</div>
+                    ${foto ? `<div style="margin-top:20px; text-align:center;"><img src="${foto}" style="width:100%; border-radius:10px;"></div>` : ""}
+                    <br><center><button onclick="window.close()" style="padding:10px 20px; cursor:pointer;">Cerrar</button></center>
+                </body>
+                </html>`);
+        };
         // ESTA FUNCIÓN ES LA QUE ABRE LA VENTANA CON EL DOCUMENTO
         window.verDetalleCompleto = (mod, fechaRaw, texto, foto) => {
             const fecha = new Date(Number(fechaRaw)).toLocaleString();
