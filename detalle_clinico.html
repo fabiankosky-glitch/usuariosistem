@@ -74,19 +74,16 @@
         <button class="btn-accion" style="background:#95a5a6" onclick="window.volver()">Volver al Menú</button>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://gstatic.com";
-        import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, doc, getDoc } from "https://gstatic.com";
-
-        // CONFIGURACIÓN DE TU FIREBASE (Misma que usas siempre)
+   <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
-            authDomain: "://firebaseapp.com",
+            authDomain: "caminosnuevosdatabase.firebaseapp.com",
             projectId: "caminosnuevosdatabase",
             storageBucket: "caminosnuevosdatabase.firebasestorage.app",
             appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
         };
-
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const params = new URLSearchParams(window.location.search);
