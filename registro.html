@@ -15,14 +15,61 @@
         <h2>Registro de Paciente</h2>
         <input type="text" id="nombre" placeholder="Nombre completo">
         <video id="video" autoplay playsinline></video>
+        <canvas id="canvas" style="display:none;"></canvas>
         <button id="btnCapturar">📸 TOMAR FOTO</button>
         <button id="btnGuardar" style="background: #2ecc71;">🚀 GUARDAR Y CREAR CARPETAS</button>
         <button onclick="window.location.href='index.html'" style="background: #95a5a6;">⬅ VOLVER</button>
     </div>
 
     <script type="module">
-        // AQUÍ VA TU CONFIGURACIÓN DE FIREBASE QUE YA TENÍAS
-        // ... (Cámara y lógica de guardado)
+        import { initializeApp } from "https://gstatic.com";
+        import { getFirestore, collection, addDoc } from "https://gstatic.com";
+
+        // PON TUS DATOS REALES AQUÍ:
+        const firebaseConfig = {
+            apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+            authDomain: "://firebaseapp.com",
+            projectId: "caminosnuevosdatabase",
+            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+            appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        let fotoData = null;
+
+        // Encender cámara
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(s => video.srcObject = s)
+            .catch(e => alert("Error cámara: " + e));
+
+        // Capturar foto
+        document.getElementById('btnCapturar').onclick = () => {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            fotoData = canvas.toDataURL('image/jpeg');
+            alert("¡Foto capturada! ✅");
+        };
+
+        // Guardar en Firebase
+        document.getElementById('btnGuardar').onclick = async () => {
+            const nombre = document.getElementById('nombre').value;
+            if(!nombre || !fotoData) return alert("Falta nombre o foto");
+
+            try {
+                await addDoc(collection(db, "pacientes"), {
+                    nombre: nombre,
+                    foto: fotoData,
+                    fecha: new Promise(r => r(new Date().toISOString()))
+                });
+                alert("Paciente registrado con éxito");
+                window.location.href = "index.html";
+            } catch (e) { alert("Error al guardar: " + e); }
+        };
     </script>
 </body>
 </html>
