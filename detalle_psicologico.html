@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Evolución Psicológica</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #f4f7f6; text-align: center; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 500px; margin: auto; border-top: 5px solid #8e44ad; }
+        textarea, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; }
+        button { background: #8e44ad; color: white; border: none; font-weight: bold; cursor: pointer; }
+        #btnCamara { background: #2980b9; }
+        video, canvas { width: 100%; border-radius: 10px; background: #000; }
+        canvas { display: none; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <h2>🧠 Nota Psicológica</h2>
+    <video id="video" autoplay playsinline></video>
+    <button id="btnCamara">📸 Anexar Foto de Test / Prueba</button>
+    <canvas id="canvas"></canvas>
+
+    <textarea id="evolucion" rows="5" placeholder="Escribe la evolución psicológica..."></textarea>
+    <button id="btnGuardar">🔒 Guardar Registro Protegido</button>
+</div>
+<!-- Aquí va el mismo script de Firebase que usaste en la terapéutica -->
+</body>
+</html>
