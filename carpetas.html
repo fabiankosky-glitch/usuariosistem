@@ -1,51 +1,26 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Historias Clínicas - Pacientes</title>
+    <title>Historias Clínicas</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; text-align: center; }
-        .container { max-width: 800px; margin: auto; }
-        .btn-volver { background: #95a5a6; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-bottom: 20px; font-weight: bold; }
-        
-        /* Tarjeta del Paciente */
-        .paciente-item { background: white; border-radius: 12px; margin-bottom: 15px; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: 0.3s; }
-        .paciente-header { padding: 15px; display: flex; align-items: center; cursor: pointer; background: #fff; }
-        .paciente-header:hover { background: #f9f9f9; }
-        .paciente-header img { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; margin-right: 15px; border: 2px solid #3498db; }
-        .paciente-info { text-align: left; flex-grow: 1; }
-        .paciente-info h3 { margin: 0; color: #2c3e50; font-size: 18px; }
-        
-        /* Contenedor de las 3 Carpetas (Oculto por defecto) */
-        .folders-container { 
-            display: none; /* Se activa con JS */
-            padding: 15px; background: #f8f9fa; border-top: 1px solid #eee;
-            grid-template-columns: repeat(3, 1fr); gap: 10px;
-        }
-        .btn-folder { 
-            padding: 12px; border: none; border-radius: 8px; color: white; 
-            font-weight: bold; cursor: pointer; font-size: 13px; transition: 0.2s;
-        }
-        .clinico { background: #3498db; }
-        .terapeutico { background: #27ae60; }
-        .psicologico { background: #8e44ad; }
-        .btn-folder:hover { opacity: 0.8; transform: translateY(-2px); }
+        body { font-family: sans-serif; background: #f0f2f5; text-align: center; padding: 20px; }
+        .btn-volver { background: #95a5a6; color: white; border: none; padding: 10px; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-block; margin-bottom: 20px; }
+        .paciente-card { background: white; border-radius: 12px; margin: 10px auto; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 450px; }
+        .folders { display: none; margin-top: 15px; padding-top: 10px; border-top: 1px solid #eee; }
+        .btn-f { padding: 8px; border: none; border-radius: 5px; color: white; margin: 3px; cursor: pointer; font-size: 12px; }
     </style>
 </head>
 <body>
-
-<div class="container">
-    <button class="btn-volver" onclick="window.location.href='menu.html'">⬅ Volver al Menú</button>
+    <a href="index.html" class="btn-volver">⬅ Volver al Menú</a>
     <h2>📋 Historias Clínicas</h2>
     <div id="listaPacientes">Cargando pacientes...</div>
-</div>
 
-<script type="module">
+    <script type="module">
 // LÍNEA 1 (Únela toda)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 
 // LÍNEA 2 (Únela toda)
-import { getFirestore, collection, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // Configuración de tu base de datos
         const firebaseConfig = {
@@ -56,53 +31,39 @@ import { getFirestore, collection, getDoc } from "https://www.gstatic.com/fireba
             appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
         };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
- async function cargarPacientes() {
-        const lista = document.getElementById("listaPacientes");
-        try {
-            const querySnapshot = await getDocs(collection(db, "pacientes"));
-            
-            if (querySnapshot.empty) {
-                lista.innerHTML = "<p>No hay pacientes registrados aún.</p>";
-                return;
-            }
-
-            lista.innerHTML = ""; // Limpiamos el "Cargando..."
-            
-            querySnapshot.forEach((doc) => {
-                const p = doc.data();
-                const id = doc.id;
-                lista.innerHTML += `
-                    <div style="border:1px solid #ccc; margin:10px; padding:15px; border-radius:12px; background:white;">
-                        <div onclick="toggleFolders('${id}')" style="cursor:pointer; display:flex; align-items:center;">
-                            <img src="${p.foto || 'https://placeholder.com'}" width="50" height="50" style="border-radius:50%; margin-right:15px; object-fit: cover;">
-                            <div style="text-align:left;">
-                                <strong>${p.nombre}</strong><br>
-                                <small>ID: ${p.cedula || 'N/A'}</small>
+        async function cargarPacientes() {
+            const lista = document.getElementById("listaPacientes");
+            try {
+                const querySnapshot = await getDocs(collection(db, "pacientes"));
+                lista.innerHTML = ""; 
+                querySnapshot.forEach((doc) => {
+                    const p = doc.data();
+                    const id = doc.id;
+                    lista.innerHTML += `
+                        <div class="paciente-card">
+                            <div onclick="toggleF('${id}')" style="cursor:pointer; display:flex; align-items:center;">
+                                <img src="${p.foto}" width="50" height="50" style="border-radius:50%; margin-right:15px; object-fit:cover;">
+                                <strong>${p.nombre}</strong>
                             </div>
-                        </div>
-                        <div id="folders-${id}" style="display:none; margin-top:15px; border-top:1px solid #eee; padding-top:10px;">
-                            <button onclick="window.location.href='detalle_clinico.html?id=${id}'" style="background:#3498db; color:white; border:none; padding:8px; border-radius:5px; margin:2px;">📁 Clínico</button>
-                            <button onclick="window.location.href='detalle_terapeutico.html?id=${id}'" style="background:#27ae60; color:white; border:none; padding:8px; border-radius:5px; margin:2px;">📁 Terapéutico</button>
-                            <button onclick="window.location.href='detalle_psicologico.html?id=${id}'" style="background:#8e44ad; color:white; border:none; padding:8px; border-radius:5px; margin:2px;">📁 Psicológico</button>
-                        </div>
-                    </div>`;
-            });
-        } catch (e) {
-            console.error("Error en Firebase:", e);
-            lista.innerHTML = "Error al conectar con la base de datos.";
+                            <div id="f-${id}" class="folders">
+                                <button class="btn-f" style="background:#3498db" onclick="location.href='detalle_clinico.html?id=${id}'">Clínico</button>
+                                <button class="btn-f" style="background:#27ae60" onclick="location.href='detalle_terapeutico.html?id=${id}'">Terapéutico</button>
+                                <button class="btn-f" style="background:#8e44ad" onclick="location.href='detalle_psicologico.html?id=${id}'">Psicológico</button>
+                            </div>
+                        </div>`;
+                });
+            } catch (e) { lista.innerHTML = "Error de conexión."; }
         }
-    }
 
-window.toggleFolders = (id) => {
-    const div = document.getElementById('folders-' + id);
-    if (div.style.display === 'none' || div.style.display === '') {
-        div.style.display = 'block';
-    } else {
-        div.style.display = 'none';
-    }
-};
+        window.toggleF = (id) => {
+            const d = document.getElementById('f-' + id);
+            d.style.display = (d.style.display === 'block') ? 'none' : 'block';
+        };
 
-cargarPacientes();
+        cargarPacientes();
+    </script>
+</body>
+</html>
