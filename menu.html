@@ -5,34 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Panel de Control - Sistema Médico</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; display: flex; flex-direction: column; align-items: center; }
         
-        /* Encabezado */
-        .header { background: #2c3e50; color: white; width: 100%; padding: 20px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
-        .btn-exit { background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; text-decoration: none; font-weight: bold; }
+        /* Barra Superior */
+        .header { background: #2c3e50; color: white; width: 100%; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
+        .btn-exit { background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; text-decoration: none; font-weight: bold; font-size: 14px; }
 
-        /* Botón Principal de Registro */
-        .registro-container { margin: 30px 0; }
+        /* Botón de Registro Destacado */
+        .main-action { margin: 30px 0; width: 90%; max-width: 400px; }
         .btn-registro { 
-            background: #27ae60; color: white; border: none; padding: 20px 40px; 
-            font-size: 20px; font-weight: bold; border-radius: 50px; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4); transition: 0.3s;
+            width: 100%; background: #27ae60; color: white; border: none; padding: 20px; 
+            font-size: 18px; font-weight: bold; border-radius: 12px; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3); transition: 0.3s;
         }
-        .btn-registro:hover { transform: scale(1.05); background: #219150; }
+        .btn-registro:hover { transform: scale(1.02); background: #219150; }
 
-        /* Cuadrícula de Opciones */
-        .grid-container { 
+        /* Cuadrícula de las 4 Secciones */
+        .menu-grid { 
             display: grid; grid-template-columns: repeat(2, 1fr); 
-            gap: 20px; max-width: 600px; width: 90%; 
+            gap: 15px; width: 90%; max-width: 400px; 
         }
-        .option-card { 
-            background: white; padding: 40px 20px; border-radius: 15px; 
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1); cursor: pointer; 
-            transition: 0.3s; text-align: center; border-bottom: 5px solid #3498db;
+        .menu-item { 
+            background: white; padding: 30px 10px; border-radius: 12px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); text-align: center; 
+            cursor: pointer; transition: 0.2s; border-bottom: 4px solid #3498db;
         }
-        .option-card:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
-        .option-card h3 { margin: 0; color: #2c3e50; font-size: 18px; }
-        .option-card i { font-size: 30px; display: block; margin-bottom: 10px; }
+        .menu-item:hover { background: #f8f9fa; transform: translateY(-3px); }
+        .menu-item h3 { margin: 0; font-size: 16px; color: #34495e; }
 
         /* Colores por sección */
         .libros { border-color: #f1c40f; }
@@ -44,29 +43,29 @@
 <body>
 
 <div class="header">
-    <h2>🏥 Sistema de Gestión</h2>
-    <a href="https://google.com" class="btn-exit">Cerrar Sesión</a>
+    <h2 style="margin:0; font-size: 18px;">🏥 Sistema Médico</h2>
+    <a href="https://google.com" class="btn-exit">SALIR</a>
 </div>
 
-<!-- Botón de Registro (Lleva a la Cámara) -->
-<div class="registro-container">
+<!-- Acción Principal -->
+<div class="main-action">
     <button class="btn-registro" onclick="window.location.href='index.html'">
-        ➕ AGREGAR PACIENTE
+        ➕ REGISTRAR PACIENTE
     </button>
 </div>
 
-<!-- Cuadrícula de las 4 opciones principales -->
-<div class="grid-container">
-    <div class="option-card libros" onclick="window.location.href='libros.html'">
+<!-- Las 4 Opciones de tu Menú -->
+<div class="menu-grid">
+    <div class="menu-item libros" onclick="window.location.href='libros.html'">
         <h3>📚 Libros</h3>
     </div>
-    <div class="option-card historias" onclick="window.location.href='carpetas.html'">
+    <div class="menu-item historias" onclick="window.location.href='carpetas.html'">
         <h3>📋 Historias Clínicas</h3>
     </div>
-    <div class="option-card ingresos" onclick="window.location.href='ingresos.html'">
+    <div class="menu-item ingresos" onclick="window.location.href='ingresos.html'">
         <h3>📝 Libro de Ingresos</h3>
     </div>
-    <div class="option-card admin" onclick="window.location.href='administracion.html'">
+    <div class="menu-item admin" onclick="window.location.href='administracion.html'">
         <h3>⚙️ Administración</h3>
     </div>
 </div>
