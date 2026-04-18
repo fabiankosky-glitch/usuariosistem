@@ -54,12 +54,13 @@
             <option>Feedback</option>
         </select>
 
-        <div class="preview-camera">
+  <div class="preview-camera">
             <span id="txtCamara">Cámara no iniciada</span>
             <img id="imgPreview" style="width:100%; height:100%; object-fit:cover; display:none;">
         </div>
 
-        <input type="file" accept="image/*" capture="camera" id="inputCamara" style="display:none;" onchange="previsualizarFoto(event)">
+        <input type="file" accept="image/*" capture="camera" id="inputCamara" style="display:none;" onchange="window.previsualizarFoto(event)">
+        
         <button class="btn-accion" style="background:#3498db" onclick="document.getElementById('inputCamara').click()">📸 Tomar Foto de Documento</button>
 
         <textarea id="textoEvolucion" placeholder="Escriba aquí la evolución del paciente..."></textarea>
