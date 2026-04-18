@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Gestión de Historias Clínicas</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 20px; text-align: center; }
+        .container { max-width: 850px; margin: auto; }
+        
+        .categoria-section { margin-bottom: 15px; text-align: left; }
+        .categoria-header { 
+            padding: 12px 20px; 
+            border-radius: 10px; 
+            color: white; 
+            font-weight: bold; 
+            display: flex; 
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        /* COLORES DE LAS 5 CATEGORÍAS */
+        .activos { background: #27ae60; }         /* Verde */
+        .desprendimiento { background: #16a085; } /* Turquesa */
+        .abandonos { background: #f39c12; }      /* Naranja */
+        .fugas { background: #e74c3c; }          /* Rojo */
+        .movilizaciones { background: #3498db; }  /* Azul */
+
+        .paciente-lista { background: white; border-radius: 0 0 10px 10px; padding: 5px 15px; margin-top: -5px; border: 1px solid #ddd; display: none; }
+        .paciente-card { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 12px 0; 
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+        .paciente-card:last-child { border-bottom: none; }
+        
+        .count-badge { background: rgba(255,255,255,0.3); padding: 2px 10px; border-radius: 20px; font-size: 14px; }
+        .btn-ver { background: #2c3e50; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>📊 Control de Historias Clínicas</h2>
+        <p style="color: #666;">Seleccione una categoría para ver los pacientes</p>
+        <hr><br>
+
+        <!-- 1. USUARIOS ACTIVOS -->
+        <div class="categoria-section">
+            <div class="categoria-header activos" onclick="toggleLista('lista-activos')">
+                <span>🟢 1. USUARIOS ACTIVOS</span>
+                <span class="count-badge" id="count-activos">0</span>
+            </div>
+            <div id="lista-activos" class="paciente-lista">Cargando...</div>
+        </div>
+
+        <!-- 2. DESPRENDIMIENTO -->
+        <div class="categoria-section">
+            <div class="categoria-header desprendimiento" onclick="toggleLista('lista-desprendimiento')">
+                <span>🤝 2. DESPRENDIMIENTO</span>
+                <span class="count-badge" id="count-desprendimiento">0</span>
+            </div>
+            <div id="lista-desprendimiento" class="paciente-lista">Cargando...</div>
+        </div>
+
+        <!-- 3. ABANDONOS -->
+        <div class="categoria-section">
+            <div class="categoria-header abandonos" onclick="toggleLista('lista-abandonos')">
+                <span>🟠 3. ABANDONOS</span>
+                <span class="count-badge" id="count-abandonos">0</span>
+            </div>
+            <div id="lista-abandonos" class="paciente-lista">Cargando...</div>
+        </div>
+
+        <!-- 4. FUGAS -->
+        <div class="categoria-section">
+            <div class="categoria-header fugas" onclick="toggleLista('lista-fugas')">
+                <span>🔴 4. FUGAS</span>
+                <span class="count-badge" id="count-fugas">0</span>
+            </div>
+            <div id="lista-fugas" class="paciente-lista">Cargando...</div>
+        </div>
+
+        <!-- 5. MOVILIZACIONES -->
+        <div class="categoria-section">
+            <div class="categoria-header movilizaciones" onclick="toggleLista('lista-movilizaciones')">
+                <span>🔵 5. MOVILIZACIONES</span>
+                <span class="count-badge" id="count-movilizaciones">0</span>
+            </div>
+            <div id="lista-movilizaciones" class="paciente-lista">Cargando...</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://gstatic.com";
+        import { getFirestore, collection, onSnapshot } from "https://gstatic.com";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+            authDomain: "://firebaseapp.com",
+            projectId: "caminosnuevosdatabase",
+            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+            appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Función para abrir/cerrar las listas
+        window.toggleLista = (id) => {
+            const el = document.getElementById(id);
+            el.style.display = (el.style.display === "block") ? "none" : "block";
+        };
+
+        // Escuchar pacientes en tiempo real
+        onSnapshot(collection(db, "pacientes"), (snapshot) => {
+            const grupos = { activos: [], desprendimiento: [], abandonos: [], fugas: [], movilizaciones: [] };
+
+            snapshot.forEach((doc) => {
+                const p = { id: doc.id, ...doc.data() };
+                const estado = p.estado || "activos";
+                if (grupos[estado]) grupos[estado].push(p);
+            });
+
+            Object.keys(grupos).forEach(cat => renderizarGrupo(cat, grupos[cat]));
+        });
+
+        function renderizarGrupo(cat, pacientes) {
+            const div = document.getElementById(`lista-${cat}`);
+            const count = document.getElementById(`count-${cat}`);
+            count.innerText = pacientes.length;
+            
+            div.innerHTML = pacientes.length === 0 ? "<p style='color:gray; padding:10px;'>Sin pacientes.</p>" : "";
+            pacientes.forEach(p => {
+                div.innerHTML += `
+                    <div class="paciente-card">
+                        <div><strong>${p.nombre}</strong><br><small>${p.documento || 'Sin ID'}</small></div>
+                        <button class="btn-ver" onclick="window.location.href='perfil_paciente.html?id=${p.id}'">📂 Abrir</button>
+                    </div>`;
+            });
+        }
+    </script>
+</body>
+</html>
