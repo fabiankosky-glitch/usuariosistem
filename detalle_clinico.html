@@ -1,29 +1,224 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Evolución Clínica</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Folder Médico - Sistema de Salud</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f4f7f6; text-align: center; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 500px; margin: auto; border-top: 5px solid #3498db; }
-        input, textarea, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; }
-        button { background: #3498db; color: white; border: none; font-weight: bold; cursor: pointer; }
-        #btnCamara { background: #2980b9; }
-        video, canvas { width: 100%; border-radius: 10px; background: #000; }
-        canvas { display: none; }
+        /* ESTILOS PROFESIONALES (Igual que el Terapéutico para consistencia) */
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; text-align: center; padding: 20px; }
+        .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 500px; margin: 0 auto; }
+        h2 { color: #2c3e50; margin-bottom: 5px; }
+        
+        /* Botones de Menú Principal */
+        .btn-menu { width: 90%; max-width: 350px; padding: 20px; margin: 10px; border: none; border-radius: 12px; color: white; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-add { background: #e67e22; } /* Naranja para identificar Médico */
+        .btn-show { background: #2980b9; }
+        .btn-menu:hover { opacity: 0.9; transform: scale(1.02); }
+
+        /* Formulario Médico */
+        label { display: block; text-align: left; font-weight: bold; margin: 10px 0 5px 45px; color: #34495e; }
+        input, textarea { width: 90%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
+        textarea { height: 120px; resize: none; }
+        
+        .preview-camera { background: black; width: 100%; height: 250px; border-radius: 10px; margin: 10px 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        
+        .btn-accion { width: 90%; padding: 15px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; }
+
+        /* Estilo del Historial */
+        .registro-item { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: left; border-left: 6px solid #e67e22; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
     </style>
 </head>
 <body>
-<div class="card">
-    <h2>🏥 Registro Clínico</h2>
-    <input type="text" id="eps" placeholder="Nombre de la EPS">
-    
-    <video id="video" autoplay playsinline></video>
-    <button id="btnCamara">📸 Foto de Orden Médica / Examen</button>
-    <canvas id="canvas"></canvas>
 
-    <textarea id="evolucion" rows="5" placeholder="Escribe observaciones clínicas aquí..."></textarea>
-    <button id="btnGuardar">💾 Guardar en Folder Clínico</button>
-</div>
-<!-- Aquí va el mismo script de Firebase que usaste en la terapéutica -->
+    <div id="header">
+        <h2 id="nombrePaciente">Cargando Paciente...</h2>
+        <p style="color: #e67e22; font-weight: bold; margin-top: 0;">⚕️ HISTORIAL MÉDICO</p>
+        <hr style="width: 50%; border: 0.5px solid #ddd;">
+    </div>
+
+    <!-- 1. SECCIÓN: MENÚ PRINCIPAL -->
+    <div id="menuPrincipal">
+        <button class="btn-menu btn-add" onclick="abrirFormulario()">🩺 Nueva Consulta Médica</button>
+        <button class="btn-menu btn-show" onclick="verHistorial()">📋 Ver Historial Clínico</button>
+        <br><br>
+        <a href="historias.html" style="text-decoration:none; color:#7f8c8d; font-weight:bold;">⬅ Volver a Pacientes</a>
+    </div>
+
+    <!-- 2. SECCIÓN: AGREGAR REGISTRO -->
+    <div id="seccionAgregar" style="display: none;" class="card">
+        <h3>📋 Registro de Consulta</h3>
+        
+        <label>Signos Vitales y Triaje:</label>
+        <input type="text" id="signos" placeholder="Ej: TA: 120/80, Peso: 70kg, Temp: 36.5°C">
+        
+        <div class="preview-camera">
+            <video id="video" autoplay playsinline style="width:100%; height:100%; object-fit:cover;"></video>
+            <img id="imgPreview" style="width:100%; height:100%; object-fit:cover; display:none;">
+            <canvas id="canvas" style="display:none;"></canvas>
+        </div>
+
+        <button class="btn-accion" style="background:#3498db" onclick="window.tomarFoto()">📸 Foto de Fórmula / Examen</button>
+        
+        <label>Evolución y Diagnóstico:</label>
+        <textarea id="textoMedico" placeholder="Escriba aquí el diagnóstico médico..."></textarea>
+        
+        <button class="btn-accion" style="background:#27ae60" onclick="window.guardarRegistro()">🚀 Guardar Registro Médico</button>
+        <button class="btn-accion" style="background:#95a5a6" onclick="window.volver()">Cancelar</button>
+    </div>
+
+    <!-- 3. SECCIÓN: MOSTRAR HISTORIAL -->
+    <div id="seccionHistorial" style="display: none;" class="card">
+        <h3>📋 Consultas Guardadas</h3>
+        <div id="listaMedica">Buscando registros médicos...</div>
+        <button class="btn-accion" style="background:#95a5a6" onclick="window.volver()">Volver al Menú</button>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://gstatic.com";
+        import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, doc, getDoc } from "https://gstatic.com";
+
+        // CONFIGURACIÓN DE TU FIREBASE (Misma que usas siempre)
+        const firebaseConfig = {
+            apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+            authDomain: "://firebaseapp.com",
+            projectId: "caminosnuevosdatabase",
+            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+            appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const params = new URLSearchParams(window.location.search);
+        const idPaciente = params.get("id");
+        let fotoBase64 = null;
+        let streamActivo = null;
+
+        // 1. CARGAR NOMBRE DEL PACIENTE
+        async function cargarNombre() {
+            if (!idPaciente) return;
+            const snap = await getDoc(doc(db, "pacientes", idPaciente));
+            if (snap.exists()) document.getElementById("nombrePaciente").innerText = snap.data().nombre;
+        }
+        cargarNombre();
+
+        // 2. NAVEGACIÓN Y CÁMARA (Lógica Inteligente)
+        window.abrirFormulario = () => {
+            document.getElementById("menuPrincipal").style.display = "none";
+            document.getElementById("seccionAgregar").style.display = "block";
+            
+            const video = document.getElementById('video');
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => { 
+                    streamActivo = stream;
+                    video.srcObject = stream; 
+                })
+                .catch(err => alert("Error de cámara: Por favor activa los permisos."));
+        };
+
+        window.tomarFoto = () => {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            fotoBase64 = canvas.toDataURL('image/jpeg', 0.5);
+            
+            document.getElementById('imgPreview').src = fotoBase64;
+            document.getElementById('imgPreview').style.display = "block";
+            video.style.display = "none";
+            alert("📸 Captura médica lista");
+        };
+
+        // 3. GUARDADO EN NUBE (Colección: evoluciones_medicas)
+        window.guardarRegistro = async () => {
+            const texto = document.getElementById("textoMedico").value;
+            const signos = document.getElementById("signos").value;
+
+            if (!texto || !fotoBase64) return alert("Falta diagnóstico o evidencia fotográfica.");
+
+            try {
+                await addDoc(collection(db, "evoluciones_medicas"), {
+                    idPaciente: idPaciente,
+                    signos: signos,
+                    texto: texto,
+                    fotoDoc: fotoBase64,
+                    fecha: Date.now()
+                });
+                alert("✅ Registro Médico guardado con éxito.");
+                window.location.reload();
+            } catch (e) { alert("Error al guardar: " + e.message); }
+        };
+
+        // 4. VER HISTORIAL MÉDICO
+        window.verHistorial = async () => {
+            document.getElementById("menuPrincipal").style.display = "none";
+            document.getElementById("seccionHistorial").style.display = "block";
+            const lista = document.getElementById("listaMedica");
+            lista.innerHTML = "Cargando registros...";
+
+            try {
+                const q = query(collection(db, "evoluciones_medicas"), where("idPaciente", "==", idPaciente), orderBy("fecha", "desc"));
+                const snap = await getDocs(q);
+                lista.innerHTML = snap.empty ? "No hay consultas médicas registradas." : "";
+                
+                snap.forEach((doc) => {
+                    const d = doc.data();
+                    const fecha = new Date(d.fecha).toLocaleString();
+                    lista.innerHTML += `
+                        <div class="registro-item">
+                            <div>
+                                <strong>📅 ${fecha}</strong><br>
+                                <small>🩺 ${d.signos}</small>
+                            </div>
+                            <button onclick="verDetalleMedico('${d.signos}', '${d.fecha}', \`${d.texto}\`, '${d.fotoDoc || ""}')" 
+                                    style="background:#2980b9; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer; font-weight:bold;">
+                                👁️ Ver
+                            </button>
+                        </div>`;
+                });
+            } catch (e) { lista.innerHTML = "Error al cargar historial médico."; }
+        };
+
+        window.volver = () => {
+            if (streamActivo) streamActivo.getTracks().forEach(t => t.stop());
+            window.location.reload(); 
+        };
+
+        // 5. REPORTE MÉDICO IMPRIMIBLE
+        window.verDetalleMedico = (signos, fRaw, txt, foto) => {
+            const win = window.open("", "_blank", "width=800,height=900");
+            const fecha = new Date(Number(fRaw)).toLocaleString();
+            const nombre = document.getElementById("nombrePaciente").innerText;
+            const textoLimpio = txt.replace(/`/g, "'");
+
+            win.document.write(`
+                <html>
+                <head><title>Reporte_Medico_${nombre}</title>
+                <style>
+                    body { font-family: sans-serif; padding: 40px; background: #fff; }
+                    .container { border: 2px solid #e67e22; padding: 30px; border-radius: 10px; max-width: 700px; margin: auto; }
+                    .h { text-align: center; border-bottom: 2px solid #e67e22; padding-bottom: 10px; margin-bottom: 20px; }
+                    .meta { display: flex; justify-content: space-between; font-size: 14px; color: #555; }
+                    .box { background: #fdf2e9; padding: 20px; border-radius: 5px; margin: 20px 0; white-space: pre-wrap; line-height: 1.6; }
+                    @media print { .no-print { display: none; } }
+                </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="h"><h2>REPORTE MÉDICO OFICIAL</h2><p>Paciente: <b>${nombre}</b></p></div>
+                        <div class="meta"><span><b>Fecha:</b> ${fecha}</span><span><b>Signos:</b> ${signos}</span></div>
+                        <div class="box">${textoLimpio}</div>
+                        ${foto ? `<div style="text-align:center;"><p><b>Evidencia Médica:</b></p><img src="${foto}" style="width:100%; border-radius:10px;"></div>` : ""}
+                        <div class="no-print" style="text-align:center; margin-top:30px;">
+                            <button onclick="window.print()" style="padding:12px 25px; background:#27ae60; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer;">🖨️ Imprimir Reporte</button>
+                            <button onclick="window.close()" style="padding:12px 25px; background:#95a5a6; color:white; border:none; border-radius:5px; font-weight:bold; cursor:pointer; margin-left:10px;">Cerrar</button>
+                        </div>
+                    </div>
+                </body>
+                </html>`);
+            win.document.close();
+        };
+    </script>
 </body>
 </html>
