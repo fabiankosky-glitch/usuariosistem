@@ -115,13 +115,12 @@
 
         // 3. NAVEGACIÓN A CARPETAS (Ajustado a tus archivos de GitHub)
         window.irA = (tipo) => {
-            if (tipo === 'medico') {
-                window.location.href = `detalle_clinico.html?id=${idPaciente}`;
-            } else if (tipo === 'terapeutico') {
-                window.location.href = `detalle_terapeutico.html?id=${idPaciente}`;
-            } else if (tipo === 'psicologico') {
-                window.location.href = `detalle_psicologico.html?id=${idPaciente}`;
-            }
+            const archivos = {
+                'medico': 'detalle_clinico.html',
+                'terapeutico': 'detalle_terapeutico.html',
+                'psicologico': 'detalle_psicologico.html'
+            };
+            window.location.href = `${archivos[tipo]}?id=${idPaciente}`;
         };
     </script>
 </body>
