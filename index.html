@@ -3,123 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Caminos Nuevos</title>
-    <!-- 1. CARGAMOS FIREBASE DE FORMA SIMPLE (SIN IMPORTS) -->
-    <script src="https://gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
+    <title>Sistema de Gestión - Inicio</title>
     <style>
-        body { font-family: sans-serif; text-align: center; background: #f4f7f6; padding: 20px; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
-        video { width: 100%; border-radius: 10px; background: #000; margin-bottom: 10px; }
-        input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 16px; }
-        button { background: #27ae60; color: white; border: none; font-weight: bold; cursor: pointer; }
-        #btnCapturar { background: #2980b9; }
-        canvas { display: none; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; display: flex; flex-direction: column; align-items: center; }
+        
+        /* Barra Superior */
+        .header { background: #2c3e50; color: white; width: 100%; padding: 15px 25px; display: flex; justify-content: space-between; align-items: center; box-sizing: border-box; }
+        .btn-exit { background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; text-decoration: none; font-weight: bold; font-size: 14px; }
+
+        /* Botón de Registro Destacado */
+        .main-action { margin: 30px 0; width: 90%; max-width: 400px; }
+        .btn-registro { 
+            width: 100%; background: #27ae60; color: white; border: none; padding: 20px; 
+            font-size: 18px; font-weight: bold; border-radius: 50px; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.4); transition: 0.3s;
+        }
+        .btn-registro:hover { transform: scale(1.03); background: #219150; }
+
+        /* Cuadrícula de 4 Opciones */
+        .menu-grid { 
+            display: grid; grid-template-columns: repeat(2, 1fr); 
+            gap: 20px; width: 90%; max-width: 450px; 
+        }
+        .menu-item { 
+            background: white; padding: 35px 10px; border-radius: 15px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.05); text-align: center; 
+            cursor: pointer; transition: 0.2s; border-bottom: 5px solid;
+        }
+        .menu-item:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
+        .menu-item h3 { margin: 0; font-size: 16px; color: #34495e; }
+
+        /* Colores de las secciones */
+        .libros { border-color: #f1c40f; }
+        .historias { border-color: #3498db; }
+        .ingresos { border-color: #e67e22; }
+        .admin { border-color: #95a5a6; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <h2>Registro de Paciente</h2>
-    <input type="text" id="nombreP" placeholder="Nombre completo">
-    <video id="video" autoplay playsinline></video>
-    <button id="btnCapturar">📸 TOMAR FOTO</button>
-    <button id="btnGuardar">🚀 GUARDAR Y CREAR CARPETAS</button>
-    <canvas id="canvas"></canvas>
+<div class="header">
+    <h2 style="margin:0; font-size: 18px;">💾 Sistema de Gestión</h2>
+    <a href="https://google.com" class="btn-exit">Cerrar Sesión</a>
 </div>
 
-<script defer>
-    // 2. CONFIGURACIÓN
-    const firebaseConfig = {
-        apiKey: "AIzaSyC78y2K4T9rMFMVsG_UQxTmPANzV7Yapf8",
-        authDomain: "://firebaseapp.com",
-        projectId: "caminosnuevosdatabase",
-        storageBucket: "caminosnuevosdatabase.firebasestorage.app",
-        appId: "1:907500835423:web:f50b459a84f5d7d92a81ea"
-    };
+<div class="main-action">
+    <!-- Este botón ahora apunta a registro.html -->
+    <button class="btn-registro" onclick="window.location.href='registro.html'">
+        ➕ AGREGAR PACIENTE
+    </button>
+</div>
 
-    // Inicializar Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    let fotoBase64 = null;
-
-    // 3. ENCENDER CÁMARA
-    const video = document.getElementById('video');
-    navigator.mediaDevices.getUserMedia({ video: true })
-        .then(stream => { video.srcObject = stream; })
-        .catch(err => alert("Error: Activa la cámara en el candado de la URL"));
-
-    // 4. TOMAR FOTO
-    document.getElementById('btnCapturar').onclick = function() {
-        const canvas = document.getElementById('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        canvas.getContext('2d').drawImage(video, 0, 0);
-        fotoBase64 = canvas.toDataURL('image/jpeg', 0.5);
-        alert("✅ Foto capturada con éxito");
-    };
-
-    // 5. GUARDAR Y CREAR CARPETAS
-    document.getElementById('btnGuardar').onclick = async function() {
-        const nombre = document.getElementById('nombreP').value;
-        if(!nombre || !fotoBase64) return alert("Falta el nombre o la foto");
-
-        this.innerText = "⏳ Guardando...";
-        this.disabled = true;
-
-        try {
-            // Guardar paciente
-            const res = await db.collection("pacientes").add({
-                nombre: nombre,
-                foto: fotoBase64,
-                fecha: new Date().toLocaleString()
-            });
-
-            // Crear las 3 carpetas automáticamente
-            const carpetas = ["Clinica", "Terapeutica", "Psicologica"];
-            for (let c of carpetas) {
-                await db.collection("pacientes").doc(res.id).collection("carpetas").doc(c).set({
-                    creado: true,
-                    fecha: new Date().toISOString()
-                });
-            }
-
-            alert("🚀 ¡TODO GUARDADO! Paciente y carpetas listas.");
-            location.reload();
-        } catch(e) {
-            alert("Error: " + e.message);
-            this.innerText = "🚀 GUARDAR Y CREAR CARPETAS";
-            this.disabled = false;
-        }
-    };
-</script>
-</body>
-    <nav style="background: #2c3e50; padding: 15px; margin-bottom: 20px; display: flex; justify-content: center; gap: 20px;">
-    <a href="index.html" style="color: white; text-decoration: none; font-weight: bold;">📝 Registro</a>
-    <a href="menu.html" style="color: white; text-decoration: none; font-weight: bold;">📋 Ver Pacientes</a>
-    <div style="background: #2c3e50; padding: 15px; display: flex; justify-content: space-between; align-items: center; color: white;">
-    <h2 style="margin: 0; font-size: 18px;">Sistema de Gestión</h2>
-    <div>
-        <!-- Botón para ir al registro -->
-        <button onclick="window.location.href='index.html'" style="background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 10px;">
-            ➕ Agregar Paciente
-        </button>
-        
-        <!-- Botón para Salir -->
-        <button onclick="salir()" style="background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">
-            🚪 Salir
-        </button>
+<div class="menu-grid">
+    <div class="menu-item libros" onclick="window.location.href='libros.html'">
+        <h3>📚 Libros</h3>
+    </div>
+    <div class="menu-item historias" onclick="window.location.href='carpetas.html'">
+        <h3>📋 Historias Clínicas</h3>
+    </div>
+    <div class="menu-item ingresos" onclick="window.location.href='ingresos.html'">
+        <h3>📝 Libro de Ingresos</h3>
+    </div>
+    <div class="menu-item admin" onclick="window.location.href='administracion.html'">
+        <h3>⚙️ Administración</h3>
     </div>
 </div>
 
-<script>
-    function salir() {
-        if(confirm("¿Estás seguro de que deseas salir del sistema?")) {
-            // Aquí puedes redirigir a una página de login o cerrar la pestaña
-            window.location.href = "https://google.com"; 
-        }
-    }
-</script>
-</nav>
+</body>
 </html>
