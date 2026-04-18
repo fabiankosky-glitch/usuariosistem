@@ -116,34 +116,63 @@
             const lista = document.getElementById("listaEvoluciones");
             lista.innerHTML = "Cargando...";
 
-            const q = query(collection(db, "evoluciones_terapeuticas"), where("idPaciente", "==", idPaciente), orderBy("fecha", "desc"));
-            const querySnapshot = await getDocs(q);
-            
-            lista.innerHTML = "";
-            if (querySnapshot.empty) {
-                lista.innerHTML = "No hay registros aún.";
-                return;
-            }
-
-            // TODO ESTO DEBE IR AQUÍ ADENTRO:
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                const fecha = new Date(data.fecha).toLocaleString();
+            try {
+                const q = query(collection(db, "evoluciones_terapeuticas"), where("idPaciente", "==", idPaciente), orderBy("fecha", "desc"));
+                const querySnapshot = await getDocs(q);
                 
-                // Definimos la foto si existe
-                const mostrarFoto = data.fotoDoc ? `<img src="${data.fotoDoc}" style="width:100%; border-radius:10px; margin-top:10px;">` : "";
+                lista.innerHTML = "";
+                if (querySnapshot.empty) {
+                    lista.innerHTML = "No hay registros aún.";
+                    return;
+                }
 
-                lista.innerHTML += `
-                    <div class="registro-item">
-                        <strong>📅 ${fecha}</strong> | 🏷️ ${data.modalidad}<br>
-                        <p style="margin:10px 0;">${data.texto}</p>
-                        ${mostrarFoto}
-                        <br>
-                        <small style="color:green;">🔒 Registro Protegido</small>
-                    </div>`;
-            });
+                querySnapshot.forEach((doc) => {
+                    const data = doc.data();
+                    const fechaTexto = new Date(data.fecha).toLocaleString();
+                    
+                    // Miniatura de la foto si existe
+                    const fotoMini = data.fotoDoc ? `<img src="${data.fotoDoc}" style="width:40px; height:40px; border-radius:5px; object-fit:cover; margin-right:10px; border:1px solid #ddd;">` : "";
+
+                    lista.innerHTML += `
+                        <div class="registro-item" style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
+                            <div style="text-align:left; display:flex; align-items:center;">
+                                ${fotoMini}
+                                <div>
+                                    <strong>📅 ${fechaTexto}</strong><br>
+                                    <small>🏷️ ${data.modalidad}</small>
+                                </div>
+                            </div>
+                            <button onclick="verDetalleCompleto('${data.modalidad}', '${data.fecha}', \`${data.texto}\`, '${data.fotoDoc || ""}')" 
+                                    style="background:#2980b9; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer; font-weight:bold;">
+                                👁️ Ver
+                            </button>
+                        </div>`;
+                });
+            } catch (e) {
+                lista.innerHTML = "Error al cargar: " + e.message;
+            }
         };
 
+        // ESTA FUNCIÓN ES LA QUE ABRE LA VENTANA CON EL DOCUMENTO
+        window.verDetalleCompleto = (mod, fechaRaw, texto, foto) => {
+            const fecha = new Date(Number(fechaRaw)).toLocaleString();
+            const win = window.open("", "_blank", "width=600,height=800");
+            win.document.write(`
+                <html>
+                <head><title>Detalle de Evolución</title></head>
+                <body style="font-family:sans-serif; padding:30px; line-height:1.6; color:#333;">
+                    <div style="text-align:center; border-bottom:2px solid #2980b9; padding-bottom:10px; margin-bottom:20px;">
+                        <h2 style="margin:0; color:#2980b9;">📄 Evolución Terapéutica</h2>
+                        <p style="margin:5px 0;"><strong>Modalidad:</strong> ${mod} | <strong>Fecha:</strong> ${fecha}</p>
+                    </div>
+                    <div style="background:#f9f9f9; padding:15px; border-radius:8px; border:1px solid #eee; min-height:100px; white-space:pre-wrap;">${texto}</div>
+                    ${foto ? `<div style="margin-top:20px; text-align:center;"><p><strong>Evidencia Adjunta:</strong></p><img src="${foto}" style="width:100%; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.2);"></div>` : ""}
+                    <br><br>
+                    <center><button onclick="window.close()" style="background:#95a5a6; color:white; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold;">Cerrar Documento</button></center>
+                </body>
+                </html>
+            `);
+        };
         window.volver = () => {
             document.getElementById("menuPrincipal").style.display = "block";
             document.getElementById("seccionAgregar").style.display = "none";
