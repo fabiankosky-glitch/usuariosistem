@@ -121,17 +121,24 @@
             
             lista.innerHTML = "";
             if (querySnapshot.empty) {
-                lista.innerHTML = "No hay evoluciones registradas.";
+                lista.innerHTML = "No hay registros aún.";
                 return;
             }
 
+            // TODO ESTO DEBE IR AQUÍ ADENTRO:
             querySnapshot.forEach((doc) => {
                 const data = doc.data();
                 const fecha = new Date(data.fecha).toLocaleString();
+                
+                // Definimos la foto si existe
+                const mostrarFoto = data.fotoDoc ? `<img src="${data.fotoDoc}" style="width:100%; border-radius:10px; margin-top:10px;">` : "";
+
                 lista.innerHTML += `
                     <div class="registro-item">
                         <strong>📅 ${fecha}</strong> | 🏷️ ${data.modalidad}<br>
                         <p style="margin:10px 0;">${data.texto}</p>
+                        ${mostrarFoto}
+                        <br>
                         <small style="color:green;">🔒 Registro Protegido</small>
                     </div>`;
             });
