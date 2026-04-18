@@ -64,22 +64,29 @@
         const params = new URLSearchParams(window.location.search);
         const idPaciente = params.get("id");
 
-        async function cargarPaciente() {
+  async function cargarPaciente() {
             if (!idPaciente) return;
             try {
                 const docRef = doc(db, "pacientes", idPaciente);
                 const snap = await getDoc(docRef);
+
                 if (snap.exists()) {
                     const p = snap.data();
                     document.getElementById("nombrePaciente").innerText = p.nombre;
-                    if (p.fotoID) document.getElementById("fotoPaciente").src = p.fotoID;
+                    
+                    // BUSCAR FOTO: Probamos con fotoID o foto (el seguro de vida)
+                    const imagenUrl = p.fotoID || p.foto || 'https://placeholder.com👤';
+                    document.getElementById("fotoPaciente").src = imagenUrl;
+                    
+                    // Actualizar Badge de Estado
                     const badge = document.getElementById("badgeEstado");
                     const estado = p.estado || "activos";
                     badge.innerText = estado.toUpperCase();
+                    
                     const colores = { activos: '#27ae60', desprendimiento: '#16a085', abandonos: '#f39c12', fugas: '#e74c3c', movilizaciones: '#3498db' };
                     badge.style.background = colores[estado] || "#95a5a6";
                 }
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Error cargando:", e); }
         }
         cargarPaciente();
 
