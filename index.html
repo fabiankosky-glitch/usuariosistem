@@ -98,5 +98,28 @@
     <nav style="background: #2c3e50; padding: 15px; margin-bottom: 20px; display: flex; justify-content: center; gap: 20px;">
     <a href="index.html" style="color: white; text-decoration: none; font-weight: bold;">📝 Registro</a>
     <a href="menu.html" style="color: white; text-decoration: none; font-weight: bold;">📋 Ver Pacientes</a>
+    <div style="background: #2c3e50; padding: 15px; display: flex; justify-content: space-between; align-items: center; color: white;">
+    <h2 style="margin: 0; font-size: 18px;">Sistema de Gestión</h2>
+    <div>
+        <!-- Botón para ir al registro -->
+        <button onclick="window.location.href='index.html'" style="background: #27ae60; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-right: 10px;">
+            ➕ Agregar Paciente
+        </button>
+        
+        <!-- Botón para Salir -->
+        <button onclick="salir()" style="background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold;">
+            🚪 Salir
+        </button>
+    </div>
+</div>
+
+<script>
+    function salir() {
+        if(confirm("¿Estás seguro de que deseas salir del sistema?")) {
+            // Aquí puedes redirigir a una página de login o cerrar la pestaña
+            window.location.href = "https://google.com"; 
+        }
+    }
+</script>
 </nav>
 </html>
