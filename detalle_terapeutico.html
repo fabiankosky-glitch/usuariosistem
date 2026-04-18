@@ -144,39 +144,28 @@
         };
 
         // --- LÓGICA DE CÁMARA Y GUARDADO ---
-        window.previsualizarFoto = (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    document.getElementById("imgPreview").src = e.target.result;
-                    document.getElementById("imgPreview").style.display = "block";
-                    document.getElementById("txtCamara").style.display = "none";
-                };
-                reader.readAsDataURL(file);
-            }
-        };
+window.guardarRegistro = async () => {
+    const texto = document.getElementById("textoEvolucion").value;
+    const mod = document.getElementById("modalidad").value;
+    const fotoData = document.getElementById("imgPreview").src; // Esto toma la foto de la cámara
 
-        window.guardarRegistro = async () => {
-            const texto = document.getElementById("textoEvolucion").value;
-            const mod = document.getElementById("modalidad").value;
+    if (!texto) return alert("Escriba la evolución antes de guardar.");
 
-            if (!texto) return alert("Escriba la evolución antes de guardar.");
-
-            try {
-                await addDoc(collection(db, "evoluciones_terapeuticas"), {
-                    idPaciente: idPaciente,
-                    modalidad: mod,
-                    texto: texto,
-                    fecha: Date.now(),
-                    bloqueado: true
-                });
-                alert("✅ Registro guardado y bloqueado en la nube.");
-                volver();
-            } catch (e) {
-                alert("Error al guardar: " + e.message);
-            }
-        };
+    try {
+        await addDoc(collection(db, "evoluciones_terapeuticas"), {
+            idPaciente: idPaciente,
+            modalidad: mod,
+            texto: texto,
+            fotoDoc: fotoData, // Guardamos la foto como texto largo (Base64)
+            fecha: Date.now(),
+            bloqueado: true
+        });
+        alert("✅ Registro y Foto guardados correctamente.");
+        volver();
+    } catch (e) {
+        alert("Error al guardar: " + e.message);
+    }
+};
     </script>
 </body>
 </html>
