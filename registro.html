@@ -1,31 +1,41 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
+    <meta charset="UTF-8">
     <title>Registro de Paciente</title>
     <style>
-        body { font-family: sans-serif; text-align: center; background: #f4f7f6; padding: 20px; }
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; background: #f4f7f6; padding: 20px; }
         .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 400px; margin: auto; }
-        video { width: 100%; border-radius: 10px; background: #000; margin-bottom: 10px; }
-        input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; font-weight: bold; }
-        button { background: #27ae60; color: white; border: none; cursor: pointer; }
+        video { width: 100%; border-radius: 10px; background: #000; margin-bottom: 10px; transform: scaleX(-1); }
+        input, button { width: 100%; padding: 12px; margin: 8px 0; border-radius: 8px; border: 1px solid #ccc; font-weight: bold; font-size: 16px; box-sizing: border-box; }
+        button { cursor: pointer; transition: 0.3s; color: white; border: none; }
+        .btn-foto { background: #27ae60; }
+        .btn-guardar { background: #2ecc71; }
+        .btn-volver { background: #95a5a6; }
+        button:hover { opacity: 0.8; transform: scale(1.02); }
     </style>
 </head>
 <body>
+
     <div class="card">
-        <h2>Registro de Paciente</h2>
-        <input type="text" id="nombre" placeholder="Nombre completo">
+        <h2>➕ AGREGAR PACIENTE</h2>
+        
+        <input type="text" id="nombre" placeholder="Nombre completo del paciente">
+        
         <video id="video" autoplay playsinline></video>
         <canvas id="canvas" style="display:none;"></canvas>
-        <button id="btnCapturar">📸 TOMAR FOTO</button>
-        <button id="btnGuardar" style="background: #2ecc71;">🚀 GUARDAR Y CREAR CARPETAS</button>
-        <button onclick="window.location.href='index.html'" style="background: #95a5a6;">⬅ VOLVER</button>
+        
+        <button id="btnCapturar" class="btn-foto">📸 TOMAR FOTO</button>
+        <button id="btnGuardar" class="btn-guardar">🚀 GUARDAR Y CREAR CARPETAS</button>
+        <button onclick="window.location.href='index.html'" class="btn-volver">⬅ VOLVER AL MENÚ</button>
     </div>
 
     <script type="module">
+        // Importación corregida con www.
         import { initializeApp } from "https://gstatic.com";
         import { getFirestore, collection, addDoc } from "https://gstatic.com";
 
-        // PON TUS DATOS REALES AQUÍ:
+        // Configuración de tu base de datos
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
             authDomain: "://firebaseapp.com",
@@ -41,34 +51,48 @@
         const canvas = document.getElementById('canvas');
         let fotoData = null;
 
-        // Encender cámara
+        // Iniciar cámara al cargar la página
         navigator.mediaDevices.getUserMedia({ video: true })
-            .then(s => video.srcObject = s)
-            .catch(e => alert("Error cámara: " + e));
+            .then(stream => { video.srcObject = stream; })
+            .catch(err => { 
+                console.error("Error cámara:", err);
+                alert("Por favor, permite el acceso a la cámara.");
+            });
 
-        // Capturar foto
+        // Capturar la imagen
         document.getElementById('btnCapturar').onclick = () => {
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-            canvas.getContext('2d').drawImage(video, 0, 0);
-            fotoData = canvas.toDataURL('image/jpeg');
-            alert("¡Foto capturada! ✅");
+            const ctx = canvas.getContext('2d');
+            // Efecto espejo para que la foto quede igual que la vista previa
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0);
+            fotoData = canvas.toDataURL('image/jpeg', 0.7);
+            alert("Foto capturada con éxito ✅");
         };
 
         // Guardar en Firebase
         document.getElementById('btnGuardar').onclick = async () => {
             const nombre = document.getElementById('nombre').value;
-            if(!nombre || !fotoData) return alert("Falta nombre o foto");
+            
+            if(!nombre || !fotoData) {
+                return alert("Escribe el nombre y toma la foto antes de guardar.");
+            }
 
             try {
                 await addDoc(collection(db, "pacientes"), {
                     nombre: nombre,
                     foto: fotoData,
-                    fecha: new Promise(r => r(new Date().toISOString()))
+                    fechaRegistro: new Date().toLocaleString()
                 });
-                alert("Paciente registrado con éxito");
-                window.location.href = "index.html";
-            } catch (e) { alert("Error al guardar: " + e); }
+                
+                alert("¡Paciente registrado y carpetas creadas!");
+                window.location.href = "index.html"; 
+            } catch (error) {
+                console.error("Error al guardar:", error);
+                alert("Error al conectar con la base de datos.");
+            }
         };
     </script>
 </body>
