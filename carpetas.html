@@ -22,48 +22,54 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 // LÍNEA 2 (Únela toda)
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Configuración de tu base de datos
-        const firebaseConfig = {
-            apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
-            authDomain: "caminosnuevosdatabase.firebaseapp.com",
-            projectId: "caminosnuevosdatabase",
-            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
-            appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
-        };
+  const firebaseConfig = {
+        apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+        authDomain: "://firebaseapp.com",
+        projectId: "caminosnuevosdatabase",
+        storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+        appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
 
-        async function cargarPacientes() {
-            const lista = document.getElementById("listaPacientes");
-            try {
-                const querySnapshot = await getDocs(collection(db, "pacientes"));
-                lista.innerHTML = ""; 
-                querySnapshot.forEach((doc) => {
-                    const p = doc.data();
-                    const id = doc.id;
-                    lista.innerHTML += `
-                        <div class="paciente-card">
-                            <div onclick="toggleF('${id}')" style="cursor:pointer; display:flex; align-items:center;">
-                                <img src="${p.foto}" width="50" height="50" style="border-radius:50%; margin-right:15px; object-fit:cover;">
-                                <strong>${p.nombre}</strong>
-                            </div>
-                            <div id="f-${id}" class="folders">
-                                <button class="btn-f" style="background:#3498db" onclick="location.href='detalle_clinico.html?id=${id}'">Clínico</button>
-                                <button class="btn-f" style="background:#27ae60" onclick="location.href='detalle_terapeutico.html?id=${id}'">Terapéutico</button>
-                                <button class="btn-f" style="background:#8e44ad" onclick="location.href='detalle_psicologico.html?id=${id}'">Psicológico</button>
-                            </div>
-                        </div>`;
-                });
-            } catch (e) { lista.innerHTML = "Error de conexión."; }
+    async function cargarPacientes() {
+        const lista = document.getElementById("listaPacientes");
+        try {
+            const querySnapshot = await getDocs(collection(db, "pacientes"));
+            lista.innerHTML = ""; 
+            if (querySnapshot.empty) {
+                lista.innerHTML = "No hay pacientes. Registra uno primero.";
+                return;
+            }
+            querySnapshot.forEach((doc) => {
+                const p = doc.data();
+                const id = doc.id;
+                lista.innerHTML += `
+                    <div style="background:white; margin:10px auto; padding:15px; border-radius:12px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width:450px;">
+                        <div onclick="toggleF('${id}')" style="cursor:pointer; display:flex; align-items:center;">
+                            <img src="${p.foto}" width="50" height="50" style="border-radius:50%; margin-right:15px; object-fit:cover;">
+                            <strong>${p.nombre}</strong>
+                        </div>
+                        <div id="f-${id}" style="display:none; margin-top:10px; border-top:1px solid #eee; padding-top:10px;">
+                            <button onclick="location.href='detalle_clinico.html?id=${id}'" style="background:#3498db; color:white; border:none; padding:8px; border-radius:5px; margin:2px;">Clínico</button>
+                            <button onclick="location.href='detalle_terapeutico.html?id=${id}'" style="background:#27ae60; color:white; border:none; padding:8px; border-radius:5px; margin:2px;">Terapéutico</button>
+                            <button onclick="location.href='detalle_psicologico.html?id=${id}'" style="background:#8e44ad; color:white; border:none; padding:8px; border-radius:5px; margin:2px;">Psicológico</button>
+                        </div>
+                    </div>`;
+            });
+        } catch (e) { 
+            // Esto nos dirá el error real en la pantalla
+            lista.innerHTML = "Error real: " + e.message; 
+            console.error(e);
         }
+    }
 
-        window.toggleF = (id) => {
-            const d = document.getElementById('f-' + id);
-            d.style.display = (d.style.display === 'block') ? 'none' : 'block';
-        };
+    window.toggleF = (id) => {
+        const d = document.getElementById('f-' + id);
+        d.style.display = (d.style.display === 'block') ? 'none' : 'block';
+    };
 
-        cargarPacientes();
-    </script>
-</body>
+    cargarPacientes();
+</script>
 </html>
