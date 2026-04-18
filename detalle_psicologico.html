@@ -1,27 +1,173 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-    <title>Evolución Psicológica</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Folder Psicológico</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #f4f7f6; text-align: center; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 500px; margin: auto; border-top: 5px solid #8e44ad; }
-        textarea, button { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; }
-        button { background: #8e44ad; color: white; border: none; font-weight: bold; cursor: pointer; }
-        #btnCamara { background: #2980b9; }
-        video, canvas { width: 100%; border-radius: 10px; background: #000; }
-        canvas { display: none; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; text-align: center; padding: 20px; }
+        .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 500px; margin: 0 auto; }
+        h2, h3 { color: #2c3e50; }
+        .btn-menu { width: 90%; max-width: 350px; padding: 20px; margin: 10px; border: none; border-radius: 12px; color: white; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-add { background: #9b59b6; } /* Púrpura para Psicología */
+        .btn-show { background: #2980b9; }
+        select, textarea, input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
+        textarea { height: 120px; resize: none; }
+        .preview-camera { background: black; width: 100%; height: 250px; border-radius: 10px; margin: 10px 0; display: flex; align-items: center; justify-content: center; color: white; overflow: hidden; }
+        .btn-accion { width: 100%; padding: 15px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .registro-item { background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: left; border-left: 6px solid #9b59b6; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     </style>
 </head>
 <body>
-<div class="card">
-    <h2>🧠 Nota Psicológica</h2>
-    <video id="video" autoplay playsinline></video>
-    <button id="btnCamara">📸 Anexar Foto de Test / Prueba</button>
-    <canvas id="canvas"></canvas>
+    <div id="header">
+        <h2 id="nombrePaciente">Cargando Paciente...</h2>
+        <p style="color: #9b59b6; font-weight: bold;">🧠 FOLDER PSICOLÓGICO</p>
+        <hr style="width: 50%; border: 1px solid #ddd;">
+    </div>
 
-    <textarea id="evolucion" rows="5" placeholder="Escribe la evolución psicológica..."></textarea>
-    <button id="btnGuardar">🔒 Guardar Registro Protegido</button>
-</div>
-<!-- Aquí va el mismo script de Firebase que usaste en la terapéutica -->
+    <div id="menuPrincipal">
+        <button class="btn-menu btn-add" onclick="abrirFormulario()">➕ Nueva Evolución Psic.</button>
+        <button class="btn-menu btn-show" onclick="verHistorial()">👁️ Ver Historial Psic.</button>
+        <br><br>
+        <a href="historias.html" style="text-decoration:none; color:#7f8c8d; font-weight:bold;">⬅ Volver a Pacientes</a>
+    </div>
+
+    <div id="seccionAgregar" style="display: none;" class="card">
+        <h3>🧠 Nueva Entrada Psicológica</h3>
+        <label>Aspectos Observados:</label>
+        <input type="text" id="aspectos" placeholder="Ej: Orientado, Colaborador, Ansiedad leve">
+        
+        <div class="preview-camera">
+            <video id="video" autoplay playsinline style="width:100%; height:100%; object-fit:cover;"></video>
+            <img id="imgPreview" style="width:100%; height:100%; object-fit:cover; display:none;">
+            <canvas id="canvas" style="display:none;"></canvas>
+        </div>
+        <button class="btn-accion" style="background:#3498db" onclick="window.tomarFoto()">📸 Tomar Foto de Documento</button>
+        <textarea id="textoPsicologico" placeholder="Escriba aquí el análisis psicológico..."></textarea>
+        <button class="btn-accion" style="background:#27ae60" onclick="window.guardarRegistro()">🚀 Guardar Registro Protegido</button>
+        <button class="btn-accion" style="background:#95a5a6" onclick="window.volver()">Cancelar</button>
+    </div>
+
+    <div id="seccionHistorial" style="display: none;" class="card">
+        <h3>📋 Evoluciones Guardadas</h3>
+        <div id="listaEvoluciones">Buscando registros...</div>
+        <button class="btn-accion" style="background:#95a5a6" onclick="window.volver()">Volver al Menú</button>
+    </div>
+
+   <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+            authDomain: "caminosnuevosdatabase.firebaseapp.com",
+            projectId: "caminosnuevosdatabase",
+            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+            appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const params = new URLSearchParams(window.location.search);
+        const idPaciente = params.get("id");
+        let fotoBase64 = null;
+        let streamActivo = null;
+
+        // 1. CARGAR DATOS
+        async function cargarDatosPaciente() {
+            if (!idPaciente) return;
+            const snap = await getDoc(doc(db, "pacientes", idPaciente));
+            if (snap.exists()) document.getElementById("nombrePaciente").innerText = snap.data().nombre;
+        }
+        cargarDatosPaciente();
+
+        // 2. NAVEGACIÓN Y CÁMARA
+        window.abrirFormulario = () => {
+            document.getElementById("menuPrincipal").style.display = "none";
+            document.getElementById("seccionAgregar").style.display = "block";
+            const video = document.getElementById('video');
+            navigator.mediaDevices.getUserMedia({ video: true })
+                .then(stream => { streamActivo = stream; video.srcObject = stream; })
+                .catch(err => alert("Cámara bloqueada. Permite el acceso."));
+        };
+
+        window.verHistorial = async () => {
+            document.getElementById("menuPrincipal").style.display = "none";
+            document.getElementById("seccionHistorial").style.display = "block";
+            const lista = document.getElementById("listaEvoluciones");
+            lista.innerHTML = "Cargando...";
+
+            const q = query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente), orderBy("fecha", "desc"));
+            const snap = await getDocs(q);
+            lista.innerHTML = snap.empty ? "No hay registros aún." : "";
+            snap.forEach((doc) => {
+                const data = doc.data();
+                const fechaTexto = new Date(data.fecha).toLocaleString();
+                lista.innerHTML += `
+                    <div class="registro-item" style="display:flex; justify-content:space-between; align-items:center;">
+                        <div style="text-align:left;">
+                            <strong>📅 ${fechaTexto}</strong><br><small>🧠 ${data.aspectos}</small>
+                        </div>
+                        <button onclick="verDetalleCompleto('${data.aspectos}', '${data.fecha}', \`${data.texto}\`, '${data.fotoDoc || ""}')" 
+                                style="background:#2980b9; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer;">👁️ Ver</button>
+                    </div>`;
+            });
+        };
+
+        // 3. CAPTURA Y GUARDADO
+        window.tomarFoto = () => {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            fotoBase64 = canvas.toDataURL('image/jpeg', 0.5);
+            document.getElementById('imgPreview').src = fotoBase64;
+            document.getElementById('imgPreview').style.display = "block";
+            video.style.display = "none";
+        };
+
+        window.guardarRegistro = async () => {
+            const texto = document.getElementById("textoPsicologico").value;
+            const aspectos = document.getElementById("aspectos").value;
+            if (!texto || !fotoBase64) return alert("Falta texto o foto.");
+            try {
+                await addDoc(collection(db, "evoluciones_psicologicas"), {
+                    idPaciente, aspectos, texto, fotoDoc: fotoBase64, fecha: Date.now()
+                });
+                alert("✅ Guardado con éxito");
+                window.location.reload();
+            } catch (e) { alert("Error al guardar."); }
+        };
+
+        window.volver = () => { if (streamActivo) streamActivo.getTracks().forEach(t => t.stop()); window.location.reload(); };
+
+        // 4. REPORTE IMPRIMIBLE (Copia fiel del terapéutico)
+        window.verDetalleCompleto = (asp, fechaRaw, texto, foto) => {
+            const win = window.open("", "_blank", "width=800,height=900");
+            const fecha = new Date(Number(fechaRaw)).toLocaleString();
+            const nombre = document.getElementById("nombrePaciente").innerText;
+            const textoSeguro = texto.replace(/`/g, "'");
+
+            win.document.write(`
+                <html><head><title>Reporte_Psicologico_${nombre}</title>
+                <style>
+                    body { font-family: sans-serif; padding: 40px; line-height: 1.6; }
+                    .container { max-width: 700px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px; }
+                    .header { text-align: center; border-bottom: 2px solid #9b59b6; margin-bottom: 20px; }
+                    @media print { .no-print { display: none; } }
+                </style></head>
+                <body>
+                    <div class="container">
+                        <div class="header"><h2>INFORME PSICOLÓGICO</h2><p>Paciente: <b>${nombre}</b></p></div>
+                        <p><b>Fecha:</b> ${fecha} | <b>Aspectos:</b> ${asp}</p>
+                        <hr><div style="white-space: pre-wrap; background:#f9f9f9; padding:15px;">${textoSeguro}</div>
+                        ${foto ? `<img src="${foto}" style="width:100%; margin-top:20px; border-radius:10px;">` : ""}
+                        <div class="no-print" style="text-align:center; margin-top:30px;">
+                            <button onclick="window.print()" style="background:#27ae60; color:white; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">🖨️ Imprimir</button>
+                        </div>
+                    </div>
+                </body></html>`);
+            win.document.close();
+        };
+    </script>
 </body>
 </html>
