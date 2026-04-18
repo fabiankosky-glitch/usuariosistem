@@ -8,27 +8,19 @@
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; text-align: center; padding: 20px; }
         .container { max-width: 500px; margin: auto; }
         .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        
-        /* Foto de Perfil */
         .foto-perfil { width: 150px; height: 150px; border-radius: 50%; border: 5px solid #2c3e50; object-fit: cover; margin-bottom: 10px; }
-        
-        /* Botones de Carpetas (Grandes) */
         .btn-folder { width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 10px; color: white; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; }
         .btn-med { background: #e67e22; }
         .btn-ter { background: #27ae60; }
         .btn-psi { background: #9b59b6; }
-        
-        /* Botones de Estado (Pequeños) */
         .grid-estados { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .btn-estado { padding: 10px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 12px; }
-        
         .status-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; color: white; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- SECCIÓN 1: DATOS BÁSICOS -->
         <div class="card">
             <img id="fotoPaciente" src="https://placeholder.com" class="foto-perfil">
             <h2 id="nombrePaciente">Cargando...</h2>
@@ -37,7 +29,6 @@
             <button onclick="window.location.href='historias.html'" style="background:none; border:none; color:#3498db; cursor:pointer; font-weight:bold;">⬅ Volver al Listado</button>
         </div>
 
-        <!-- SECCIÓN 2: CARPETAS CLÍNICAS -->
         <div class="card">
             <h3>📂 Carpetas del Sistema</h3>
             <button class="btn-folder btn-med" onclick="irA('medico')">⚕️ Folder Médico</button>
@@ -45,7 +36,6 @@
             <button class="btn-folder btn-psi" onclick="irA('psicologico')">🧠 Folder Psicológico</button>
         </div>
 
-        <!-- SECCIÓN 3: CAMBIAR ESTADO (MOVIMIENTOS) -->
         <div class="card">
             <h3>🔄 Cambiar de Categoría</h3>
             <div class="grid-estados">
@@ -59,12 +49,14 @@
     </div>
 
     <script type="module">
+        // 1. CORRECCIÓN DE URLs DE IMPORTACIÓN
         import { initializeApp } from "https://gstatic.com";
         import { getFirestore, doc, getDoc, updateDoc } from "https://gstatic.com";
 
+        // 2. CORRECCIÓN DE FIREBASE CONFIG (authDomain completo)
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
-            authDomain: "://firebaseapp.com",
+            authDomain: "caminosnuevosdatabase.firebaseapp.com",
             projectId: "caminosnuevosdatabase",
             storageBucket: "caminosnuevosdatabase.firebasestorage.app",
             appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
@@ -72,48 +64,38 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-
-        // Obtener ID del paciente desde la URL
         const params = new URLSearchParams(window.location.search);
         const idPaciente = params.get("id");
 
-        // 1. CARGAR DATOS DEL PACIENTE
         async function cargarPaciente() {
-            if (!idPaciente) return alert("No se encontró el ID del paciente.");
-            
-            const docRef = doc(db, "pacientes", idPaciente);
-            const snap = await getDoc(docRef);
-
-            if (snap.exists()) {
-                const p = snap.data();
-                document.getElementById("nombrePaciente").innerText = p.nombre;
-                if (p.fotoID) document.getElementById("fotoPaciente").src = p.fotoID;
-                
-                // Actualizar Badge de Estado
-                const badge = document.getElementById("badgeEstado");
-                const estado = p.estado || "activos";
-                badge.innerText = estado.toUpperCase();
-                
-                // Color del badge
-                const colores = { activos: '#27ae60', desprendimiento: '#16a085', abandonos: '#f39c12', fugas: '#e74c3c', movilizaciones: '#3498db' };
-                badge.style.background = colores[estado] || "#95a5a6";
-            }
+            if (!idPaciente) return;
+            try {
+                const docRef = doc(db, "pacientes", idPaciente);
+                const snap = await getDoc(docRef);
+                if (snap.exists()) {
+                    const p = snap.data();
+                    document.getElementById("nombrePaciente").innerText = p.nombre;
+                    if (p.fotoID) document.getElementById("fotoPaciente").src = p.fotoID;
+                    const badge = document.getElementById("badgeEstado");
+                    const estado = p.estado || "activos";
+                    badge.innerText = estado.toUpperCase();
+                    const colores = { activos: '#27ae60', desprendimiento: '#16a085', abandonos: '#f39c12', fugas: '#e74c3c', movilizaciones: '#3498db' };
+                    badge.style.background = colores[estado] || "#95a5a6";
+                }
+            } catch (e) { console.error(e); }
         }
         cargarPaciente();
 
-        // 2. FUNCIÓN PARA MOVER CATEGORÍA
         window.moverPaciente = async (nuevoEstado) => {
-            const confirmacion = confirm(`¿Mover a ${nuevoEstado.toUpperCase()}?`);
-            if (confirmacion) {
+            if (confirm(`¿Mover a ${nuevoEstado.toUpperCase()}?`)) {
                 try {
                     await updateDoc(doc(db, "pacientes", idPaciente), { estado: nuevoEstado });
-                    alert("✅ Paciente movido correctamente.");
-                    window.location.reload(); // Recarga para ver el cambio
+                    alert("✅ Movido con éxito");
+                    location.reload();
                 } catch (e) { alert("Error: " + e.message); }
             }
         };
 
-        // 3. NAVEGACIÓN A CARPETAS (Ajustado a tus archivos de GitHub)
         window.irA = (tipo) => {
             const archivos = {
                 'medico': 'detalle_clinico.html',
