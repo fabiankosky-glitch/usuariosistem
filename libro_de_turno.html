@@ -9,93 +9,73 @@
         .container { max-width: 700px; margin: auto; }
         .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
         h2, h3 { text-align: center; color: #2c3e50; }
-        
-        /* Censo Automático */
         .censo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .censo-item { padding: 12px; border-radius: 10px; color: white; text-align: center; font-weight: bold; }
-        
         label { display: block; font-weight: bold; margin-top: 15px; font-size: 13px; color: #34495e; }
         input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 15px; }
         textarea { height: 100px; resize: none; }
-        
-        /* Secciones Desplegables */
         .seccion-especial { background: #f8f9fa; padding: 15px; border-radius: 10px; border: 1px solid #dee2e6; margin-top: 15px; display: none; }
-        
-        /* Delegaciones Grid */
         .delegaciones-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
-        .delegaciones-grid div { background: #fff; }
-
         .btn-guardar { background: #2c3e50; color: white; padding: 18px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 25px; font-size: 16px; }
         .historial-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 6px solid #2c3e50; text-align: left; }
     </style>
 </head>
 <body>
-
 <div class="container">
     <button onclick="location.href='index.html'" style="margin-bottom:15px; padding:8px 15px; cursor:pointer; border-radius:8px; border:none; background:#95a5a6; color:white;">🏠 Menú Principal</button>
     
     <div class="card">
         <h2>📒 Libro de Turno</h2>
-        <p id="fechaHoy" style="font-weight: bold; color: #7f8c8d;"></p>
-
-        <!-- CENSO AUTOMÁTICO -->
+        <p id="fechaHoy" style="font-weight: bold; color: #7f8c8d; text-align: center;"></p>
         <div class="censo-grid">
             <div class="censo-item" style="background: #27ae60;">🏠 Activos: <span id="cntActivos">0</span></div>
             <div class="censo-item" style="background: #e74c3c;">🚶 Fuera: <span id="cntFuera">0</span></div>
         </div>
 
-        <!-- OPERADORES -->
         <h3>👥 Personal</h3>
         <input type="text" id="opTurno" placeholder="Operador de Turno">
         <input type="text" id="opApoyo" placeholder="Operador de Apoyo">
         <input type="text" id="opOficina" placeholder="Enfermería / Oficina">
+    </div>
 
-        <!-- ACTIVIDAD / TERAPIA -->
-        <!-- SECCIÓN DINÁMICA DE ACTIVIDADES Y TERAPIAS -->
-        <div class="card">
-            <h3>🎭 Registro de Actividades y Terapias</h3>
-            <select id="tipoEvento" onchange="window.prepararFormularioEvento()">
-                <option value="ninguno">-- Seleccionar para agregar --</option>
-                <option value="actividad">⚽ Actividad</option>
-                <option value="terapia">🧠 Terapia</option>
-            </select>
+    <div class="card">
+        <h3>🎭 Registro de Actividades y Terapias</h3>
+        <select id="tipoEvento" onchange="window.prepararFormularioEvento()">
+            <option value="ninguno">-- Seleccionar para agregar --</option>
+            <option value="actividad">⚽ Actividad</option>
+            <option value="terapia">🧠 Terapia</option>
+        </select>
 
-            <!-- Bloque para Actividad -->
-            <div id="secActividad" class="seccion-especial" style="display:none; background:#e8f4fd;">
-                <p>⏰ Hora: <b id="horaActividad">--:--</b></p>
-                <label>Nombre de la Actividad:</label>
-                <input type="text" id="nombreActividad" placeholder="Ej: Deporte, Aseo, Cine">
-                <label>Observaciones:</label>
-                <textarea id="obsActividad"></textarea>
-            </div>
-
-            <!-- Bloque para Terapia -->
-            <div id="secTerapia" class="seccion-especial" style="display:none; background:#f5eef8;">
-                <p>⏰ Hora: <b id="horaTerapia">--:--</b></p>
-                <label>Nombre de la Terapia:</label>
-                <input type="text" id="nombreTerapia" placeholder="Ej: Prevención de recaídas">
-                <label>Asistencia:</label>
-                <textarea id="asistenciaTerapia" placeholder="Lista de usuarios..."></textarea>
-                <label>Observaciones de la Terapia:</label>
-                <textarea id="obsTerapia"></textarea>
-            </div>
-
-            <!-- Área de Cámara (Se activa para ambos) -->
-            <div id="areaCamaraEvento" style="display:none; margin-top:10px;">
-                <div style="background: #000; height: 180px; border-radius: 10px; overflow:hidden;">
-                    <video id="videoEvidencia" autoplay playsinline style="width:100%; height:100%; object-fit:cover;"></video>
-                </div>
-                <button type="button" onclick="window.tomarFotoEvento()" style="background:#3498db; color:white; width:100%; padding:10px; border:none; border-radius:8px; margin-top:5px; cursor:pointer;">📸 Tomar Foto de Evidencia</button>
-            </div>
-
-            <!-- EL BOTÓN CLAVE PARA SEGUIR AGREGANDO -->
-            <button type="button" onclick="window.agregarEventoALista()" style="background:#27ae60; color:white; width:100%; padding:15px; border:none; border-radius:10px; margin-top:15px; font-weight:bold; cursor:pointer;">➕ Añadir y Seguir Agregando</button>
-            
-            <!-- Resumen de lo que vas añadiendo -->
-            <div id="listaTemporalEventos" style="margin-top:10px; text-align:left;"></div>
+        <div id="secActividad" class="seccion-especial">
+            <p>⏰ Hora: <b id="horaActividad">--:--</b></p>
+            <label>Nombre de la Actividad:</label>
+            <input type="text" id="nombreActividad" placeholder="Ej: Deporte, Aseo, Cine">
+            <label>Observaciones:</label>
+            <textarea id="obsActividad"></textarea>
         </div>
 
-        <!-- DELEGACIONES -->
+        <div id="secTerapia" class="seccion-especial">
+            <p>⏰ Hora: <b id="horaTerapia">--:--</b></p>
+            <label>Nombre de la Terapia:</label>
+            <input type="text" id="nombreTerapia" placeholder="Ej: Prevención de recaídas">
+            <label>Asistencia:</label>
+            <textarea id="asistenciaTerapia" placeholder="Lista de usuarios..."></textarea>
+            <label>Observaciones de la Terapia:</label>
+            <textarea id="obsTerapia"></textarea>
+        </div>
+
+        <div id="areaCamaraEvento" style="display:none; margin-top:10px;">
+            <div style="background: #000; height: 180px; border-radius: 10px; overflow:hidden;">
+                <video id="videoEvidencia" autoplay playsinline style="width:100%; height:100%; object-fit:cover;"></video>
+            </div>
+            <button type="button" onclick="window.tomarFotoEvento()" style="background:#3498db; color:white; width:100%; padding:10px; border:none; border-radius:8px; margin-top:5px; cursor:pointer;">📸 Tomar Foto de Evidencia</button>
+        </div>
+
+        <button type="button" onclick="window.agregarEventoALista()" style="background:#27ae60; color:white; width:100%; padding:15px; border:none; border-radius:10px; margin-top:15px; font-weight:bold; cursor:pointer;">➕ Añadir y Seguir Agregando</button>
+        <div id="listaTemporalEventos" style="margin-top:10px; text-align:left;"></div>
+    </div>
+
+    <div class="card">
         <h3>🔑 Delegaciones</h3>
         <div class="delegaciones-grid">
             <input type="number" id="dTimbre" placeholder="Timbre">
@@ -107,14 +87,12 @@
         </div>
         <input type="text" id="dOtras" placeholder="Otras delegaciones..." style="margin-top:8px;">
 
-        <!-- NOVEDADES RELEVANTES -->
         <h3>🚨 Novedades Relevantes</h3>
         <textarea id="novedadesTxt" placeholder="Fugas, ingresos, permisos, novedades..."></textarea>
-
+        
         <button id="btnGuardar" class="btn-guardar">🚀 GUARDAR ENTREGA DE TURNO</button>
-        <button id="btnImprimir" style="background: #34495e; color: white; padding: 15px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px;">
-    🖨️ VISTA PREVIA E IMPRIMIR TURNO
-</button>
+        <button id="btnImprimir" style="background: #34495e; color: white; padding: 15px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px;">🖨️ VISTA PREVIA E IMPRIMIR TURNO</button>
+    </div>
 
     <div id="historial">
         <h3>📋 Registros Anteriores</h3>
@@ -122,71 +100,54 @@
 </div>
 
 <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, onSnapshot, collection, addDoc, query, where, getDocs, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        const firebaseConfig = {
-            apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
-            authDomain: "caminosnuevosdatabase.firebaseapp.com",
-            projectId: "caminosnuevosdatabase",
-            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
-            appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
-        };
+    import { initializeApp } from "https://gstatic.com";
+    import { getFirestore, onSnapshot, collection, addDoc, query, orderBy } from "https://gstatic.com";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+        authDomain: "://firebaseapp.com",
+        projectId: "caminosnuevosdatabase",
+        storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+        appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
+
     let cActivos = 0, cFuera = 0;
-
-    // Fecha Automática
-    document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-
-    // Toggle Secciones
-    // --- LÓGICA DINÁMICA DE ACTIVIDADES Y TERAPIAS ---
     let listaEventosTurno = []; 
     let fotoTemporal = null;
 
-window.prepararFormularioEvento = () => {
-    const tipo = document.getElementById("tipoEvento").value;
-    
-    // 1. Limpieza inicial
-    const secAct = document.getElementById("secActividad");
-    const secTer = document.getElementById("secTerapia");
-    const areaCam = document.getElementById("areaCamaraEvento");
+    document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-    if (!tipo || tipo === "ninguno") {
+    window.prepararFormularioEvento = () => {
+        const tipo = document.getElementById("tipoEvento").value;
+        const secAct = document.getElementById("secActividad");
+        const secTer = document.getElementById("secTerapia");
+        const areaCam = document.getElementById("areaCamaraEvento");
+
         secAct.style.display = "none";
         secTer.style.display = "none";
         areaCam.style.display = "none";
-        return;
-    }
-    
-    // 2. Mostrar área de cámara y calcular hora
-    areaCam.style.display = "block";
-    const horaActual = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-    
-    // 3. Lógica de despliegue de secciones
-    if (tipo === "actividad") {
-        secAct.style.display = "block";
-        secTer.style.display = "none";
-        document.getElementById("horaActividad").innerText = horaActual;
-    } else if (tipo === "terapia") {
-        secTer.style.display = "block";
-        secAct.style.display = "none";
-        document.getElementById("horaTerapia").innerText = horaActual;
-    }
 
-    // 4. Encendido seguro de cámara (con manejo de errores)
-    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        if (tipo === "ninguno") return;
+
+        areaCam.style.display = "block";
+        const horaActual = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+        if (tipo === "actividad") {
+            secAct.style.display = "block";
+            document.getElementById("horaActividad").innerText = horaActual;
+        } else if (tipo === "terapia") {
+            secTer.style.display = "block";
+            document.getElementById("horaTerapia").innerText = horaActual;
+        }
+
         navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-            .then(s => { 
-                const video = document.getElementById("videoEvidencia");
-                if (video) video.srcObject = s; 
-            })
-            .catch(err => {
-                console.warn("Cámara no disponible o permiso denegado:", err);
-                // No detenemos el proceso para que al menos puedan escribir
-            });
-    }
-};
+            .then(s => { document.getElementById("videoEvidencia").srcObject = s; })
+            .catch(e => console.warn("Cámara no disponible"));
+    };
+
     window.tomarFotoEvento = () => {
         const video = document.getElementById("videoEvidencia");
         const canvas = document.createElement("canvas");
@@ -205,23 +166,14 @@ window.prepararFormularioEvento = () => {
 
         if (!nombre || !obs) return alert("Por favor completa el nombre y las observaciones.");
 
-        // Guardamos en la lista global
         listaEventosTurno.push({ tipo, hora, nombre, obs, asistencia, foto: fotoTemporal });
+        document.getElementById("listaTemporalEventos").innerHTML += `<div style="background:#e8f4fd; padding:8px; margin-top:5px; border-radius:5px; font-size:12px;">✅ <b>${tipo.toUpperCase()}:</b> ${nombre} (${hora})</div>`;
 
-        // Resumen visual para el usuario
-        document.getElementById("listaTemporalEventos").innerHTML += `
-            <div style="background:#e8f4fd; padding:8px; margin-top:5px; border-radius:5px; font-size:12px;">
-                ✅ <b>${tipo}:</b> ${nombre} (${hora})
-            </div>`;
-
-        // Limpiar campos para el siguiente
         document.getElementById("tipoEvento").value = "ninguno";
-        document.getElementById("secActividad").style.display = "none";
-        document.getElementById("secTerapia").style.display = "none";
+        window.prepararFormularioEvento();
         fotoTemporal = null;
     };
 
-    // Censo Automático en tiempo real
     onSnapshot(collection(db, "pacientes"), (snap) => {
         cActivos = 0; cFuera = 0;
         snap.forEach(doc => {
@@ -233,117 +185,58 @@ window.prepararFormularioEvento = () => {
         document.getElementById("cntFuera").innerText = cFuera;
     });
 
-// --- LÓGICA ÚNICA: REGISTRO INDEPENDIENTE ---
-document.getElementById('btnGuardar').onclick = async () => {
-    
-    // 1. Recolectamos novedades (único campo obligatorio)
-    const novedades = document.getElementById("novedadesTxt") ? document.getElementById("novedadesTxt").value : "";
+    document.getElementById('btnGuardar').onclick = async () => {
+        const novedades = document.getElementById("novedadesTxt").value;
+        if (!novedades) return alert("⚠️ Escribe las novedades.");
 
-    if (!novedades) {
-        return alert("⚠️ Por favor, escribe las novedades del turno antes de guardar.");
-    }
+        try {
+            await addDoc(collection(db, "libro_de_turnos_pro"), {
+                fecha: new Date().toLocaleString(),
+                timestamp: Date.now(),
+                censo: { activos: cActivos, fuera: cFuera },
+                operadores: { 
+                    turno: document.getElementById("opTurno").value, 
+                    apoyo: document.getElementById("opApoyo").value, 
+                    oficina: document.getElementById("opOficina").value 
+                },
+                eventos: listaEventosTurno,
+                novedades: novedades,
+                estaBloqueado: true
+            });
+            alert("✅ Turno Guardado");
+            location.reload();
+        } catch (e) { alert("Error: " + e.message); }
+    };
 
-    try {
-        // 2. Preparamos el paquete de datos para la carpeta general
-        const data = {
-            fecha: new Date().toLocaleString(),
-            timestamp: Date.now(),
-            censo: { 
-                activos: typeof cActivos !== 'undefined' ? cActivos : 0, 
-                fuera: typeof cFuera !== 'undefined' ? cFuera : 0 
-            },
-            operadores: {
-                turno: document.getElementById("opTurno")?.value || "No asignado",
-                apoyo: document.getElementById("opApoyo")?.value || "",
-                oficina: document.getElementById("opOficina")?.value || ""
-            },
-            // Guardamos la lista de actividades/terapias que sumaste con el botón verde
-            eventos: typeof listaEventosTurno !== 'undefined' ? listaEventosTurno : [],
-            novedades: novedades,
-            estaBloqueado: true // Candado de seguridad
-        };
-
-        // 3. Guardamos en la colección GENERAL (Libro de Turnos)
-        await addDoc(collection(db, "libro_de_turnos_pro"), data);
-
-        alert("✅ Libro de turno guardado con éxito en la nube.");
-        location.reload(); // Limpiar todo para el próximo turno
-
-    } catch (e) {
-        console.error("Error al guardar:", e);
-        alert("❌ Error: No se pudo conectar con Firebase. " + e.message);
-    }
-    // --- LÓGICA DE IMPRESIÓN PROFESIONAL ---
-document.getElementById('btnImprimir').onclick = () => {
-    const opTurno = document.getElementById("opTurno")?.value || "---";
-    const fecha = document.getElementById("fechaHoy").innerText;
-    const novedades = document.getElementById("novedadesTxt").value;
-    
-    const ventana = window.open('', '_blank');
-    ventana.document.write(`
-        <html>
-        <head>
-            <title>Reporte de Turno - ${fecha}</title>
-            <style>
-                body { font-family: 'Segoe UI', sans-serif; padding: 40px; color: #333; }
-                .header { text-align: center; border-bottom: 2px solid #2c3e50; margin-bottom: 20px; }
-                .section { margin-bottom: 20px; border: 1px solid #eee; padding: 10px; border-radius: 5px; }
-                .title { font-weight: bold; background: #f8f9fa; padding: 5px; display: block; border-bottom: 1px solid #ddd; }
-                .foto { max-width: 300px; margin-top: 10px; border-radius: 5px; border: 1px solid #ccc; }
-                .item { border-left: 4px solid #3498db; padding-left: 10px; margin-bottom: 15px; }
-                @media print { .no-print { display: none; } }
-            </style>
-        </head>
-        <body>
-            <div class="header">
+    document.getElementById('btnImprimir').onclick = () => {
+        const opTurno = document.getElementById("opTurno")?.value || "---";
+        const fecha = document.getElementById("fechaHoy").innerText;
+        const novedades = document.getElementById("novedadesTxt").value;
+        const ventana = window.open('', '_blank');
+        ventana.document.write(`
+            <html>
+            <head><style>body{font-family:sans-serif;padding:30px}.item{border-left:4px solid #3498db;padding-left:10px;margin-bottom:10px}.foto{max-width:300px;display:block;margin-top:5px}</style></head>
+            <body>
                 <h2>INFORME TÉCNICO DE TURNO</h2>
                 <p><b>Fecha:</b> ${fecha} | <b>Responsable:</b> ${opTurno}</p>
-            </div>
-            <div class="section">
-                <span class="title">I. ESTADO DEL CENSO</span>
-                <p>Activos: ${cActivos} | Fuera: ${cFuera}</p>
-            </div>
-            <div class="section">
-                <span class="title">II. ACTIVIDADES Y TERAPIAS</span>
-${listaEventosTurno.length === 0 ? '<p>No se registraron eventos.</p>' : 
-    listaEventosTurno.map(ev => `
-        <div class="item">
-            <b>${ev.tipo.toUpperCase()}:</b> ${ev.nombre} (${ev.hora})<br>
-            <b>Nota:</b> ${ev.obs}<br>
-            ${ev.foto ? `<img src="${ev.foto}" class="foto">` : ''}
-        </div>
-    `).join('') // <-- ESTE .join('') es fundamental para que no salgan comas raras
-}
-            </div>
-            <div class="section">
-                <span class="title">III. NOVEDADES RELEVANTES</span>
-                <p style="white-space: pre-wrap;">${novedades || "Sin novedades."}</p>
-            </div>
-            <div style="margin-top: 60px; text-align: center;">
-                <p>__________________________<br>Firma y Sello</p>
-            </div>
-            <button class="no-print" onclick="window.print()" style="padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">
-                🖨️ CONFIRMAR IMPRESIÓN
-            </button>
-        `);
+                <hr>
+                <p><b>Censo:</b> Activos: ${cActivos} | Fuera: ${cFuera}</p>
+                <h3>ACTIVIDADES REALIZADAS:</h3>
+                ${listaEventosTurno.map(ev => `<div class="item"><b>${ev.tipo.toUpperCase()}:</b> ${ev.nombre} (${ev.hora})<br>${ev.obs}${ev.foto ? `<img src="${ev.foto}" class="foto">` : ''}</div>`).join('')}
+                <h3>NOVEDADES:</h3><p>${novedades}</p>
+                <br><br><p>__________________________<br>Firma del Responsable</p>
+                <script>window.print();<\/script>
+            </body></html>`);
         ventana.document.close();
-    }; // Fin de imprimir
+    };
 
-    // --- HISTORIAL EN TIEMPO REAL ---
     const q = query(collection(db, "libro_de_turnos_pro"), orderBy("timestamp", "desc"));
     onSnapshot(q, (snap) => {
         const hist = document.getElementById("historial");
-        if (!hist) return;
         hist.innerHTML = "<h3>📋 Registros Anteriores</h3>";
         snap.forEach(doc => {
             const d = doc.data();
-            hist.innerHTML += `
-                <div class="historial-item">
-                    <small>${d.fecha}</small><br>
-                    <b>👤 Op:</b> ${d.operadores?.turno || '---'}<br>
-                    <b>🏠 Censo:</b> ${d.censo?.activos || 0} Activos / ${d.censo?.fuera || 0} Fuera<br>
-                    <p>${d.novedades}</p>
-                </div>`;
+            hist.innerHTML += `<div class="historial-item"><small>${d.fecha}</small><br><b>👤 Op:</b> ${d.operadores?.turno || '---'}<br><p>${d.novedades}</p></div>`;
         });
     });
 </script>
