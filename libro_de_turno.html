@@ -325,16 +325,15 @@ ${listaEventosTurno.length === 0 ? '<p>No se registraron eventos.</p>' :
             <button class="no-print" onclick="window.print()" style="padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">
                 🖨️ CONFIRMAR IMPRESIÓN
             </button>
-        </body>
-        </html>
         `);
         ventana.document.close();
     }; // Fin de imprimir
 
-    // --- HISTORIAL EN TIEMPO REAL ---
+  // --- HISTORIAL EN TIEMPO REAL ---
     const q = query(collection(db, "libro_de_turnos_pro"), orderBy("timestamp", "desc"));
     onSnapshot(q, (snap) => {
         const hist = document.getElementById("historial");
+        if (!hist) return;
         hist.innerHTML = "<h3>📋 Registros Anteriores</h3>";
         snap.forEach(doc => {
             const d = doc.data();
