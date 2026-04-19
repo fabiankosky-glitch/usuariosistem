@@ -112,6 +112,9 @@
         <textarea id="novedadesTxt" placeholder="Fugas, ingresos, permisos, novedades..."></textarea>
 
         <button id="btnGuardar" class="btn-guardar">🚀 GUARDAR ENTREGA DE TURNO</button>
+        <button id="btnImprimir" style="background: #34495e; color: white; padding: 15px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px;">
+    🖨️ VISTA PREVIA E IMPRIMIR TURNO
+</button>
 
     <div id="historial">
         <h3>📋 Registros Anteriores</h3>
@@ -257,22 +260,78 @@ document.getElementById('btnGuardar').onclick = async () => {
         console.error("Error al guardar:", e);
         alert("❌ Error: No se pudo conectar con Firebase. " + e.message);
     }
-};
+    // --- LÓGICA DE IMPRESIÓN PROFESIONAL ---
+document.getElementById('btnImprimir').onclick = () => {
+    const opTurno = document.getElementById("opTurno")?.value || "---";
+    const fecha = document.getElementById("fechaHoy").innerText;
+    const novedades = document.getElementById("novedadesTxt").value;
+    
+    const ventana = window.open('', '_blank');
+    ventana.document.write(`
+        <html>
+        <head>
+            <title>Reporte de Turno - ${fecha}</title>
+            <style>
+                body { font-family: 'Segoe UI', sans-serif; padding: 40px; color: #333; }
+                .header { text-align: center; border-bottom: 2px solid #2c3e50; margin-bottom: 20px; }
+                .section { margin-bottom: 20px; border: 1px solid #eee; padding: 10px; border-radius: 5px; }
+                .title { font-weight: bold; background: #f8f9fa; padding: 5px; display: block; border-bottom: 1px solid #ddd; }
+                .foto { max-width: 300px; margin-top: 10px; border-radius: 5px; border: 1px solid #ccc; }
+                .item { border-left: 4px solid #3498db; padding-left: 10px; margin-bottom: 15px; }
+                @media print { .no-print { display: none; } }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h2>INFORME TÉCNICO DE TURNO</h2>
+                <p><b>Fecha:</b> ${fecha} | <b>Responsable:</b> ${opTurno}</p>
+            </div>
+            <div class="section">
+                <span class="title">I. ESTADO DEL CENSO</span>
+                <p>Activos: ${cActivos} | Fuera: ${cFuera}</p>
+            </div>
+            <div class="section">
+                <span class="title">II. ACTIVIDADES Y TERAPIAS</span>
+${listaEventosTurno.length === 0 ? '<p>No se registraron eventos.</p>' : 
+    listaEventosTurno.map(ev => `
+        <div class="item">
+            <b>${ev.tipo.toUpperCase()}:</b> ${ev.nombre} (${ev.hora})<br>
+            <b>Nota:</b> ${ev.obs}<br>
+            ${ev.foto ? `<img src="${ev.foto}" class="foto">` : ''}
+        </div>
+    `).join('') // <-- ESTE .join('') es fundamental para que no salgan comas raras
+}
+            </div>
+            <div class="section">
+                <span class="title">III. NOVEDADES RELEVANTES</span>
+                <p style="white-space: pre-wrap;">${novedades || "Sin novedades."}</p>
+            </div>
+            <div style="margin-top: 60px; text-align: center;">
+                <p>__________________________<br>Firma y Sello</p>
+            </div>
+            <button class="no-print" onclick="window.print()" style="padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">
+                🖨️ CONFIRMAR IMPRESIÓN
+            </button>
+        </body>
+        </html>
+        `);
+        ventana.document.close();
+    }; // Fin de imprimir
 
-
-    // Historial
+    // --- HISTORIAL EN TIEMPO REAL ---
     const q = query(collection(db, "libro_de_turnos_pro"), orderBy("timestamp", "desc"));
     onSnapshot(q, (snap) => {
         const hist = document.getElementById("historial");
         hist.innerHTML = "<h3>📋 Registros Anteriores</h3>";
         snap.forEach(doc => {
             const d = doc.data();
-            hist.innerHTML += `<div class="historial-item">
-                <small>${d.fecha}</small><br>
-                <b>👤 Op:</b> ${d.operadores.turno}<br>
-                <b>🏠 Censo:</b> ${d.censo.activos} Activos / ${d.censo.fuera} Fuera<br>
-                <p>${d.novedades}</p>
-            </div>`;
+            hist.innerHTML += `
+                <div class="historial-item">
+                    <small>${d.fecha}</small><br>
+                    <b>👤 Op:</b> ${d.operadores?.turno || '---'}<br>
+                    <b>🏠 Censo:</b> ${d.censo?.activos || 0} Activos / ${d.censo?.fuera || 0} Fuera<br>
+                    <p>${d.novedades}</p>
+                </div>`;
         });
     });
 </script>
