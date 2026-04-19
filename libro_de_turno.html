@@ -144,36 +144,49 @@
     let listaEventosTurno = []; 
     let fotoTemporal = null;
 
-   window.prepararFormularioEvento = () => {
-        const tipo = document.getElementById("tipoEvento").value;
-        if (!tipo || tipo === "ninguno") {
-            document.getElementById("secActividad").style.display = "none";
-            document.getElementById("secTerapia").style.display = "none";
-            document.getElementById("areaCamaraEvento").style.display = "none"; // Ocultar si no hay nada
-            return;
-        }
-        
-        // MOSTRAR EL ÁREA DE LA CÁMARA
-        document.getElementById("areaCamaraEvento").style.display = "block"
-        
-        // Poner la hora automática del sistema
-        const horaActual = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-        
-        if (tipo === "actividad") {
-            document.getElementById("secActividad").style.display = "block";
-            document.getElementById("secTerapia").style.display = "none";
-            document.getElementById("horaActividad").innerText = horaActual;
-        } else {
-            document.getElementById("secTerapia").style.display = "block";
-            document.getElementById("secActividad").style.display = "none";
-            document.getElementById("horaTerapia").innerText = horaActual;
-        }
+window.prepararFormularioEvento = () => {
+    const tipo = document.getElementById("tipoEvento").value;
+    
+    // 1. Limpieza inicial
+    const secAct = document.getElementById("secActividad");
+    const secTer = document.getElementById("secTerapia");
+    const areaCam = document.getElementById("areaCamaraEvento");
 
-        // Encender cámara trasera para la evidencia
+    if (!tipo || tipo === "ninguno") {
+        secAct.style.display = "none";
+        secTer.style.display = "none";
+        areaCam.style.display = "none";
+        return;
+    }
+    
+    // 2. Mostrar área de cámara y calcular hora
+    areaCam.style.display = "block";
+    const horaActual = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+    
+    // 3. Lógica de despliegue de secciones
+    if (tipo === "actividad") {
+        secAct.style.display = "block";
+        secTer.style.display = "none";
+        document.getElementById("horaActividad").innerText = horaActual;
+    } else if (tipo === "terapia") {
+        secTer.style.display = "block";
+        secAct.style.display = "none";
+        document.getElementById("horaTerapia").innerText = horaActual;
+    }
+
+    // 4. Encendido seguro de cámara (con manejo de errores)
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
         navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-            .then(s => { document.getElementById("videoEvidencia").srcObject = s; });
-    };
-
+            .then(s => { 
+                const video = document.getElementById("videoEvidencia");
+                if (video) video.srcObject = s; 
+            })
+            .catch(err => {
+                console.warn("Cámara no disponible o permiso denegado:", err);
+                // No detenemos el proceso para que al menos puedan escribir
+            });
+    }
+};
     window.tomarFotoEvento = () => {
         const video = document.getElementById("videoEvidencia");
         const canvas = document.createElement("canvas");
