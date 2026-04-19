@@ -120,16 +120,15 @@
 </div>
 
 <script type="module">
-    import { initializeApp } from "https://gstatic.com";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://gstatic.com";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
-        authDomain: "://firebaseapp.com",
-        projectId: "caminosnuevosdatabase",
-        storageBucket: "caminosnuevosdatabase.firebasestorage.app",
-        appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
-    };
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+            authDomain: "caminosnuevosdatabase.firebaseapp.com",
+            projectId: "caminosnuevosdatabase",
+            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+            appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+        };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -139,10 +138,68 @@
     document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
     // Toggle Secciones
-    window.toggleEventos = () => {
-        const val = document.getElementById("tipoEvento").value;
-        document.getElementById("secActividad").style.display = val === 'actividad' ? 'block' : 'none';
-        document.getElementById("secTerapia").style.display = val === 'terapia' ? 'block' : 'none';
+    // --- LÓGICA DINÁMICA DE ACTIVIDADES Y TERAPIAS ---
+    let listaEventosTurno = []; 
+    let fotoTemporal = null;
+
+    window.prepararFormularioEvento = () => {
+        const tipo = document.getElementById("tipoEvento").value;
+        if (!tipo || tipo === "ninguno") {
+            document.getElementById("secActividad").style.display = "none";
+            document.getElementById("secTerapia").style.display = "none";
+            return;
+        }
+        
+        // Poner la hora automática del sistema
+        const horaActual = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        
+        if (tipo === "actividad") {
+            document.getElementById("secActividad").style.display = "block";
+            document.getElementById("secTerapia").style.display = "none";
+            document.getElementById("horaActividad").innerText = horaActual;
+        } else {
+            document.getElementById("secTerapia").style.display = "block";
+            document.getElementById("secActividad").style.display = "none";
+            document.getElementById("horaTerapia").innerText = horaActual;
+        }
+
+        // Encender cámara trasera para la evidencia
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+            .then(s => { document.getElementById("videoEvidencia").srcObject = s; });
+    };
+
+    window.tomarFotoEvento = () => {
+        const video = document.getElementById("videoEvidencia");
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+        canvas.getContext("2d").drawImage(video, 0, 0);
+        fotoTemporal = canvas.toDataURL("image/jpeg", 0.5);
+        alert("📸 Evidencia capturada");
+    };
+
+    window.agregarEventoALista = () => {
+        const tipo = document.getElementById("tipoEvento").value;
+        const hora = tipo === "actividad" ? document.getElementById("horaActividad").innerText : document.getElementById("horaTerapia").innerText;
+        const nombre = tipo === "actividad" ? document.getElementById("nombreActividad").value : document.getElementById("nombreTerapia").value;
+        const obs = tipo === "actividad" ? document.getElementById("obsActividad").value : document.getElementById("obsTerapia").value;
+        const asistencia = tipo === "terapia" ? document.getElementById("asistenciaTerapia").value : "N/A";
+
+        if (!nombre || !obs) return alert("Por favor completa el nombre y las observaciones.");
+
+        // Guardamos en la lista global
+        listaEventosTurno.push({ tipo, hora, nombre, obs, asistencia, foto: fotoTemporal });
+
+        // Resumen visual para el usuario
+        document.getElementById("listaTemporalEventos").innerHTML += `
+            <div style="background:#e8f4fd; padding:8px; margin-top:5px; border-radius:5px; font-size:12px;">
+                ✅ <b>${tipo}:</b> ${nombre} (${hora})
+            </div>`;
+
+        // Limpiar campos para el siguiente
+        document.getElementById("tipoEvento").value = "ninguno";
+        document.getElementById("secActividad").style.display = "none";
+        document.getElementById("secTerapia").style.display = "none";
+        fotoTemporal = null;
     };
 
     // Censo Automático en tiempo real
@@ -171,16 +228,13 @@
                 apoyo: document.getElementById("opApoyo").value,
                 oficina: document.getElementById("opOficina").value
             },
-            evento: {
-                tipo: document.getElementById("tipoEvento").value,
-                detalle: document.getElementById("nombreTerapia").value,
-                obs: document.getElementById("obsActividad").value || document.getElementById("obsTerapia").value
-            },
+            // CAMBIO AQUÍ: Guardamos toda la lista de actividades/terapias
+            eventos: listaEventosTurno, 
+            
             delegaciones: {
                 timbre: document.getElementById("dTimbre").value,
                 llavero: document.getElementById("dLlavero").value,
                 grilletes: document.getElementById("dGrilletes").value
-                // Se pueden agregar todos los demás aquí
             },
             novedades: document.getElementById("novedadesTxt").value
         };
