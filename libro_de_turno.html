@@ -111,8 +111,7 @@
         <h3>🚨 Novedades Relevantes</h3>
         <textarea id="novedadesTxt" placeholder="Fugas, ingresos, permisos, novedades..."></textarea>
 
-        <button class="btn-guardar" onclick="window.guardarLibro()">🚀 GUARDAR ENTREGA DE TURNO</button>
-    </div>
+        <button id="btnGuardar" class="btn-guardar">🚀 GUARDAR ENTREGA DE TURNO</button>
 
     <div id="historial">
         <h3>📋 Registros Anteriores</h3>
@@ -121,7 +120,7 @@
 
 <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, onSnapshot, collection, addDoc, query, where, getDocs, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
             authDomain: "caminosnuevosdatabase.firebaseapp.com",
@@ -218,40 +217,48 @@
         document.getElementById("cntFuera").innerText = cFuera;
     });
 
-    // Guardar Turno
-window.guardarLibro = async () => {
-    const btn = document.querySelector(".btn-guardar");
+// --- LÓGICA ÚNICA: REGISTRO INDEPENDIENTE ---
+document.getElementById('btnGuardar').onclick = async () => {
     
-    // Verificamos que los campos básicos existan
-    const opTurno = document.getElementById("opTurno") ? document.getElementById("opTurno").value : "No asignado";
-    const novedades = document.getElementById("novedadesTxt") ? document.getElementById("novedadesTxt").value : "Sin novedades";
+    // 1. Recolectamos novedades (único campo obligatorio)
+    const novedades = document.getElementById("novedadesTxt") ? document.getElementById("novedadesTxt").value : "";
 
-    const data = {
-        fecha: new Date().toLocaleString(),
-        timestamp: Date.now(),
-        censo: { 
-            activos: typeof cActivos !== 'undefined' ? cActivos : 0, 
-            fuera: typeof cFuera !== 'undefined' ? cFuera : 0 
-        },
-        operadores: {
-            turno: opTurno,
-            apoyo: document.getElementById("opApoyo")?.value || "",
-            oficina: document.getElementById("opOficina")?.value || ""
-        },
-        // Aquí es donde guardamos la lista de actividades que hiciste arriba
-        eventos: typeof listaEventosTurno !== 'undefined' ? listaEventosTurno : [],
-        novedades: novedades
-    };
+    if (!novedades) {
+        return alert("⚠️ Por favor, escribe las novedades del turno antes de guardar.");
+    }
 
     try {
+        // 2. Preparamos el paquete de datos para la carpeta general
+        const data = {
+            fecha: new Date().toLocaleString(),
+            timestamp: Date.now(),
+            censo: { 
+                activos: typeof cActivos !== 'undefined' ? cActivos : 0, 
+                fuera: typeof cFuera !== 'undefined' ? cFuera : 0 
+            },
+            operadores: {
+                turno: document.getElementById("opTurno")?.value || "No asignado",
+                apoyo: document.getElementById("opApoyo")?.value || "",
+                oficina: document.getElementById("opOficina")?.value || ""
+            },
+            // Guardamos la lista de actividades/terapias que sumaste con el botón verde
+            eventos: typeof listaEventosTurno !== 'undefined' ? listaEventosTurno : [],
+            novedades: novedades,
+            estaBloqueado: true // Candado de seguridad
+        };
+
+        // 3. Guardamos en la colección GENERAL (Libro de Turnos)
         await addDoc(collection(db, "libro_de_turnos_pro"), data);
-        alert("✅ Turno Guardado con Éxito");
-        location.reload();
+
+        alert("✅ Libro de turno guardado con éxito en la nube.");
+        location.reload(); // Limpiar todo para el próximo turno
+
     } catch (e) {
-        console.error("Error al guardar: ", e);
-        alert("Hubo un problema al guardar. Revisa la consola.");
+        console.error("Error al guardar:", e);
+        alert("❌ Error: No se pudo conectar con Firebase. " + e.message);
     }
 };
+
 
     // Historial
     const q = query(collection(db, "libro_de_turnos_pro"), orderBy("timestamp", "desc"));
