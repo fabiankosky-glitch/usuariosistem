@@ -107,27 +107,44 @@ import { getFirestore, collection, addDoc } from "https://www.gstatic.com/fireba
         };
 
         // Guardar en Firebase
-        document.getElementById('btnGuardar').onclick = async () => {
-            const nombre = document.getElementById('nombre').value;
-            
-            if(!nombre || !fotoData) {
-                return alert("Escribe el nombre y toma la foto antes de guardar.");
-            }
+     window.guardarPaciente = async () => {
+    // 1. Capturamos todos los nuevos datos
+    const nombre = document.getElementById("nombreInput").value;
+    const cedula = document.getElementById("cedulaInput").value;
+    const edad = document.getElementById("edadInput").value;
+    const sexo = document.getElementById("sexoInput").value;
+    const estado = document.getElementById("estadoInicial").value;
 
-            try {
-                await addDoc(collection(db, "pacientes"), {
-                    nombre: nombre,
-                    foto: fotoData,
-                    fechaRegistro: new Date().toLocaleString()
-                });
-                
-                alert("¡Paciente registrado y carpetas creadas!");
-                window.location.href = "index.html"; 
-            } catch (error) {
-                console.error("Error al guardar:", error);
-                alert("Error al conectar con la base de datos.");
-            }
-        };
+    // 2. Validación de seguridad
+    if (!nombre || !cedula || !fotoData) { // Usamos fotoData que es el nombre de tu variable
+        return alert("⚠️ Error: El nombre, la cédula y la foto son obligatorios.");
+    }
+
+    try {
+        // 3. Generar fecha automática legible
+        const fechaHoy = new Date().toLocaleDateString('es-CO', {
+            year: 'numeric', month: 'long', day: 'numeric'
+        });
+
+        // 4. Guardar en Firebase (Ajustado a tus nombres de campos)
+        await addDoc(collection(db, "pacientes"), {
+            nombre: nombre,
+            cedula: cedula,
+            edad: edad,
+            sexo: sexo,
+            estado: estado,
+            fotoID: fotoData, // Guardamos la foto capturada
+            fechaIngreso: fechaHoy,
+            timestamp: Date.now()
+        });
+
+        alert("✅ Paciente registrado con éxito.");
+        window.location.href = "historias.html"; 
+
+    } catch (error) {
+        alert("Error al guardar: " + error.message);
+    }
+};
     </script>
 </body>
 </html>
