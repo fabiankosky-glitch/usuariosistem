@@ -17,17 +17,49 @@
 </head>
 <body>
 
-    <div class="card">
-        <h2>➕ AGREGAR PACIENTE</h2>
+    <div class="card" style="max-width: 450px; margin: auto; padding: 20px; background: white; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+        <h2 style="color: #2c3e50;">📝 Registro de Ingreso</h2>
         
-        <input type="text" id="nombre" placeholder="Nombre completo del paciente">
+        <label style="display:block; text-align:left; font-weight:bold; margin-top:10px;">Nombre Completo:</label>
+        <input type="text" id="nombreInput" placeholder="Nombre completo del paciente" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #ccc; box-sizing: border-box;">
+
+        <label style="display:block; text-align:left; font-weight:bold;">Cédula de Ciudadanía:</label>
+        <input type="number" id="cedulaInput" placeholder="Número de documento" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #ccc; box-sizing: border-box;">
+
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <div style="flex: 1;">
+                <label style="display:block; text-align:left; font-weight:bold;">Edad:</label>
+                <input type="number" id="edadInput" placeholder="Años" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; box-sizing: border-box;">
+            </div>
+            <div style="flex: 1;">
+                <label style="display:block; text-align:left; font-weight:bold;">Sexo:</label>
+                <select id="sexoInput" style="width:100%; padding:10px; border-radius:8px; border:1px solid #ccc; height: 38px;">
+                    <option value="Masculino">Masculino</option>
+                    <option value="Femenino">Femenino</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+        </div>
+
+        <label style="display:block; text-align:left; font-weight:bold;">Categoría de Ingreso:</label>
+        <select id="estadoInicial" style="width:100%; padding:10px; margin-bottom:15px; border-radius:8px; border:1px solid #ccc;">
+            <option value="activos">🟢 Usuario Activo</option>
+            <option value="desprendimiento">🤝 Desprendimiento</option>
+            <option value="abandonos">🟠 Abandono</option>
+            <option value="fugas">🔴 Fuga</option>
+            <option value="movilizaciones">🔵 Movilización</option>
+        </select>
+
+        <div class="preview-camera" style="background: #000; height: 200px; border-radius: 10px; margin: 10px 0; overflow:hidden;">
+            <video id="video" autoplay playsinline style="width:100%; height:100%; object-fit:cover;"></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+        </div>
+
+        <button style="background:#3498db; color:white; padding:10px; width:100%; border:none; border-radius:8px; cursor:pointer; font-weight:bold;" onclick="window.tomarFoto()">📸 Tomar Foto de Identidad</button>
         
-        <video id="video" autoplay playsinline></video>
-        <canvas id="canvas" style="display:none;"></canvas>
+        <button style="background:#27ae60; color:white; padding:15px; width:100%; border:none; border-radius:8px; cursor:pointer; margin-top:15px; font-weight:bold;" onclick="window.guardarPaciente()">🚀 Registrar e Iniciar Historia</button>
         
-        <button id="btnCapturar" class="btn-foto">📸 TOMAR FOTO</button>
-        <button id="btnGuardar" class="btn-guardar">🚀 GUARDAR Y CREAR CARPETAS</button>
-        <button onclick="window.location.href='index.html'" class="btn-volver">⬅ VOLVER AL MENÚ</button>
+        <button onclick="window.location.href='index.html'" style="background:none; border:none; color:#95a5a6; cursor:pointer; margin-top:10px;">Volver al Menú</button>
     </div>
 
     <script type="module">
