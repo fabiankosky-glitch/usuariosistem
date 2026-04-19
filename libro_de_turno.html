@@ -142,13 +142,17 @@
     let listaEventosTurno = []; 
     let fotoTemporal = null;
 
-    window.prepararFormularioEvento = () => {
+   window.prepararFormularioEvento = () => {
         const tipo = document.getElementById("tipoEvento").value;
         if (!tipo || tipo === "ninguno") {
             document.getElementById("secActividad").style.display = "none";
             document.getElementById("secTerapia").style.display = "none";
+            document.getElementById("areaCamaraEvento").style.display = "none"; // Ocultar si no hay nada
             return;
         }
+        
+        // MOSTRAR EL ÁREA DE LA CÁMARA
+        document.getElementById("areaCamaraEvento").style.display = "block"
         
         // Poner la hora automática del sistema
         const horaActual = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
