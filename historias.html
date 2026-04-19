@@ -26,6 +26,11 @@
     <div class="container">
         <h2>📊 Control de Historias Clínicas</h2>
         <p>Haz clic en una categoría para desplegar</p>
+        <div style="margin-bottom: 20px;">
+    <input type="text" id="buscador" onkeyup="filtrarPacientes()" 
+           placeholder="🔍 Buscar por nombre o cédula..." 
+           style="width: 100%; padding: 15px; border-radius: 25px; border: 2px solid #3498db; font-size: 16px; outline: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        </div>
         <div class="categoria-section"><div class="categoria-header activos" onclick="toggleLista('lista-activos')"><span>🟢 USUARIOS ACTIVOS</span><span id="count-activos">0</span></div><div id="lista-activos" class="paciente-lista"></div></div>
         <div class="categoria-section"><div class="categoria-header desprendimiento" onclick="toggleLista('lista-desprendimiento')"><span>🤝 DESPRENDIMIENTO</span><span id="count-desprendimiento">0</span></div><div id="lista-desprendimiento" class="paciente-lista"></div></div>
         <div class="categoria-section"><div class="categoria-header abandonos" onclick="toggleLista('lista-abandonos')"><span>🟠 ABANDONOS</span><span id="count-abandonos">0</span></div><div id="lista-abandonos" class="paciente-lista"></div></div>
@@ -84,6 +89,23 @@
                                 📂 Abrir
                             </button>
                         </div>`;
+                    
+            window.filtrarPacientes = () => {
+            const busqueda = document.getElementById("buscador").value.toLowerCase();
+            const tarjetas = document.querySelectorAll(".paciente-card");
+
+            tarjetas.forEach(tarjeta => {
+                const contenido = tarjeta.innerText.toLowerCase();
+                // Si lo que escribes está en la tarjeta, se muestra; si no, se oculta
+                tarjeta.style.display = contenido.includes(busqueda) ? "flex" : "none";
+            });
+
+            // Si el usuario escribe algo, abrimos las listas automáticamente
+            const listas = document.querySelectorAll(".paciente-lista");
+            listas.forEach(lista => {
+                lista.style.display = busqueda.length > 0 ? "block" : "none";
+            });
+        };
                 });
             });
         });
