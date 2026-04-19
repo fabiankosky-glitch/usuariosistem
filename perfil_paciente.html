@@ -21,10 +21,18 @@
 <body>
 
     <div class="container">
-        <div class="card">
-            <img id="fotoPaciente" src="https://placeholder.com" class="foto-perfil">
-            <h2 id="nombrePaciente">Cargando...</h2>
+             <div class="card">
+            <img id="fotoPaciente" src="https://placeholder.com👤" class="foto-perfil">
+            <h2 id="nombrePaciente" style="margin-bottom: 5px;">Cargando...</h2>
             <div id="badgeEstado" class="status-badge" style="background: #95a5a6;">Estado...</div>
+            
+            <!-- SECCIÓN DE DATOS TÉCNICOS (Esto es lo nuevo) -->
+            <div id="datosTecnicos" style="margin-top: 15px; text-align: left; background: #f9f9f9; padding: 15px; border-radius: 10px; font-size: 14px; border: 1px solid #eee;">
+                <p><strong>🪪 Cédula:</strong> <span id="txtCedula">...</span></p>
+                <p><strong>🎂 Edad:</strong> <span id="txtEdad">...</span> años</p>
+                <p><strong>🚻 Sexo:</strong> <span id="txtSexo">...</span></p>
+                <p><strong>📅 Ingreso:</strong> <span id="txtFecha">...</span></p>
+            </div>
             <br>
             <button onclick="window.location.href='historias.html'" style="background:none; border:none; color:#3498db; cursor:pointer; font-weight:bold;">⬅ Volver al Listado</button>
         </div>
@@ -64,7 +72,7 @@
         const params = new URLSearchParams(window.location.search);
         const idPaciente = params.get("id");
 
-  async function cargarPaciente() {
+        async function cargarPaciente() {
             if (!idPaciente) return;
             try {
                 const docRef = doc(db, "pacientes", idPaciente);
@@ -72,21 +80,27 @@
 
                 if (snap.exists()) {
                     const p = snap.data();
+                    // Pintar Nombre
                     document.getElementById("nombrePaciente").innerText = p.nombre;
                     
-                    // BUSCAR FOTO: Probamos con fotoID o foto (el seguro de vida)
+                    // Pintar Datos Técnicos (Lo nuevo)
+                    document.getElementById("txtCedula").innerText = p.cedula || "No registrada";
+                    document.getElementById("txtEdad").innerText = p.edad || "--";
+                    document.getElementById("txtSexo").innerText = p.sexo || "No definido";
+                    document.getElementById("txtFecha").innerText = p.fechaIngreso || "Sin fecha";
+
+                    // Pintar Foto
                     const imagenUrl = p.fotoID || p.foto || 'https://placeholder.com👤';
                     document.getElementById("fotoPaciente").src = imagenUrl;
                     
-                    // Actualizar Badge de Estado
+                    // Pintar Badge de Estado
                     const badge = document.getElementById("badgeEstado");
                     const estado = p.estado || "activos";
                     badge.innerText = estado.toUpperCase();
-                    
                     const colores = { activos: '#27ae60', desprendimiento: '#16a085', abandonos: '#f39c12', fugas: '#e74c3c', movilizaciones: '#3498db' };
                     badge.style.background = colores[estado] || "#95a5a6";
                 }
-            } catch (e) { console.error("Error cargando:", e); }
+            } catch (e) { console.error("Error cargando datos:", e); }
         }
         cargarPaciente();
 
