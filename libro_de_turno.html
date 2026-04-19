@@ -125,16 +125,21 @@
     // Fecha en pantalla
     document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-    // 1. CENSO SINCRONIZADO
+    // 1. CENSO SINCRONIZADO (Versión Blindada)
     onSnapshot(collection(db, "pacientes"), (snap) => {
         totalActivosDB = 0;
         snap.forEach(doc => {
-            if(doc.data().estado === 'activos') totalActivosDB++;
+            const datos = doc.data();
+            // Esto limpia el texto: quita espacios y pone todo en minúsculas
+            const estadoLimpio = (datos.estado || "").toString().toLowerCase().trim();
+            
+            if(estadoLimpio === 'activos' || estadoLimpio === 'activo') {
+                totalActivosDB++;
+            }
         });
         document.getElementById("cntActivos").innerText = totalActivosDB;
         window.calcularPresencia();
     });
-
     window.calcularPresencia = () => {
         const fuera = parseInt(document.getElementById("inpFuera").value) || 0;
         const enCasa = totalActivosDB - fuera;
