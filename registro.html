@@ -93,25 +93,23 @@ import { getFirestore, collection, addDoc } from "https://www.gstatic.com/fireba
                 alert("Por favor, permite el acceso a la cámara.");
             });
 
-        // Capturar la imagen
          window.tomarFoto = () => {
-            const video = document.getElementById('video');
-            const canvas = document.getElementById('canvas');
-            const ctx = canvas.getContext('2d');
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
 
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+        // Ajustamos el tamaño del canvas al del video
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
 
-            // Efecto espejo para que la foto quede igual que la vista previa
-            ctx.translate(canvas.width, 0);
-            ctx.scale(-1, 1);
-            ctx.drawImage(video, 0, 0);
-            
-            // Guardamos la foto en la variable 'fotoData' para que se guarde en Firebase
-            fotoData = canvas.toDataURL('image/jpeg', 0.7);
-            alert("📸 Foto capturada con éxito");
-        };
-
+        // Dibujamos la imagen del video en el canvas
+        ctx.drawImage(video, 0, 0);
+        
+        // Guardamos la foto en la variable 'fotoData'
+        fotoData = canvas.toDataURL('image/jpeg', 0.7);
+        
+        alert("📸 Foto capturada con éxito");
+    };
         // Guardar en Firebase
      window.guardarPaciente = async () => {
     // 1. Capturamos todos los nuevos datos
