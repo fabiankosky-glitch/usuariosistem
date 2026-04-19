@@ -94,16 +94,22 @@ import { getFirestore, collection, addDoc } from "https://www.gstatic.com/fireba
             });
 
         // Capturar la imagen
-        document.getElementById('btnCapturar').onclick = () => {
+         window.tomarFoto = () => {
+            const video = document.getElementById('video');
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
-            const ctx = canvas.getContext('2d');
+
             // Efecto espejo para que la foto quede igual que la vista previa
             ctx.translate(canvas.width, 0);
             ctx.scale(-1, 1);
             ctx.drawImage(video, 0, 0);
+            
+            // Guardamos la foto en la variable 'fotoData' para que se guarde en Firebase
             fotoData = canvas.toDataURL('image/jpeg', 0.7);
-            alert("Foto capturada con éxito ✅");
+            alert("📸 Foto capturada con éxito");
         };
 
         // Guardar en Firebase
