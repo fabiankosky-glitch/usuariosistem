@@ -329,7 +329,7 @@ ${listaEventosTurno.length === 0 ? '<p>No se registraron eventos.</p>' :
         ventana.document.close();
     }; // Fin de imprimir
 
-  // --- HISTORIAL EN TIEMPO REAL ---
+    // --- HISTORIAL EN TIEMPO REAL ---
     const q = query(collection(db, "libro_de_turnos_pro"), orderBy("timestamp", "desc"));
     onSnapshot(q, (snap) => {
         const hist = document.getElementById("historial");
