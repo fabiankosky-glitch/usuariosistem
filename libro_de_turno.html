@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libro de Turno Digital</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 15px; }
+        .container { max-width: 700px; margin: auto; }
+        .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2, h3 { text-align: center; color: #2c3e50; }
+        
+        /* Censo Automático */
+        .censo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
+        .censo-item { padding: 12px; border-radius: 10px; color: white; text-align: center; font-weight: bold; }
+        
+        label { display: block; font-weight: bold; margin-top: 15px; font-size: 13px; color: #34495e; }
+        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 15px; }
+        textarea { height: 100px; resize: none; }
+        
+        /* Secciones Desplegables */
+        .seccion-especial { background: #f8f9fa; padding: 15px; border-radius: 10px; border: 1px solid #dee2e6; margin-top: 15px; display: none; }
+        
+        /* Delegaciones Grid */
+        .delegaciones-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+        .delegaciones-grid div { background: #fff; }
+
+        .btn-guardar { background: #2c3e50; color: white; padding: 18px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 25px; font-size: 16px; }
+        .historial-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 6px solid #2c3e50; text-align: left; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button onclick="location.href='index.html'" style="margin-bottom:15px; padding:8px 15px; cursor:pointer; border-radius:8px; border:none; background:#95a5a6; color:white;">🏠 Menú Principal</button>
+    
+    <div class="card">
+        <h2>📒 Libro de Turno</h2>
+        <p id="fechaHoy" style="font-weight: bold; color: #7f8c8d;"></p>
+
+        <!-- CENSO AUTOMÁTICO -->
+        <div class="censo-grid">
+            <div class="censo-item" style="background: #27ae60;">🏠 Activos: <span id="cntActivos">0</span></div>
+            <div class="censo-item" style="background: #e74c3c;">🚶 Fuera: <span id="cntFuera">0</span></div>
+        </div>
+
+        <!-- OPERADORES -->
+        <h3>👥 Personal</h3>
+        <input type="text" id="opTurno" placeholder="Operador de Turno">
+        <input type="text" id="opApoyo" placeholder="Operador de Apoyo">
+        <input type="text" id="opOficina" placeholder="Enfermería / Oficina">
+
+        <!-- ACTIVIDAD / TERAPIA -->
+        <h3>🎭 Actividades y Terapias</h3>
+        <select id="tipoEvento" onchange="toggleEventos()">
+            <option value="ninguno">-- Seleccionar Actividad o Terapia --</option>
+            <option value="actividad">⚽ Actividad Física/Recreativa</option>
+            <option value="terapia">🧠 Terapia Grupal/Individual</option>
+        </select>
+
+        <div id="secActividad" class="seccion-especial">
+            <label>Observaciones de Actividad:</label>
+            <textarea id="obsActividad"></textarea>
+        </div>
+
+        <div id="secTerapia" class="seccion-especial">
+            <label>Nombre de la Terapia:</label>
+            <input type="text" id="nombreTerapia">
+            <label>Asistencia y Observaciones:</label>
+            <textarea id="obsTerapia"></textarea>
+        </div>
+
+        <!-- DELEGACIONES -->
+        <h3>🔑 Delegaciones</h3>
+        <div class="delegaciones-grid">
+            <input type="number" id="dTimbre" placeholder="Timbre">
+            <input type="number" id="dChivos" placeholder="Chivos">
+            <input type="number" id="dSombras" placeholder="Sombras">
+            <input type="number" id="dGrilletes" placeholder="Grilletes">
+            <input type="number" id="dLlavero" placeholder="Llavero">
+            <input type="number" id="dAnillos" placeholder="Anillos">
+        </div>
+        <input type="text" id="dOtras" placeholder="Otras delegaciones..." style="margin-top:8px;">
+
+        <!-- NOVEDADES RELEVANTES -->
+        <h3>🚨 Novedades Relevantes</h3>
+        <textarea id="novedadesTxt" placeholder="Fugas, ingresos, permisos, novedades..."></textarea>
+
+        <button class="btn-guardar" onclick="guardarLibro()">🚀 GUARDAR ENTREGA DE TURNO</button>
+    </div>
+
+    <div id="historial">
+        <h3>📋 Registros Anteriores</h3>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://gstatic.com";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://gstatic.com";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+        authDomain: "://firebaseapp.com",
+        projectId: "caminosnuevosdatabase",
+        storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+        appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    let cActivos = 0, cFuera = 0;
+
+    // Fecha Automática
+    document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+
+    // Toggle Secciones
+    window.toggleEventos = () => {
+        const val = document.getElementById("tipoEvento").value;
+        document.getElementById("secActividad").style.display = val === 'actividad' ? 'block' : 'none';
+        document.getElementById("secTerapia").style.display = val === 'terapia' ? 'block' : 'none';
+    };
+
+    // Censo Automático en tiempo real
+    onSnapshot(collection(db, "pacientes"), (snap) => {
+        cActivos = 0; cFuera = 0;
+        snap.forEach(doc => {
+            const p = doc.data();
+            if(p.estado === 'activos') cActivos++;
+            else if(['fugas', 'abandonos', 'movilizaciones'].includes(p.estado)) cFuera++;
+        });
+        document.getElementById("cntActivos").innerText = cActivos;
+        document.getElementById("cntFuera").innerText = cFuera;
+    });
+
+    // Guardar Turno
+    window.guardarLibro = async () => {
+        const btn = document.querySelector(".btn-guardar");
+        btn.disabled = true; btn.innerText = "Guardando...";
+
+        const data = {
+            fecha: new Date().toLocaleString(),
+            timestamp: Date.now(),
+            censo: { activos: cActivos, fuera: cFuera },
+            operadores: {
+                turno: document.getElementById("opTurno").value,
+                apoyo: document.getElementById("opApoyo").value,
+                oficina: document.getElementById("opOficina").value
+            },
+            evento: {
+                tipo: document.getElementById("tipoEvento").value,
+                detalle: document.getElementById("nombreTerapia").value,
+                obs: document.getElementById("obsActividad").value || document.getElementById("obsTerapia").value
+            },
+            delegaciones: {
+                timbre: document.getElementById("dTimbre").value,
+                llavero: document.getElementById("dLlavero").value,
+                grilletes: document.getElementById("dGrilletes").value
+                // Se pueden agregar todos los demás aquí
+            },
+            novedades: document.getElementById("novedadesTxt").value
+        };
+
+        try {
+            await addDoc(collection(db, "libro_de_turnos_pro"), data);
+            alert("✅ Turno Guardado");
+            location.reload();
+        } catch (e) { alert("Error"); btn.disabled = false; }
+    };
+
+    // Historial
+    const q = query(collection(db, "libro_de_turnos_pro"), orderBy("timestamp", "desc"));
+    onSnapshot(q, (snap) => {
+        const hist = document.getElementById("historial");
+        hist.innerHTML = "<h3>📋 Registros Anteriores</h3>";
+        snap.forEach(doc => {
+            const d = doc.data();
+            hist.innerHTML += `<div class="historial-item">
+                <small>${d.fecha}</small><br>
+                <b>👤 Op:</b> ${d.operadores.turno}<br>
+                <b>🏠 Censo:</b> ${d.censo.activos} Activos / ${d.censo.fuera} Fuera<br>
+                <p>${d.novedades}</p>
+            </div>`;
+        });
+    });
+</script>
+</body>
+</html>
