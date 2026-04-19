@@ -51,24 +51,49 @@
         <input type="text" id="opOficina" placeholder="Enfermería / Oficina">
 
         <!-- ACTIVIDAD / TERAPIA -->
-        <h3>🎭 Actividades y Terapias</h3>
-        <select id="tipoEvento" onchange="toggleEventos()">
-            <option value="ninguno">-- Seleccionar Actividad o Terapia --</option>
-            <option value="actividad">⚽ Actividad Física/Recreativa</option>
-            <option value="terapia">🧠 Terapia Grupal/Individual</option>
-        </select>
+<div class="card">
+    <h3>🎭 Registro de Actividades y Terapias</h3>
+    
+    <!-- Selector de tipo -->
+    <select id="tipoEvento" onchange="prepararFormularioEvento()">
+        <option value="">-- Seleccionar para agregar --</option>
+        <option value="Actividad">⚽ Actividad</option>
+        <option value="Terapia">🧠 Terapia</option>
+    </select>
 
-        <div id="secActividad" class="seccion-especial">
-            <label>Observaciones de Actividad:</label>
-            <textarea id="obsActividad"></textarea>
-        </div>
-
-        <div id="secTerapia" class="seccion-especial">
+    <!-- Formulario Dinámico -->
+    <div id="formularioEvento" style="display:none; margin-top:15px; background:#f9f9f9; padding:15px; border-radius:10px; border:1px solid #ddd;">
+        <p>⏰ Hora: <b id="horaAuto">--:--</b></p>
+        
+        <div id="campoNombreTerapia" style="display:none;">
             <label>Nombre de la Terapia:</label>
-            <input type="text" id="nombreTerapia">
-            <label>Asistencia y Observaciones:</label>
-            <textarea id="obsTerapia"></textarea>
+            <input type="text" id="nombreTerapia" placeholder="Ej: Prevención de recaídas">
+            <label>Asistencia:</label>
+            <textarea id="asistenciaTerapia" placeholder="Listado de usuarios..."></textarea>
         </div>
+
+        <div id="campoNombreActividad" style="display:none;">
+            <label>Actividad:</label>
+            <input type="text" id="nombreActividad" placeholder="Ej: Deporte o Aseo">
+        </div>
+
+        <label>Observaciones:</label>
+        <textarea id="observacionesEvento"></textarea>
+
+        <!-- Cámara de Evidencia -->
+        <div style="background: #000; height: 150px; border-radius: 8px; margin: 10px 0; overflow:hidden;">
+            <video id="videoEvidencia" autoplay playsinline style="width:100%; height:100%; object-fit:cover;"></video>
+        </div>
+        <button type="button" class="btn-camara" onclick="tomarFotoEvento()" style="background:#3498db; color:white; width:100%; padding:8px; border:none; border-radius:5px;">📸 Tomar Evidencia</button>
+        <p id="checkFoto" style="display:none; color:green; font-weight:bold;">✅ Foto capturada</p>
+
+        <!-- BOTÓN PARA AGREGAR A LA LISTA -->
+        <button type="button" onclick="agregarEventoALista()" style="background:#27ae60; color:white; width:100%; padding:12px; border:none; border-radius:8px; margin-top:10px; font-weight:bold;">➕ Añadir y Seguir Agregando</button>
+    </div>
+
+    <!-- VISTA PREVIA DE LO QUE SE VA AGREGANDO -->
+    <div id="listaTemporalEventos" style="margin-top:15px; text-align:left; font-size:13px;"></div>
+</div>
 
         <!-- DELEGACIONES -->
         <h3>🔑 Delegaciones</h3>
