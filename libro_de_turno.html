@@ -122,9 +122,6 @@
 
     document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
 
-// Variable global para que toda la página conozca el total
-let totalActivos = 0; 
-
 // 1. Censo y Movimientos (Lógica sincronizada con Firebase)
 db.collection("pacientes").onSnapshot((snapshot) => {
     // Guardamos el total en la variable global (sin 'let' aquí)
