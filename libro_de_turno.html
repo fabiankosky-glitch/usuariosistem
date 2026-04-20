@@ -133,7 +133,7 @@
             // Esto limpia el texto: quita espacios y pone todo en minúsculas
             const estadoLimpio = (datos.estado || "").toString().toLowerCase().trim();
             
-        if (estadoLimpio === 'usuarios activos' || estadoLimpio === 'activos') {
+        if (estadoLimpio.includes('activo')) {
             totalActivosDB++;
         }
         });
