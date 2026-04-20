@@ -10,235 +10,175 @@
         .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
         h2, h3 { text-align: center; color: #2c3e50; margin-top: 0; }
         
-        /* Censo Dinámico */
-        .censo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .censo-item { padding: 15px; border-radius: 12px; color: white; text-align: center; font-weight: bold; }
-        .resultado-casa { background: #2c3e50; color: #ecf0f1; padding: 15px; border-radius: 12px; text-align: center; margin-bottom: 20px; }
+        /* Estructura del Censo */
+        .censo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .censo-item { padding: 12px; border-radius: 10px; color: white; text-align: center; font-weight: bold; font-size: 14px; }
+        .resultado-casa { background: #2c3e50; color: white; padding: 12px; border-radius: 10px; text-align: center; margin-bottom: 15px; font-weight: bold; }
         
-        label { display: block; font-weight: bold; margin-top: 15px; font-size: 13px; color: #34495e; }
-        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 15px; }
-        textarea { height: 100px; resize: none; }
+        /* Estructura de Seguridad */
+        .seguridad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; background: #fff5f5; padding: 12px; border-radius: 10px; border: 1px solid #feb2b2; }
+        .seg-box { font-size: 13px; color: #c53030; }
         
-        /* Secciones Dinámicas */
-        .seccion-especial { background: #eef2f7; padding: 15px; border-radius: 12px; border: 1px solid #d1d9e6; margin-top: 15px; display: none; }
-        .btn-accion { background: #3498db; color: white; padding: 12px; width: 100%; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-guardar { background: #27ae60; color: white; padding: 18px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 25px; font-size: 16px; }
+        label { display: block; font-weight: bold; margin-top: 10px; font-size: 12px; color: #34495e; }
+        input, textarea { width: 100%; padding: 10px; margin-top: 4px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; }
         
-        /* Historial */
-        .historial-item { background: white; padding: 15px; border-radius: 12px; margin-bottom: 12px; border-left: 6px solid #2c3e50; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .foto-evidencia { width: 100%; border-radius: 8px; margin-top: 10px; border: 1px solid #ddd; }
+        .alert-auto { background: #ebf8ff; border-left: 4px solid #3182ce; padding: 8px; margin-top: 5px; font-size: 12px; color: #2a4365; border-radius: 4px; }
+        .btn-guardar { background: #27ae60; color: white; padding: 15px; width: 100%; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; margin-top: 20px; }
         
-        .nav-btn { margin-bottom:15px; padding:10px 20px; cursor:pointer; border-radius:8px; border:none; background:#95a5a6; color:white; font-weight:bold; width: 100%; }
+        /* Estilo del Historial (Copia fiel del original) */
+        .historial-item { background: #ffffff; padding: 15px; border-radius: 15px; margin-bottom: 20px; border: 1px solid #ddd; }
+        .detalle-turno { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-top: 10px; border: 1px solid #eee; }
+        summary { font-weight: bold; color: #2c3e50; cursor: pointer; padding: 5px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <button class="nav-btn" onclick="location.href='index.html'">🏠 Volver al Menú Principal</button>
+    <button onclick="location.href='index.html'" style="margin-bottom:15px; padding:10px; width:100%; border-radius:8px; border:none; background:#95a5a6; color:white; font-weight:bold; cursor:pointer;">🏠 Menú Principal</button>
     
+    <!-- FORMULARIO DE CAPTURA -->
     <div class="card">
-        <h2>📒 Libro de Turno</h2>
+        <h2>📒 Nuevo Registro de Turno</h2>
         <p id="fechaHoy" style="font-weight: bold; text-align:center; color: #7f8c8d;"></p>
 
-        <!-- SECCIÓN CENSO -->
         <div class="censo-grid">
-            <div class="censo-item" style="background: #27ae60;">
-                🏠 Activos (DB)<br><span id="cntActivos" style="font-size: 24px;">0</span>
-            </div>
-            <div class="censo-item" style="background: #e67e22;">
-                🚶 Fuera del Hogar<br>
-                <input type="number" id="inpFuera" value="0" min="0" oninput="calcularPresencia()" 
-                       style="width:80px; height:35px; text-align:center; margin-top:5px; border:none; border-radius:5px; font-weight:bold; font-size: 18px;">
+            <div class="censo-item" style="background: #27ae60;">🏠 Activos: <span id="cntActivos">0</span></div>
+            <div class="censo-item" style="background: #e67e22;">🚶 Fuera: <input type="number" id="inpFuera" value="0" oninput="calcularPresencia()" style="width:45px;"></div>
+        </div>
+        <div class="resultado-casa">📍 Total en Casa: <span id="cntEnCasa">0</span></div>
+
+        <div class="card" style="padding:15px; border: 1px solid #feb2b2;">
+            <h3 style="font-size:16px;">🔐 Seguridad e Inventario</h3>
+            <label>👥 Grupos Altos:</label><input type="text" id="gruposAltos">
+            <div class="seguridad-grid">
+                <div><label>🔔 Timbres:</label><input type="text" id="timbres"></div>
+                <div><label>👣 Sombras:</label><input type="text" id="sombras"></div>
+                <div><label>🐐 Chivos:</label><input type="text" id="chivos"></div>
+                <div><label>🔗 Grilletes:</label><input type="text" id="grilletes"></div>
+                <div style="grid-column: span 2;"><label>🔑 Llavero:</label><input type="text" id="llavero"></div>
             </div>
         </div>
-        <div class="resultado-casa">
-            <h3 style="margin:0;">📍 Total en Casa: <span id="cntEnCasa" style="font-size: 24px;">0</span></h3>
+
+        <div class="card" style="padding:15px; border: 1px solid #3182ce; margin-top:10px;">
+            <h3 style="font-size:16px;">🤖 Movimientos del Día</h3>
+            <div id="contenedorAlertas"></div>
         </div>
 
-        <h3>👥 Personal</h3>
-        <input type="text" id="opTurno" placeholder="Operador de Turno">
-        <input type="text" id="opApoyo" placeholder="Operador de Apoyo">
+        <label>👤 Operador de Turno:</label><input type="text" id="opTurno">
+        <label>🚨 Novedades Generales:</label><textarea id="novedadesTxt" rows="3"></textarea>
 
-        <!-- REGISTRO DE ACTIVIDADES -->
-        <div class="card" style="background: #f9f9f9; border: 1px dashed #ccc; margin-top: 20px;">
-            <h3>🎭 Registro de Actividad / Terapia</h3>
-            <select id="tipoEvento" onchange="prepararFormularioEvento()">
-                <option value="ninguno">-- Seleccionar para agregar --</option>
-                <option value="actividad">⚽ Actividad</option>
-                <option value="terapia">🧠 Terapia</option>
-            </select>
-
-            <div id="secDinamica" class="seccion-especial">
-                <p>⏰ Hora: <b id="horaEvento">--:--</b></p>
-                
-                <label>Nombre / Título:</label>
-                <input type="text" id="nombreEvento" placeholder="Ej: Fisioterapia, Aseo, Cine">
-
-                <label>Asistencia:</label>
-                <textarea id="asistenciaEvento" placeholder="Lista de usuarios presentes..."></textarea>
-
-                <label>Observaciones:</label>
-                <textarea id="obsEvento" placeholder="Detalles de lo ocurrido..."></textarea>
-
-                <div id="areaCamara">
-                    <video id="videoEvidencia" autoplay playsinline style="width:100%; border-radius:10px; background:black; height:200px; object-fit:cover; margin-top:10px;"></video>
-                    <button type="button" class="btn-accion" onclick="tomarFotoEvento()">📸 Tomar Foto de Evidencia</button>
-                </div>
-
-                <button type="button" onclick="agregarALista()" style="background:#2ecc71; color:white; width:100%; padding:15px; border:none; border-radius:10px; margin-top:15px; font-weight:bold; cursor:pointer;">➕ Añadir a la Lista</button>
-            </div>
-
-            <div id="listaTemporal" style="margin-top:15px;"></div>
-        </div>
-
-        <h3>🚨 Novedades Relevantes</h3>
-        <textarea id="novedadesTxt" placeholder="Fugas, ingresos, novedades generales del turno..."></textarea>
-
-        <button id="btnGuardar" class="btn-guardar">🚀 GUARDAR Y ENTREGAR TURNO</button>
+        <button id="btnGuardar" class="btn-guardar">🚀 GUARDAR TURNO</button>
     </div>
 
+    <!-- SECCIÓN DE HISTORIAL -->
     <div id="historial">
-        <h3>📋 Turnos Anteriores</h3>
-        <div id="listaHistorial">Cargando...</div>
+        <h2 style="margin-top:40px;">📋 Turnos Anteriores</h2>
+        <div id="listaHistorial">Cargando registros...</div>
     </div>
 </div>
 
-   <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import {getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        const firebaseConfig = {
-            apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
-            authDomain: "caminosnuevosdatabase.firebaseapp.com",
-            projectId: "caminosnuevosdatabase",
-            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
-            appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
-        };
+<script type="module">
+    import { initializeApp } from "https://gstatic.com";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://gstatic.com";
 
+    const firebaseConfig = {
+        apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+        authDomain: "://firebaseapp.com",
+        projectId: "caminosnuevosdatabase",
+        appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-
-    let listaEventos = [];
-    let fotoData = null;
     let totalActivosDB = 0;
+    let cambiosDeteccion = [];
 
-    // Fecha en pantalla
-    document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString('es-CO', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
 
-    // 1. CENSO SINCRONIZADO
     onSnapshot(collection(db, "pacientes"), (snap) => {
-        totalActivosDB = 0;
+        totalActivosDB = 0; cambiosDeteccion = [];
+        const hoy = new Date().toLocaleDateString();
+        const alertCont = document.getElementById("contenedorAlertas");
+        alertCont.innerHTML = "";
+        
         snap.forEach(doc => {
-            if(doc.data().estado === 'activos') totalActivosDB++;
+            const p = doc.data();
+            if((p.estado || "").toLowerCase().includes("activo")) totalActivosDB++;
+            if(p.fechaRegistro === hoy || p.fecha === hoy) {
+                const msg = `• ${p.nombre}: ${p.estado}`;
+                cambiosDeteccion.push(msg);
+                alertCont.innerHTML += `<div class="alert-auto">${msg}</div>`;
+            }
         });
         document.getElementById("cntActivos").innerText = totalActivosDB;
         window.calcularPresencia();
     });
 
     window.calcularPresencia = () => {
-        const fuera = parseInt(document.getElementById("inpFuera").value) || 0;
-        const enCasa = totalActivosDB - fuera;
-        document.getElementById("cntEnCasa").innerText = enCasa < 0 ? 0 : enCasa;
+        const f = parseInt(document.getElementById("inpFuera").value) || 0;
+        document.getElementById("cntEnCasa").innerText = totalActivosDB - f;
     };
 
-    // 2. LÓGICA DINÁMICA
-    window.prepararFormularioEvento = () => {
-        const tipo = document.getElementById("tipoEvento").value;
-        const sec = document.getElementById("secDinamica");
-        if(tipo === "ninguno") { sec.style.display = "none"; return; }
-        
-        sec.style.display = "block";
-        document.getElementById("horaEvento").innerText = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-        .then(stream => { document.getElementById("videoEvidencia").srcObject = stream; })
-        .catch(() => console.log("Cámara no disponible"));
-    };
-
-    window.tomarFotoEvento = () => {
-        const video = document.getElementById("videoEvidencia");
-        const canvas = document.createElement("canvas");
-        canvas.width = video.videoWidth; canvas.height = video.videoHeight;
-        canvas.getContext("2d").drawImage(video, 0, 0);
-        fotoData = canvas.toDataURL("image/jpeg", 0.5);
-        alert("📸 Foto de evidencia capturada.");
-    };
-
-    window.agregarALista = () => {
-        const nombre = document.getElementById("nombreEvento").value;
-        const tipo = document.getElementById("tipoEvento").value;
-        if(!nombre) return alert("Escriba el nombre de la actividad.");
-
-        listaEventos.push({
-            tipo, nombre,
-            asistencia: document.getElementById("asistenciaEvento").value,
-            obs: document.getElementById("obsEvento").value,
-            hora: document.getElementById("horaEvento").innerText,
-            foto: fotoData
-        });
-
-        document.getElementById("listaTemporal").innerHTML += `
-            <div style="background:#d1e7dd; padding:8px; border-radius:8px; margin-bottom:5px; font-size:13px; border-left: 4px solid #0f5132;">
-                <b>${tipo.toUpperCase()}:</b> ${nombre} (${document.getElementById("horaEvento").innerText})
-            </div>`;
-        
-        // Reset
-        document.getElementById("secDinamica").style.display = "none";
-        document.getElementById("tipoEvento").value = "ninguno";
-        document.getElementById("nombreEvento").value = "";
-        document.getElementById("asistenciaEvento").value = "";
-        document.getElementById("obsEvento").value = "";
-        fotoData = null;
-    };
-
-    // 3. GUARDAR TODO
     document.getElementById('btnGuardar').onclick = async () => {
-        const novedades = document.getElementById("novedadesTxt").value;
-        if(!novedades) return alert("Por favor, detalle las novedades.");
-
         try {
             await addDoc(collection(db, "libro_de_turnos_pro"), {
                 fecha: new Date().toLocaleString(),
                 timestamp: Date.now(),
-                censo: { 
-                    total: totalActivosDB, 
-                    fuera: parseInt(document.getElementById("inpFuera").value) || 0,
-                    enCasa: parseInt(document.getElementById("cntEnCasa").innerText)
+                operador: document.getElementById("opTurno").value,
+                censo: { activos: totalActivosDB, fuera: document.getElementById("inpFuera").value, enCasa: document.getElementById("cntEnCasa").innerText },
+                seguridad: { 
+                    grupos: document.getElementById("gruposAltos").value,
+                    timbres: document.getElementById("timbres").value,
+                    sombras: document.getElementById("sombras").value,
+                    chivos: document.getElementById("chivos").value,
+                    grilletes: document.getElementById("grilletes").value,
+                    llavero: document.getElementById("llavero").value
                 },
-                operadores: { 
-                    turno: document.getElementById("opTurno").value || "---",
-                    apoyo: document.getElementById("opApoyo").value || ""
-                },
-                eventos: listaEventos,
-                novedades: novedades
+                movimientos: cambiosDeteccion,
+                novedades: document.getElementById("novedadesTxt").value
             });
-            alert("✅ Turno guardado.");
+            alert("✅ Turno Guardado");
             location.reload();
-        } catch (e) { alert("Error: " + e.message); }
+        } catch (e) { alert("Error al guardar"); }
     };
 
-    // 4. MOSTRAR HISTORIAL
     onSnapshot(query(collection(db, "libro_de_turnos_pro"), orderBy("timestamp", "desc")), (snap) => {
         const list = document.getElementById("listaHistorial");
         list.innerHTML = "";
         snap.forEach(doc => {
             const d = doc.data();
-            let evs = d.eventos.map(e => `
-                <div style="border-top:1px solid #eee; padding:5px; margin-top:5px;">
-                    <b>${e.tipo}:</b> ${e.nombre} (${e.hora})<br>
-                    <small>Asistencia: ${e.asistencia}</small><br>
-                    ${e.foto ? `<img src="${e.foto}" class="foto-evidencia">` : ''}
-                </div>
-            `).join('');
-
             list.innerHTML += `
                 <div class="historial-item">
-                    <small>📅 ${d.fecha}</small><br>
-                    <b>👤 Op:</b> ${d.operadores.turno} | <b>🏠 En Casa:</b> ${d.censo.enCasa}<br>
-                    <p><b>🚨 Novedades:</b> ${d.novedades}</p>
                     <details>
-                        <summary style="color:#3498db; cursor:pointer;">Ver Actividades (${d.eventos.length})</summary>
-                        ${evs}
+                        <summary>📅 Turno: ${d.fecha} (Op: ${d.operador})</summary>
+                        <div class="detalle-turno">
+                            <!-- ESTRUCTURA IDENTICA AL ORIGINAL -->
+                            <div class="censo-grid">
+                                <div class="censo-item" style="background:#27ae60">Activos: ${d.censo.activos}</div>
+                                <div class="censo-item" style="background:#e67e22">Fuera: ${d.censo.fuera}</div>
+                            </div>
+                            <div class="resultado-casa">📍 En Casa: ${d.censo.enCasa}</div>
+
+                            <div style="background:#fff5f5; padding:10px; border-radius:8px; border:1px solid #feb2b2; margin-bottom:10px;">
+                                <p style="margin:2px"><b>👥 Grupos:</b> ${d.seguridad.grupos}</p>
+                                <div style="display:grid; grid-template-columns:1fr 1fr; font-size:12px;">
+                                    <span>🔔 Timbres: ${d.seguridad.timbres}</span>
+                                    <span>👣 Sombras: ${d.seguridad.sombras}</span>
+                                    <span>🐐 Chivos: ${d.seguridad.chivos}</span>
+                                    <span>🔗 Grilletes: ${d.seguridad.grilletes}</span>
+                                    <span style="grid-column:span 2">🔑 Llavero: ${d.seguridad.llavero}</span>
+                                </div>
+                            </div>
+
+                            <div style="background:#ebf8ff; padding:10px; border-radius:8px; border:1px solid #3182ce; font-size:12px;">
+                                <b>🤖 Movimientos Detectados:</b><br>
+                                ${d.movimientos.join("<br>") || "Sin movimientos"}
+                            </div>
+
+                            <p style="background:white; padding:10px; border-radius:8px; margin-top:10px; border:1px solid #ccc;">
+                                <b>🚨 Novedades Generales:</b><br>${d.novedades}
+                            </p>
+                        </div>
                     </details>
                 </div>`;
         });
