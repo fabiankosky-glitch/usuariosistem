@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Libro de Turno - Capacidad Ilimitada</title>
+    <title>Libro de Turno - Ilimitado con Detalles</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 15px; margin: 0; }
         .container { max-width: 700px; margin: auto; }
@@ -12,12 +12,12 @@
         .resultado-casa { background: #2c3e50; color: white; padding: 12px; border-radius: 10px; text-align: center; margin-bottom: 15px; font-weight: bold; }
         .seguridad-box { background: #fff5f5; padding: 15px; border-radius: 12px; border: 1px solid #feb2b2; margin-top: 10px; }
         label { display: block; font-weight: bold; margin-top: 12px; font-size: 13px; color: #c53030; }
-        textarea, input { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
+        textarea, input, select { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
         textarea { height: 80px; }
         .btn-foto { background: #3498db; color: white; padding: 12px; width: 100%; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
         .btn-guardar { background: #27ae60; color: white; padding: 18px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 25px; }
-        .historial-item { background: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #ddd; }
         .foto-galeria { width: 30%; aspect-ratio: 1; object-fit: cover; border-radius: 5px; margin: 2px; border: 1px solid #ddd; }
+        .item-actividad { background: #e8f4fd; padding: 10px; border-radius: 8px; margin-top: 10px; border-left: 5px solid #3498db; }
     </style>
 </head>
 <body>
@@ -47,56 +47,63 @@
             <label>🔑 Llavero:</label><textarea id="llavero"></textarea>
         </div>
 
-        <!-- ACTIVIDADES (MULTIFOTO) -->
+        <!-- ACTIVIDADES (RESTAURADO) -->
         <div class="card" style="margin-top:20px; border: 2px dashed #3498db;">
-            <h3>📸 Registro de Evidencias (Ilimitado)</h3>
+            <h3>📸 Registro de Actividades y Fotos</h3>
             <select id="tipoEvento" onchange="prepararEvento()">
-                <option value="ninguno">-- Seleccionar Actividad --</option>
+                <option value="ninguno">-- Seleccionar Tipo --</option>
                 <option value="actividad">⚽ Actividad</option>
                 <option value="terapia">🧠 Terapia</option>
             </select>
 
             <div id="secDinamica" style="display:none; background:#f0f7ff; padding:15px; border-radius:12px; margin-top:10px;">
                 <p>⏰ Hora: <b id="horaEvento">--:--</b></p>
-                <input type="text" id="nomEvento" placeholder="Nombre de la actividad">
-                <textarea id="obsEvento" placeholder="Observaciones de esta foto..."></textarea>
+                
+                <label style="color:#2c3e50">Nombre del Evento:</label>
+                <input type="text" id="nomEvento" placeholder="Ej: Clase de Deporte">
+
+                <label style="color:#2c3e50">Asistencia:</label>
+                <textarea id="asistEvento" placeholder="Lista de pacientes..."></textarea>
+
+                <label style="color:#2c3e50">Observaciones/Novedades:</label>
+                <textarea id="obsEvento" placeholder="¿Qué sucedió durante la actividad?"></textarea>
+
                 <video id="videoEvidencia" autoplay playsinline style="width:100%; height:200px; background:black; border-radius:10px; margin-top:10px; object-fit:cover;"></video>
-                <button type="button" class="btn-foto" onclick="tomarYSubir()">📸 Capturar y Guardar Foto</button>
-                <p id="statusCarga" style="font-size:11px; color:#2980b9; text-align:center;"></p>
+                <button type="button" class="btn-foto" onclick="tomarYSubir()">📸 Capturar y Guardar Evidencia</button>
+                <p id="statusCarga" style="font-size:11px; color:#2980b9; text-align:center; font-weight:bold;"></p>
             </div>
         </div>
 
-        <label>👤 Operador:</label><input type="text" id="opTurno">
-        <label>🚨 Novedades Finales:</label><textarea id="novedadesTxt" style="height:120px;"></textarea>
+        <label style="color:#2c3e50">👤 Operador:</label><input type="text" id="opTurno">
+        <label style="color:#2c3e50">🚨 Novedades Finales del Turno:</label><textarea id="novedadesTxt" style="height:120px;"></textarea>
 
         <button id="btnGuardar" class="btn-guardar">🚀 CERRAR Y ENTREGAR TURNO</button>
     </div>
 
     <div id="historial">
-        <h3>📋 Historial de Turnos y Fotos</h3>
+        <h3>📋 Historial de Turnos</h3>
         <div id="listaHistorial">Cargando...</div>
     </div>
 </div>
 
-<script type="module">
-    import { initializeApp } from "https://gstatic.com";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, where, serverTimestamp } from "https://gstatic.com";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
-        authDomain: "://firebaseapp.com",
-        projectId: "caminosnuevosdatabase",
-        appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
-    };
+   <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+            authDomain: "caminosnuevosdatabase.firebaseapp.com",
+            projectId: "caminosnuevosdatabase",
+            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+            appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+        };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     let totalActivos = 0;
-    const ID_TURNO_ACTUAL = "turno_" + Date.now(); // ID único para agrupar las 30 fotos
+    const ID_TURNO_ACTUAL = "turno_" + Date.now();
 
     document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
 
-    // 1. Censo
     onSnapshot(collection(db, "pacientes"), (snap) => {
         totalActivos = 0;
         snap.forEach(doc => { if((doc.data().estado || "").toLowerCase().includes("activo")) totalActivos++; });
@@ -109,41 +116,50 @@
         document.getElementById("cntEnCasa").innerText = totalActivos - f;
     };
 
-    // 2. Lógica de Cámara y Subida Inmediata
     window.prepararEvento = () => {
-        document.getElementById("secDinamica").style.display = "block";
+        const t = document.getElementById("tipoEvento").value;
+        document.getElementById("secDinamica").style.display = (t === "ninguno") ? "none" : "block";
         document.getElementById("horaEvento").innerText = new Date().toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'});
-        navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}})
-        .then(s => { document.getElementById("videoEvidencia").srcObject = s; });
+        
+        if(t !== "ninguno"){
+            navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}})
+            .then(s => { document.getElementById("videoEvidencia").srcObject = s; });
+        }
     };
 
     window.tomarYSubir = async () => {
         const status = document.getElementById("statusCarga");
-        status.innerText = "⏳ Procesando foto...";
+        const nombre = document.getElementById("nomEvento").value;
+        if(!nombre) return alert("Por favor, escribe el nombre del evento antes de tomar la foto.");
+
+        status.innerText = "⏳ Subiendo evidencia...";
         
         const v = document.getElementById("videoEvidencia");
         const c = document.createElement("canvas");
         const escala = 600 / v.videoWidth;
         c.width = 600; c.height = v.videoHeight * escala;
         c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
-        const fotoFinal = c.toDataURL("image/jpeg", 0.3); // Súper liviana
+        const fotoFinal = c.toDataURL("image/jpeg", 0.3);
 
         try {
             await addDoc(collection(db, "evidencias_fotos"), {
                 idTurno: ID_TURNO_ACTUAL,
                 tipo: document.getElementById("tipoEvento").value,
-                nombre: document.getElementById("nomEvento").value,
+                nombre: nombre,
+                asistencia: document.getElementById("asistEvento").value,
                 observacion: document.getElementById("obsEvento").value,
+                hora: document.getElementById("horaEvento").innerText,
                 foto: fotoFinal,
                 timestamp: serverTimestamp()
             });
-            status.innerText = "✅ Foto guardada correctamente";
+            status.innerText = "✅ ¡Guardado! Puedes tomar otra foto o cambiar de actividad.";
+            // Limpiamos campos para la siguiente foto si es necesario
             document.getElementById("nomEvento").value = "";
+            document.getElementById("asistEvento").value = "";
             document.getElementById("obsEvento").value = "";
-        } catch (e) { alert("Error al subir foto"); }
+        } catch (e) { alert("Error al subir"); }
     };
 
-    // 3. Guardar Turno (Solo el texto)
     document.getElementById('btnGuardar').onclick = async () => {
         await addDoc(collection(db, "libro_de_turnos_pro"), {
             idRelacion: ID_TURNO_ACTUAL,
@@ -161,10 +177,10 @@
             },
             novedades: document.getElementById("novedadesTxt").value
         });
+        alert("✅ Turno Cerrado Exitosamente.");
         location.reload();
     };
 
-    // 4. Historial (Une el turno con sus 30 fotos)
     onSnapshot(query(collection(db, "libro_de_turnos_pro"), orderBy("timestamp", "desc")), (snap) => {
         const list = document.getElementById("listaHistorial");
         list.innerHTML = "";
@@ -177,24 +193,29 @@
             divTurno.innerHTML = `
                 <details>
                     <summary>📅 ${d.fecha} - Op: ${d.operador}</summary>
-                    <div style="font-size:13px; margin-top:10px;">
-                        <p><b>🏠 Casa:</b> ${d.censo.enCasa} | <b>🔑 Llavero:</b> ${d.seguridad.llavero}</p>
-                        <p><b>🚨 Novedades:</b> ${d.novedades}</p>
-                        <div id="galeria_${idT}" style="display:flex; flex-wrap:wrap; background:#f9f9f9; padding:5px; border-radius:8px;">
-                            Cargando fotos...
-                        </div>
+                    <div style="font-size:13px; margin-top:10px; border-top:1px solid #ddd; padding-top:10px;">
+                        <p><b>🏠 En Casa:</b> ${d.censo.enCasa} | <b>🔑 Llavero:</b> ${d.seguridad.llavero}</p>
+                        <p><b>🚨 Novedades Finales:</b> ${d.novedades}</p>
+                        <hr>
+                        <b>📸 Evidencias Registradas:</b>
+                        <div id="galeria_${idT}" style="margin-top:10px;">Cargando detalles...</div>
                     </div>
                 </details>`;
             list.appendChild(divTurno);
 
-            // Buscar las fotos de este turno específico
             const qFotos = query(collection(db, "evidencias_fotos"), where("idTurno", "==", idT));
             onSnapshot(qFotos, (sFotos) => {
                 const gal = document.getElementById(`galeria_${idT}`);
-                gal.innerHTML = sFotos.empty ? "Sin fotos" : "";
+                gal.innerHTML = sFotos.empty ? "Sin evidencias" : "";
                 sFotos.forEach(fDoc => {
                     const fData = fDoc.data();
-                    gal.innerHTML += `<img src="${fData.foto}" class="foto-galeria" title="${fData.nombre}">`;
+                    gal.innerHTML += `
+                        <div class="item-actividad">
+                            <b>${fData.tipo.toUpperCase()}: ${fData.nombre}</b> (${fData.hora})<br>
+                            <small><b>Asistencia:</b> ${fData.asistencia || 'N/A'}</small><br>
+                            <small><b>Obs:</b> ${fData.observacion || 'N/A'}</small><br>
+                            <img src="${fData.foto}" style="width:100%; border-radius:5px; margin-top:5px;">
+                        </div>`;
                 });
             });
         });
