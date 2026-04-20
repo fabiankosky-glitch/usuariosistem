@@ -133,9 +133,9 @@
             // Esto limpia el texto: quita espacios y pone todo en minúsculas
             const estadoLimpio = (datos.estado || "").toString().toLowerCase().trim();
             
-            if(estadoLimpio === 'activos' || estadoLimpio === 'activo') {
-                totalActivosDB++;
-            }
+        if (estadoLimpio === 'usuarios activos' || estadoLimpio === 'activos') {
+            totalActivosDB++;
+        }
         });
         document.getElementById("cntActivos").innerText = totalActivosDB;
         window.calcularPresencia();
