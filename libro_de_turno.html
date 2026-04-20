@@ -3,21 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Libro de Turno - Ilimitado con Detalles</title>
+    <title>Libro de Turno Digital - Caminos Nuevos (Completo)</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 15px; margin: 0; }
         .container { max-width: 700px; margin: auto; }
         .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        h2, h3 { text-align: center; color: #2c3e50; margin-top: 0; }
+        
+        /* Censo */
+        .censo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .censo-item { padding: 12px; border-radius: 10px; color: white; text-align: center; font-weight: bold; }
         .resultado-casa { background: #2c3e50; color: white; padding: 12px; border-radius: 10px; text-align: center; margin-bottom: 15px; font-weight: bold; }
+        
+        /* Seguridad - Espacios Grandes */
         .seguridad-box { background: #fff5f5; padding: 15px; border-radius: 12px; border: 1px solid #feb2b2; margin-top: 10px; }
         label { display: block; font-weight: bold; margin-top: 12px; font-size: 13px; color: #c53030; }
-        textarea, input, select { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
-        textarea { height: 80px; }
-        .btn-foto { background: #3498db; color: white; padding: 12px; width: 100%; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
-        .btn-guardar { background: #27ae60; color: white; padding: 18px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 25px; }
-        .foto-galeria { width: 30%; aspect-ratio: 1; object-fit: cover; border-radius: 5px; margin: 2px; border: 1px solid #ddd; }
-        .item-actividad { background: #e8f4fd; padding: 10px; border-radius: 8px; margin-top: 10px; border-left: 5px solid #3498db; }
+        textarea, input, select { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 14px; }
+        textarea { height: 100px; resize: vertical; } 
+        
+        /* Actividades y Cámara */
+        .card-actividad { margin-top:20px; border: 2px dashed #3498db; padding: 15px; border-radius: 15px; background: #f0f7ff; }
+        .btn-foto { background: #3498db; color: white; padding: 15px; width: 100%; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .btn-guardar { background: #27ae60; color: white; padding: 18px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 25px; font-size: 16px; }
+        
+        /* Historial Detallado */
+        .historial-item { background: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #ddd; }
+        .item-evidencia-historial { background: #ffffff; padding: 12px; border-radius: 10px; margin-top: 10px; border: 1px solid #e2e8f0; border-left: 6px solid #3498db; }
+        .foto-evidencia { width: 100%; border-radius: 10px; margin-top: 10px; border: 1px solid #ddd; }
+        summary { font-weight: bold; color: #2c3e50; cursor: pointer; padding: 5px; }
+        .mov-auto { background: #ebf8ff; border-left: 4px solid #3182ce; padding: 8px; margin-top: 5px; font-size: 12px; color: #2a4365; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -26,20 +40,20 @@
     <button onclick="location.href='index.html'" style="margin-bottom:15px; padding:10px; width:100%; border-radius:8px; border:none; background:#95a5a6; color:white; font-weight:bold; cursor:pointer;">🏠 Menú Principal</button>
     
     <div class="card">
-        <h2>📒 Libro de Turno (Alta Capacidad)</h2>
+        <h2>📒 Libro de Turno Digital</h2>
         <p id="fechaHoy" style="font-weight:bold; text-align:center; color:#7f8c8d;"></p>
 
-        <!-- CENSO -->
-        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+        <!-- 1. SECCIÓN CENSO -->
+        <div class="censo-grid">
             <div class="censo-item" style="background:#27ae60;">🏠 Activos: <span id="cntActivos">0</span></div>
-            <div class="censo-item" style="background:#e67e22;">🚶 Fuera: <input type="number" id="inpFuera" value="0" oninput="calcularPresencia()" style="width:40px;"></div>
+            <div class="censo-item" style="background:#e67e22;">🚶 Fuera: <input type="number" id="inpFuera" value="0" oninput="calcularPresencia()" style="width:45px; height: 25px; text-align: center;"></div>
         </div>
-        <div class="resultado-casa">📍 En Casa: <span id="cntEnCasa">0</span></div>
+        <div class="resultado-casa">📍 Total en Casa: <span id="cntEnCasa">0</span></div>
 
-        <!-- SEGURIDAD -->
+        <!-- 2. SECCIÓN SEGURIDAD (ESPACIOS AMPLIOS) -->
         <div class="seguridad-box">
             <h3>🔐 Seguridad e Inventario</h3>
-            <label>👥 Grupos Altos:</label><textarea id="gruposAltos"></textarea>
+            <label>👥 Listado Grupos Altos:</label><textarea id="gruposAltos" placeholder="Escriba aquí los detalles..."></textarea>
             <label>🔔 Timbres:</label><textarea id="timbres"></textarea>
             <label>👣 Sombras:</label><textarea id="sombras"></textarea>
             <label>🐐 Chivos:</label><textarea id="chivos"></textarea>
@@ -47,48 +61,50 @@
             <label>🔑 Llavero:</label><textarea id="llavero"></textarea>
         </div>
 
-        <!-- ACTIVIDADES (RESTAURADO) -->
-        <div class="card" style="margin-top:20px; border: 2px dashed #3498db;">
-            <h3>📸 Registro de Actividades y Fotos</h3>
+        <!-- 3. SECCIÓN ACTIVIDADES E INDUCCIÓN DE CÁMARA ILIMITADA -->
+        <div class="card-actividad">
+            <h3>📸 Registro de Actividad / Terapia</h3>
             <select id="tipoEvento" onchange="prepararEvento()">
-                <option value="ninguno">-- Seleccionar Tipo --</option>
+                <option value="ninguno">-- Seleccionar Actividad --</option>
                 <option value="actividad">⚽ Actividad</option>
                 <option value="terapia">🧠 Terapia</option>
             </select>
 
-            <div id="secDinamica" style="display:none; background:#f0f7ff; padding:15px; border-radius:12px; margin-top:10px;">
-                <p>⏰ Hora: <b id="horaEvento">--:--</b></p>
+            <div id="secDinamica" style="display:none; margin-top:15px;">
+                <p>⏰ Hora Captura: <b id="horaEvento">--:--</b></p>
+                <label>Nombre del Evento:</label><input type="text" id="nomEvento" placeholder="Ej: Clase de Yoga">
+                <label>Asistencia:</label><textarea id="asistEvento" placeholder="Nombres de los presentes..."></textarea>
+                <label>Observaciones/Novedades:</label><textarea id="obsEvento" placeholder="Detalles de lo ocurrido..."></textarea>
                 
-                <label style="color:#2c3e50">Nombre del Evento:</label>
-                <input type="text" id="nomEvento" placeholder="Ej: Clase de Deporte">
-
-                <label style="color:#2c3e50">Asistencia:</label>
-                <textarea id="asistEvento" placeholder="Lista de pacientes..."></textarea>
-
-                <label style="color:#2c3e50">Observaciones/Novedades:</label>
-                <textarea id="obsEvento" placeholder="¿Qué sucedió durante la actividad?"></textarea>
-
                 <video id="videoEvidencia" autoplay playsinline style="width:100%; height:200px; background:black; border-radius:10px; margin-top:10px; object-fit:cover;"></video>
                 <button type="button" class="btn-foto" onclick="tomarYSubir()">📸 Capturar y Guardar Evidencia</button>
-                <p id="statusCarga" style="font-size:11px; color:#2980b9; text-align:center; font-weight:bold;"></p>
+                <p id="statusCarga" style="font-size:12px; color:#2980b9; text-align:center; font-weight:bold; margin-top:10px;"></p>
             </div>
         </div>
 
-        <label style="color:#2c3e50">👤 Operador:</label><input type="text" id="opTurno">
-        <label style="color:#2c3e50">🚨 Novedades Finales del Turno:</label><textarea id="novedadesTxt" style="height:120px;"></textarea>
+        <!-- 4. MOVIMIENTOS AUTOMÁTICOS -->
+        <div class="card" style="border: 1px solid #3182ce; margin-top:15px;">
+            <h3 style="font-size:16px;">🤖 Movimientos Detectados Hoy</h3>
+            <div id="contAlertas"></div>
+        </div>
+
+        <!-- 5. CIERRE DE TURNO -->
+        <label>👤 Operador de Turno:</label><input type="text" id="opTurno" placeholder="Su nombre">
+        <label>🚨 Novedades Finales:</label><textarea id="novedadesTxt" style="height:120px;" placeholder="Resumen general..."></textarea>
 
         <button id="btnGuardar" class="btn-guardar">🚀 CERRAR Y ENTREGAR TURNO</button>
     </div>
 
+    <!-- 6. HISTORIAL DETALLADO -->
     <div id="historial">
-        <h3>📋 Historial de Turnos</h3>
-        <div id="listaHistorial">Cargando...</div>
+        <h3>📋 Historial de Turnos Anteriores</h3>
+        <div id="listaHistorial">Cargando registros...</div>
     </div>
 </div>
 
    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
             authDomain: "caminosnuevosdatabase.firebaseapp.com",
@@ -99,14 +115,28 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    let totalActivos = 0;
-    const ID_TURNO_ACTUAL = "turno_" + Date.now();
+    let totalActivos = 0; let movsAuto = [];
+    const ID_RELACION = "turno_" + Date.now();
 
     document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
 
+    // Sincronización de Censo y Movimientos
     onSnapshot(collection(db, "pacientes"), (snap) => {
-        totalActivos = 0;
-        snap.forEach(doc => { if((doc.data().estado || "").toLowerCase().includes("activo")) totalActivos++; });
+        totalActivos = 0; movsAuto = [];
+        const hoy = new Date().toLocaleDateString();
+        const alertCont = document.getElementById("contAlertas");
+        alertCont.innerHTML = "";
+        
+        snap.forEach(doc => {
+            const p = doc.data();
+            if((p.estado || "").toLowerCase().includes("activo")) totalActivos++;
+            if(p.fechaRegistro === hoy || p.fecha === hoy) {
+                const m = `• ${p.nombre}: ${p.estado}`;
+                movsAuto.push(m);
+                alertCont.innerHTML += `<div class="mov-auto">${m}</div>`;
+            }
+        });
+        if(movsAuto.length === 0) alertCont.innerHTML = "<p style='color:gray; font-size:12px;'>No hay movimientos automáticos hoy.</p>";
         document.getElementById("cntActivos").innerText = totalActivos;
         window.calcularPresencia();
     });
@@ -116,11 +146,11 @@
         document.getElementById("cntEnCasa").innerText = totalActivos - f;
     };
 
+    // Cámara y Subida Ilimitada
     window.prepararEvento = () => {
         const t = document.getElementById("tipoEvento").value;
         document.getElementById("secDinamica").style.display = (t === "ninguno") ? "none" : "block";
         document.getElementById("horaEvento").innerText = new Date().toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'});
-        
         if(t !== "ninguno"){
             navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}})
             .then(s => { document.getElementById("videoEvidencia").srcObject = s; });
@@ -130,10 +160,9 @@
     window.tomarYSubir = async () => {
         const status = document.getElementById("statusCarga");
         const nombre = document.getElementById("nomEvento").value;
-        if(!nombre) return alert("Por favor, escribe el nombre del evento antes de tomar la foto.");
-
-        status.innerText = "⏳ Subiendo evidencia...";
+        if(!nombre) return alert("Escribe el nombre de la actividad.");
         
+        status.innerText = "⏳ Guardando evidencia en la nube...";
         const v = document.getElementById("videoEvidencia");
         const c = document.createElement("canvas");
         const escala = 600 / v.videoWidth;
@@ -143,7 +172,7 @@
 
         try {
             await addDoc(collection(db, "evidencias_fotos"), {
-                idTurno: ID_TURNO_ACTUAL,
+                idTurno: ID_RELACION,
                 tipo: document.getElementById("tipoEvento").value,
                 nombre: nombre,
                 asistencia: document.getElementById("asistEvento").value,
@@ -152,39 +181,43 @@
                 foto: fotoFinal,
                 timestamp: serverTimestamp()
             });
-            status.innerText = "✅ ¡Guardado! Puedes tomar otra foto o cambiar de actividad.";
-            // Limpiamos campos para la siguiente foto si es necesario
+            status.innerText = "✅ Foto y datos guardados. Puedes tomar otra.";
             document.getElementById("nomEvento").value = "";
             document.getElementById("asistEvento").value = "";
             document.getElementById("obsEvento").value = "";
         } catch (e) { alert("Error al subir"); }
     };
 
+    // Guardar Turno
     document.getElementById('btnGuardar').onclick = async () => {
-        await addDoc(collection(db, "libro_de_turnos_pro"), {
-            idRelacion: ID_TURNO_ACTUAL,
-            fecha: new Date().toLocaleString(),
-            timestamp: serverTimestamp(),
-            operador: document.getElementById("opTurno").value,
-            censo: { activos: totalActivos, enCasa: document.getElementById("cntEnCasa").innerText },
-            seguridad: { 
-                timbres: document.getElementById("timbres").value, 
-                llavero: document.getElementById("llavero").value,
-                grupos: document.getElementById("gruposAltos").value,
-                sombras: document.getElementById("sombras").value,
-                chivos: document.getElementById("chivos").value,
-                grilletes: document.getElementById("grilletes").value
-            },
-            novedades: document.getElementById("novedadesTxt").value
-        });
-        alert("✅ Turno Cerrado Exitosamente.");
-        location.reload();
+        try {
+            await addDoc(collection(db, "libro_de_turnos_pro"), {
+                idRelacion: ID_RELACION,
+                fecha: new Date().toLocaleString(),
+                timestamp: serverTimestamp(),
+                operador: document.getElementById("opTurno").value,
+                censo: { activos: totalActivos, fuera: document.getElementById("inpFuera").value, enCasa: document.getElementById("cntEnCasa").innerText },
+                seguridad: {
+                    grupos: document.getElementById("gruposAltos").value,
+                    timbres: document.getElementById("timbres").value,
+                    sombras: document.getElementById("sombras").value,
+                    chivos: document.getElementById("chivos").value,
+                    grilletes: document.getElementById("grilletes").value,
+                    llavero: document.getElementById("llavero").value
+                },
+                movimientos: movsAuto,
+                novedades: document.getElementById("novedadesTxt").value
+            });
+            alert("✅ Turno Cerrado y Guardado.");
+            location.reload();
+        } catch (e) { alert("Error al guardar el cierre."); }
     };
 
+    // Historial unificado y en orden
     onSnapshot(query(collection(db, "libro_de_turnos_pro"), orderBy("timestamp", "desc")), (snap) => {
         const list = document.getElementById("listaHistorial");
         list.innerHTML = "";
-        snap.forEach(async (docTurno) => {
+        snap.forEach(docTurno => {
             const d = docTurno.data();
             const idT = d.idRelacion;
             
@@ -193,28 +226,45 @@
             divTurno.innerHTML = `
                 <details>
                     <summary>📅 ${d.fecha} - Op: ${d.operador}</summary>
-                    <div style="font-size:13px; margin-top:10px; border-top:1px solid #ddd; padding-top:10px;">
-                        <p><b>🏠 En Casa:</b> ${d.censo.enCasa} | <b>🔑 Llavero:</b> ${d.seguridad.llavero}</p>
-                        <p><b>🚨 Novedades Finales:</b> ${d.novedades}</p>
-                        <hr>
-                        <b>📸 Evidencias Registradas:</b>
-                        <div id="galeria_${idT}" style="margin-top:10px;">Cargando detalles...</div>
+                    <div style="margin-top:10px; border-top:1px solid #ddd; padding-top:10px; font-size:14px;">
+                        <p><b>🏠 Censo:</b> Activos: ${d.censo.activos} | Fuera: ${d.censo.fuera} | <b>En Casa: ${d.censo.enCasa}</b></p>
+                        
+                        <div style="background:#fff5f5; padding:12px; border-radius:10px; border:1px solid #feb2b2;">
+                            <b>🔐 Seguridad e Inventario:</b><br>
+                            • <b>Grupos:</b> ${d.seguridad.grupos}<br>
+                            • <b>Timbres:</b> ${d.seguridad.timbres}<br>
+                            • <b>Sombras:</b> ${d.seguridad.sombras}<br>
+                            • <b>Chivos:</b> ${d.seguridad.chivos}<br>
+                            • <b>Grilletes:</b> ${d.seguridad.grilletes}<br>
+                            • <b>Llavero:</b> ${d.seguridad.llavero}
+                        </div>
+
+                        <div id="galeria_${idT}" style="margin-top:15px;">Buscando evidencias...</div>
+
+                        <div style="background:#f1f5f9; padding:10px; border-radius:8px; border:1px solid #cbd5e1; margin-top:15px;">
+                            <b>🤖 Movimientos Auto:</b> ${d.movimientos.join(", ") || "Ninguno"}
+                        </div>
+
+                        <p style="background:#fff; padding:12px; border-radius:10px; border:2px solid #2c3e50; margin-top:15px;">
+                            <b>🚨 Novedades Finales:</b><br>${d.novedades}
+                        </p>
                     </div>
                 </details>`;
             list.appendChild(divTurno);
 
-            const qFotos = query(collection(db, "evidencias_fotos"), where("idTurno", "==", idT));
+            // Búsqueda de fotos vinculadas en orden cronológico
+            const qFotos = query(collection(db, "evidencias_fotos"), where("idTurno", "==", idT), orderBy("timestamp", "asc"));
             onSnapshot(qFotos, (sFotos) => {
                 const gal = document.getElementById(`galeria_${idT}`);
-                gal.innerHTML = sFotos.empty ? "Sin evidencias" : "";
+                gal.innerHTML = sFotos.empty ? "<i>No se registraron evidencias.</i>" : "<b>📸 Evidencias del Turno:</b>";
                 sFotos.forEach(fDoc => {
                     const fData = fDoc.data();
                     gal.innerHTML += `
-                        <div class="item-actividad">
+                        <div class="item-evidencia-historial">
                             <b>${fData.tipo.toUpperCase()}: ${fData.nombre}</b> (${fData.hora})<br>
-                            <small><b>Asistencia:</b> ${fData.asistencia || 'N/A'}</small><br>
-                            <small><b>Obs:</b> ${fData.observacion || 'N/A'}</small><br>
-                            <img src="${fData.foto}" style="width:100%; border-radius:5px; margin-top:5px;">
+                            <small><b>Asistencia:</b> ${fData.asistencia || 'No reg.'}</small><br>
+                            <small><b>Observación:</b> ${fData.observacion || 'Sin obs.'}</small><br>
+                            <img src="${fData.foto}" class="foto-evidencia">
                         </div>`;
                 });
             });
@@ -223,3 +273,4 @@
 </script>
 </body>
 </html>
+
