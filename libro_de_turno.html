@@ -122,35 +122,23 @@
 
     document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
 
-    // 1. Censo y Movimientos (LÓGICA BLINDADA PARA SUMAR LOS 7 ACTIVOS)
-    onSnapshot(collection(db, "pacientes"), (snap) => {
-        totalActivos = 0; movsAuto = [];
-        const hoy = new Date().toLocaleDateString();
-        const alertCont = document.getElementById("contAlertas");
-        if (alertCont) alertCont.innerHTML = "";
-        
-        snap.forEach(doc => {
-            const p = doc.data();
-            // Limpieza del texto para que no importen mayúsculas ni espacios
-            const estadoLimpio = (p.estado || "").toString().toLowerCase().trim();
-            
-            // Sumar si dice "activo" o "usuarios activos"
-            if(estadoLimpio.includes("activo") || estadoLimpio.includes("usuarios activos")) {
-                totalActivos++;
-            }
+// Variable global para que toda la página conozca el total
+let totalActivos = 0; 
 
-            // Detección automática de ingresos/fugas/abandonos de hoy
-            if(p.fechaRegistro === hoy || p.fecha === hoy) {
-                const m = `• ${p.nombre}: ${p.estado}`;
-                movsAuto.push(m);
-                if (alertCont) alertCont.innerHTML += `<div class="mov-auto">${m}</div>`;
-            }
-        });
-        if(movsAuto.length === 0 && alertCont) alertCont.innerHTML = "<p style='color:gray; font-size:12px;'>No hay movimientos hoy.</p>";
-        document.getElementById("cntActivos").innerText = totalActivos;
-        window.calcularPresencia();
-    });
+// 1. Censo y Movimientos (Lógica sincronizada con Firebase)
+db.collection("pacientes").onSnapshot((snapshot) => {
+    // Guardamos el total en la variable global (sin 'let' aquí)
+    totalActivos = snapshot.size; 
+    
+    // Actualizamos el número en el botón verde de la izquierda
+    const btnActivos = document.getElementById("cntActivos");
+    if (btnActivos) {
+        btnActivos.innerText = totalActivos; 
+    }
 
+    // Llamamos al cálculo de "Total en Casa" para que se actualice al instante
+    window.calcularPresencia();
+});
     window.calcularPresencia = () => {
         const f = parseInt(document.getElementById("inpFuera").value) || 0;
         document.getElementById("cntEnCasa").innerText = totalActivos - f;
