@@ -50,7 +50,7 @@
         </div>
         <div class="resultado-casa">📍 Total en Casa Actual: <span id="cntEnCasa">0</span></div>
 
-        <!-- 2. SEGURIDAD -->
+        <!-- 2. SEGURIDAD (ESPACIOS AMPLIOS) -->
         <div class="seguridad-box">
             <h3>🔐 Control de Seguridad e Inventario</h3>
             <label>👥 Listado Grupos Altos:</label><textarea id="gruposAltos" placeholder="Escriba aquí los detalles..."></textarea>
@@ -102,18 +102,16 @@
     </div>
 </div>
 
-<script type="module">
-    // --- IMPORTACIONES CORREGIDAS PARA EVITAR BLOQUEO CORS ---
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-    const firebaseConfig = {
-        apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
-        authDomain: "caminosnuevosdatabase.firebaseapp.com",
-        projectId: "caminosnuevosdatabase",
-        storageBucket: "caminosnuevosdatabase.firebasestorage.app",
-        appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
-    };
+   <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import {  getFirestore, collection, addDoc, onSnapshot, query, orderBy, where, serverTimestamp  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+            authDomain: "caminosnuevosdatabase.firebaseapp.com",
+            projectId: "caminosnuevosdatabase",
+            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+            appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+        };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -122,20 +120,27 @@
 
     document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
 
-// 1. Censo y Movimientos (Lógica sincronizada con Firebase)
-db.collection("pacientes").onSnapshot((snapshot) => {
-    // Guardamos el total en la variable global (sin 'let' aquí)
-    totalActivos = snapshot.size; 
-    
-    // Actualizamos el número en el botón verde de la izquierda
-    const btnActivos = document.getElementById("cntActivos");
-    if (btnActivos) {
-        btnActivos.innerText = totalActivos; 
-    }
+    // 1. Censo y Movimientos (Corregido para evitar errores de carga)
+    onSnapshot(collection(db, "pacientes"), (snap) => {
+        totalActivos = 0; movsAuto = [];
+        const hoy = new Date().toLocaleDateString();
+        const alertCont = document.getElementById("contAlertas");
+        if (alertCont) alertCont.innerHTML = "";
+        
+        snap.forEach(doc => {
+            const p = doc.data();
+            if((p.estado || "").toLowerCase().includes("activo")) totalActivos++;
+            if(p.fechaRegistro === hoy || p.fecha === hoy) {
+                const m = `• ${p.nombre}: ${p.estado}`;
+                movsAuto.push(m);
+                if (alertCont) alertCont.innerHTML += `<div class="mov-auto">${m}</div>`;
+            }
+        });
+        if(movsAuto.length === 0 && alertCont) alertCont.innerHTML = "<p style='color:gray; font-size:12px;'>No hay movimientos hoy.</p>";
+        document.getElementById("cntActivos").innerText = totalActivos;
+        window.calcularPresencia();
+    });
 
-    // Llamamos al cálculo de "Total en Casa" para que se actualice al instante
-    window.calcularPresencia();
-});
     window.calcularPresencia = () => {
         const f = parseInt(document.getElementById("inpFuera").value) || 0;
         document.getElementById("cntEnCasa").innerText = totalActivos - f;
@@ -170,7 +175,7 @@ db.collection("pacientes").onSnapshot((snapshot) => {
                 obs: document.getElementById("obsEvento").value || "",
                 asistencia: document.getElementById("asistEvento").value || "",
                 foto: fotoFinal,
-                creado: Date.now()
+                creado: Date.now() // Uso de número para evitar errores de índice de Firebase
             });
             status.innerText = "✅ Foto guardada correctamente";
             document.getElementById("nomEvento").value = "";
@@ -203,6 +208,7 @@ db.collection("pacientes").onSnapshot((snapshot) => {
         } catch (e) { console.error(e); alert("Error al guardar turno"); }
     };
 
+    // Historial (Corregido para evitar errores de índice)
     onSnapshot(query(collection(db, "libro_de_turnos_pro"), orderBy("creado", "desc")), (snap) => {
         const list = document.getElementById("listaHistorial");
         if (list) list.innerHTML = "";
@@ -230,6 +236,7 @@ db.collection("pacientes").onSnapshot((snapshot) => {
             </details>`;
             list.appendChild(divT);
 
+            // Búsqueda de fotos (filtro simple para evitar error de Index)
             onSnapshot(query(collection(db, "evidencias_fotos"), where("idTurno", "==", idT)), (sF) => {
                 const gal = document.getElementById(`galeria_${idT}`);
                 if (gal) {
