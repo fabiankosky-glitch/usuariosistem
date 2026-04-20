@@ -120,7 +120,7 @@
 
     document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
 
-    // 1. Censo y Movimientos (Corregido para evitar errores de carga)
+    // 1. Censo y Movimientos (Corregido para sumar los 7 activos)
     onSnapshot(collection(db, "pacientes"), (snap) => {
         totalActivos = 0; movsAuto = [];
         const hoy = new Date().toLocaleDateString();
@@ -129,7 +129,15 @@
         
         snap.forEach(doc => {
             const p = doc.data();
-            if((p.estado || "").toLowerCase().includes("activo")) totalActivos++;
+            // Limpiamos el texto para que reconozca "usuarios activos"
+            const estadoLimpio = (p.estado || "").toString().toLowerCase().trim();
+            
+            // BUSCAMOS TU CATEGORÍA EXACTA
+            if(estadoLimpio.includes("activo") || estadoLimpio.includes("usuarios activos")) {
+                totalActivos++;
+            }
+
+            // DETECCIÓN AUTOMÁTICA DE MOVIMIENTOS HOY
             if(p.fechaRegistro === hoy || p.fecha === hoy) {
                 const m = `• ${p.nombre}: ${p.estado}`;
                 movsAuto.push(m);
@@ -140,7 +148,6 @@
         document.getElementById("cntActivos").innerText = totalActivos;
         window.calcularPresencia();
     });
-
     window.calcularPresencia = () => {
         const f = parseInt(document.getElementById("inpFuera").value) || 0;
         document.getElementById("cntEnCasa").innerText = totalActivos - f;
