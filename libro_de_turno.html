@@ -120,15 +120,23 @@
 
     document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
 
-// 1. Censo y Movimientos (Sincronizado con el total de pacientes)
+// 1. Censo y Movimientos (Filtrando solo Usuarios Activos)
 onSnapshot(collection(db, "pacientes"), (snap) => {
-    // Aquí traemos el 7 directamente de Firebase
-    totalActivos = snap.size; 
+    let contadorFiltrado = 0;
+
+    snap.forEach(doc => {
+        const p = doc.data();
+        // Si el estado incluye la palabra "activo", lo sumamos
+        const estado = (p.estado || "").toLowerCase();
+        if (estado.includes("activo")) {
+            contadorFiltrado++;
+        }
+    });
+
+    totalActivos = contadorFiltrado;
     
-    // Actualizamos el número en el botón verde
+    // Actualizamos los números en la pantalla
     document.getElementById("cntActivos").innerText = totalActivos;
-    
-    // Actualizamos el cálculo de "Total en Casa"
     window.calcularPresencia();
 });
 
