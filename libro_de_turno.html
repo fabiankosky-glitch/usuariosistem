@@ -128,15 +128,15 @@
     // 1. CENSO SINCRONIZADO (Versión Blindada)
     onSnapshot(collection(db, "pacientes"), (snap) => {
         totalActivosDB = 0;
+        console.log("Revisando base de datos...");
         snap.forEach(doc => {
-            const datos = doc.data();
-            // Esto limpia el texto: quita espacios y pone todo en minúsculas
-            const estadoLimpio = (datos.estado || "").toString().toLowerCase().trim();
-            
-        if (estadoLimpio.includes('activo')) {
-            totalActivosDB++;
-        }
+            totalActivosDB++; 
+            console.log("Encontrado:", doc.data());
         });
+        console.log("Total detectado:", totalActivosDB);
+        document.getElementById("cntActivos").innerText = totalActivosDB;
+        window.calcularPresencia();
+    });
         document.getElementById("cntActivos").innerText = totalActivosDB;
         window.calcularPresencia();
     });
