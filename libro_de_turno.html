@@ -120,26 +120,17 @@
 
     document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
 
-    // 1. Censo y Movimientos (Corregido para evitar errores de carga)
-    onSnapshot(collection(db, "pacientes"), (snap) => {
-        totalActivos = 0; movsAuto = [];
-        const hoy = new Date().toLocaleDateString();
-        const alertCont = document.getElementById("contAlertas");
-        if (alertCont) alertCont.innerHTML = "";
-        
-        snap.forEach(doc => {
-            const p = doc.data();
-            if((p.estado || "").toLowerCase().includes("activo")) totalActivos++;
-            if(p.fechaRegistro === hoy || p.fecha === hoy) {
-                const m = `• ${p.nombre}: ${p.estado}`;
-                movsAuto.push(m);
-                if (alertCont) alertCont.innerHTML += `<div class="mov-auto">${m}</div>`;
-            }
-        });
-        if(movsAuto.length === 0 && alertCont) alertCont.innerHTML = "<p style='color:gray; font-size:12px;'>No hay movimientos hoy.</p>";
-        document.getElementById("cntActivos").innerText = totalActivos;
-        window.calcularPresencia();
-    });
+// 1. Censo y Movimientos (Sincronizado con el total de pacientes)
+onSnapshot(collection(db, "pacientes"), (snap) => {
+    // Aquí traemos el 7 directamente de Firebase
+    totalActivos = snap.size; 
+    
+    // Actualizamos el número en el botón verde
+    document.getElementById("cntActivos").innerText = totalActivos;
+    
+    // Actualizamos el cálculo de "Total en Casa"
+    window.calcularPresencia();
+});
 
     window.calcularPresencia = () => {
         const f = parseInt(document.getElementById("inpFuera").value) || 0;
