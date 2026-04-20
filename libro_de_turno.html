@@ -120,7 +120,7 @@
 
     document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
 
-    // 1. Censo y Movimientos (Corregido para sumar los 7 activos)
+    // 1. Censo y Movimientos (CON DIAGNÓSTICO)
     onSnapshot(collection(db, "pacientes"), (snap) => {
         totalActivos = 0; movsAuto = [];
         const hoy = new Date().toLocaleDateString();
@@ -129,22 +129,23 @@
         
         snap.forEach(doc => {
             const p = doc.data();
-            // Limpiamos el texto para que reconozca "usuarios activos"
+            
+            // ESTA LÍNEA MOSTRARÁ LOS DATOS EN TU CONSOLA NEGRA
+            console.log("Paciente:", p.nombre, "| Estado en DB:", p.estado);
+
             const estadoLimpio = (p.estado || "").toString().toLowerCase().trim();
             
-            // BUSCAMOS TU CATEGORÍA EXACTA
+            // Buscamos cualquier cosa que diga "activo" o "usuarios activos"
             if(estadoLimpio.includes("activo") || estadoLimpio.includes("usuarios activos")) {
                 totalActivos++;
             }
 
-            // DETECCIÓN AUTOMÁTICA DE MOVIMIENTOS HOY
             if(p.fechaRegistro === hoy || p.fecha === hoy) {
                 const m = `• ${p.nombre}: ${p.estado}`;
                 movsAuto.push(m);
                 if (alertCont) alertCont.innerHTML += `<div class="mov-auto">${m}</div>`;
             }
         });
-        if(movsAuto.length === 0 && alertCont) alertCont.innerHTML = "<p style='color:gray; font-size:12px;'>No hay movimientos hoy.</p>";
         document.getElementById("cntActivos").innerText = totalActivos;
         window.calcularPresencia();
     });
