@@ -120,23 +120,25 @@
 
     document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
 
-// 1. Censo y Movimientos (Filtrando solo Usuarios Activos)
 onSnapshot(collection(db, "pacientes"), (snap) => {
-    let contadorFiltrado = 0;
+    let conteoActivos = 0;
 
     snap.forEach(doc => {
         const p = doc.data();
-        // Si el estado incluye la palabra "activo", lo sumamos
-        const estado = (p.estado || "").toLowerCase();
-        if (estado.includes("activo")) {
-            contadorFiltrado++;
+        // Solo contamos si el estado es exactamente "USUARIOS ACTIVOS" o "activo"
+        const estadoLimpio = (p.estado || "").toUpperCase().trim();
+        
+        if (estadoLimpio === "USUARIOS ACTIVOS" || estadoLimpio === "ACTIVO") {
+            conteoActivos++;
         }
     });
 
-    totalActivos = contadorFiltrado;
+    totalActivos = conteoActivos;
     
-    // Actualizamos los números en la pantalla
+    // Actualizamos el número en el botón verde
     document.getElementById("cntActivos").innerText = totalActivos;
+    
+    // Actualizamos el Total en Casa
     window.calcularPresencia();
 });
 
