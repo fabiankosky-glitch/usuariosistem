@@ -9,29 +9,20 @@
         .container { max-width: 700px; margin: auto; }
         .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
         h2, h3 { text-align: center; color: #2c3e50; margin-top: 0; }
-        
-        /* Censo */
         .censo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .censo-item { padding: 12px; border-radius: 10px; color: white; text-align: center; font-weight: bold; }
         .resultado-casa { background: #2c3e50; color: white; padding: 12px; border-radius: 10px; text-align: center; margin-bottom: 15px; font-weight: bold; }
-        
-        /* Seguridad - ESPACIOS GRANDES */
         .seguridad-box { background: #fff5f5; padding: 15px; border-radius: 12px; border: 1px solid #feb2b2; margin-top: 10px; }
         label { display: block; font-weight: bold; margin-top: 12px; font-size: 13px; color: #c53030; }
         textarea, input { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 14px; }
-        textarea { height: 80px; resize: vertical; } /* Altura aumentada para descripciones largas */
-        
+        textarea { height: 80px; resize: vertical; }
         .seccion-especial { background: #eef2f7; padding: 15px; border-radius: 12px; border: 1px solid #d1d9e6; margin-top: 15px; display: none; }
         .btn-guardar { background: #27ae60; color: white; padding: 18px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 25px; font-size: 16px; }
-        
-        /* Historial */
         .historial-item { background: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #ddd; }
-        .historial-detail { background: #fdfdfd; padding: 10px; border-radius: 10px; margin-top: 10px; font-size: 14px; line-height: 1.5; }
         .foto-historial { width: 100%; border-radius: 10px; margin-top: 10px; }
     </style>
 </head>
 <body>
-
 <div class="container">
     <button onclick="location.href='index.html'" style="margin-bottom:15px; padding:10px; width:100%; border-radius:8px; border:none; background:#95a5a6; color:white; font-weight:bold; cursor:pointer;">🏠 Menú Principal</button>
     
@@ -46,30 +37,18 @@
         </div>
         <div class="resultado-casa">📍 Total en Casa: <span id="cntEnCasa">0</span></div>
 
-        <!-- SEGURIDAD CON ESPACIOS AMPLIOS -->
+        <!-- SEGURIDAD -->
         <div class="seguridad-box">
             <h3>🔐 Control de Seguridad e Inventario</h3>
-            
-            <label>👥 Listado Grupos Altos:</label>
-            <textarea id="gruposAltos" placeholder="Detalle completo de los grupos..."></textarea>
-            
-            <label>🔔 Timbres:</label>
-            <textarea id="timbres" placeholder="Estado o novedades de timbres..."></textarea>
-            
-            <label>👣 Sombras:</label>
-            <textarea id="sombras" placeholder="Registro detallado de sombras..."></textarea>
-            
-            <label>🐐 Chivos:</label>
-            <textarea id="chivos" placeholder="Detalle de chivos..."></textarea>
-            
-            <label>🔗 Grilletes:</label>
-            <textarea id="grilletes" placeholder="Estado de grilletes..."></textarea>
-            
-            <label>🔑 Llavero:</label>
-            <textarea id="llavero" placeholder="Control del llavero..."></textarea>
+            <label>👥 Listado Grupos Altos:</label><textarea id="gruposAltos"></textarea>
+            <label>🔔 Timbres:</label><textarea id="timbres"></textarea>
+            <label>👣 Sombras:</label><textarea id="sombras"></textarea>
+            <label>🐐 Chivos:</label><textarea id="chivos"></textarea>
+            <label>🔗 Grilletes:</label><textarea id="grilletes"></textarea>
+            <label>🔑 Llavero:</label><textarea id="llavero"></textarea>
         </div>
 
-        <!-- ACTIVIDADES -->
+        <!-- ACTIVIDADES (MEJORADO PARA 30+ FOTOS) -->
         <div class="card" style="margin-top:20px; border: 1px dashed #ccc;">
             <h3>🎭 Registro Actividad / Terapia</h3>
             <select id="tipoEvento" onchange="prepararEvento()">
@@ -77,30 +56,24 @@
                 <option value="actividad">⚽ Actividad</option>
                 <option value="terapia">🧠 Terapia</option>
             </select>
-
             <div id="secDinamica" class="seccion-especial">
                 <p>⏰ Hora: <b id="horaEvento">--:--</b></p>
                 <input type="text" id="nomEvento" placeholder="Nombre del evento">
                 <textarea id="asistEvento" placeholder="Listado de asistencia..."></textarea>
                 <textarea id="obsEvento" placeholder="Observaciones detalladas..."></textarea>
                 <video id="videoEvidencia" autoplay playsinline style="width:100%; height:200px; background:black; border-radius:10px; margin-top:10px; object-fit:cover;"></video>
-                <button type="button" onclick="tomarFoto()" style="background:#3498db; color:white; width:100%; padding:10px; border:none; border-radius:8px; margin-top:5px; font-weight:bold;">📸 Tomar Evidencia</button>
-                <button type="button" onclick="subirALista()" style="background:#2ecc71; color:white; width:100%; padding:12px; border:none; border-radius:8px; margin-top:10px; font-weight:bold;">➕ Añadir al Turno</button>
+                <button type="button" onclick="tomarYSubir()" style="background:#3498db; color:white; width:100%; padding:10px; border:none; border-radius:8px; margin-top:5px; font-weight:bold;">📸 Capturar y Guardar Foto</button>
+                <p id="statusCarga" style="font-size:11px; color:#2980b9; text-align:center; font-weight:bold; margin-top:5px;"></p>
             </div>
-            <div id="listaTemporal" style="margin-top:10px;"></div>
         </div>
 
-        <!-- MOVIMIENTOS AUTO -->
         <div class="card" style="border: 1px solid #3182ce;">
-            <h3 style="font-size:16px;">🤖 Movimientos Detectados</h3>
+            <h3>🤖 Movimientos Detectados</h3>
             <div id="contAlertas"></div>
         </div>
 
-        <label style="color:#2c3e50">👤 Operador Responsable:</label>
-        <input type="text" id="opTurno" placeholder="Nombre del operador">
-        
-        <label style="color:#2c3e50">🚨 Novedades Generales:</label>
-        <textarea id="novedadesTxt" style="height:120px;" placeholder="Resumen final del turno..."></textarea>
+        <label>👤 Operador Responsable:</label><input type="text" id="opTurno" placeholder="Nombre del operador">
+        <label>🚨 Novedades Generales:</label><textarea id="novedadesTxt" style="height:120px;"></textarea>
 
         <button id="btnGuardar" class="btn-guardar">🚀 GUARDAR TURNO COMPLETO</button>
     </div>
@@ -111,20 +84,22 @@
     </div>
 </div>
 
-   <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import {  getFirestore, collection, addDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        const firebaseConfig = {
-            apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
-            authDomain: "caminosnuevosdatabase.firebaseapp.com",
-            projectId: "caminosnuevosdatabase",
-            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
-            appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
-        };
+<script type="module">
+    import { initializeApp } from "https://gstatic.com";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, where, serverTimestamp } from "https://gstatic.com";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+        authDomain: "://firebaseapp.com",
+        projectId: "caminosnuevosdatabase",
+        storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+        appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    let totalActivos = 0; let listaEvs = []; let fotoTemp = null; let movsAuto = [];
+    let totalActivos = 0; let movsAuto = [];
+    const ID_RELACION = "turno_" + Date.now(); // Vincula las 30 fotos con el turno actual
 
     document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
 
@@ -133,7 +108,6 @@
         const hoy = new Date().toLocaleDateString();
         const alertCont = document.getElementById("contAlertas");
         alertCont.innerHTML = "";
-        
         snap.forEach(doc => {
             const p = doc.data();
             if((p.estado || "").toLowerCase().includes("activo")) totalActivos++;
@@ -162,32 +136,39 @@
         .then(stream => { document.getElementById("videoEvidencia").srcObject = stream; });
     };
 
-    window.tomarFoto = () => {
+    window.tomarYSubir = async () => {
+        const status = document.getElementById("statusCarga");
+        status.innerText = "⏳ Guardando evidencia...";
         const v = document.getElementById("videoEvidencia");
         const c = document.createElement("canvas");
-        c.width = v.videoWidth; c.height = v.videoHeight;
-        c.getContext("2d").drawImage(v,0,0);
-        fotoTemp = c.toDataURL("image/jpeg", 0.5);
-        alert("📸 Evidencia capturada");
-    };
+        const escala = 600 / v.videoWidth; 
+        c.width = 600; c.height = v.videoHeight * escala;
+        c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
+        const fotoFinal = c.toDataURL("image/jpeg", 0.3); // Calidad optimizada para muchas fotos
 
-    window.subirALista = () => {
-        listaEvs.push({
-            tipo: document.getElementById("tipoEvento").value,
-            nom: document.getElementById("nomEvento").value,
-            obs: document.getElementById("obsEvento").value,
-            foto: fotoTemp
-        });
-        document.getElementById("listaTemporal").innerHTML += `<div style="font-size:12px; color:green;">✔️ ${document.getElementById("nomEvento").value} añadida</div>`;
-        document.getElementById("secDinamica").style.display="none";
-        fotoTemp = null;
+        try {
+            await addDoc(collection(db, "evidencias_fotos"), {
+                idTurno: ID_RELACION,
+                tipo: document.getElementById("tipoEvento").value,
+                nom: document.getElementById("nomEvento").value,
+                obs: document.getElementById("obsEvento").value,
+                asistencia: document.getElementById("asistEvento").value,
+                foto: fotoFinal,
+                timestamp: serverTimestamp()
+            });
+            status.innerText = "✅ Foto guardada correctamente";
+            document.getElementById("nomEvento").value = "";
+            document.getElementById("obsEvento").value = "";
+            document.getElementById("asistEvento").value = "";
+        } catch (e) { alert("Error al subir foto"); }
     };
 
     document.getElementById('btnGuardar').onclick = async () => {
         try {
             await addDoc(collection(db, "libro_de_turnos_pro"), {
+                idRelacion: ID_RELACION,
                 fecha: new Date().toLocaleString(),
-                timestamp: Date.now(),
+                timestamp: serverTimestamp(),
                 operador: document.getElementById("opTurno").value,
                 censo: { activos: totalActivos, fuera: document.getElementById("inpFuera").value, enCasa: document.getElementById("cntEnCasa").innerText },
                 seguridad: {
@@ -198,11 +179,10 @@
                     grilletes: document.getElementById("grilletes").value,
                     llavero: document.getElementById("llavero").value
                 },
-                eventos: listaEvs,
                 movimientos: movsAuto,
                 novedades: document.getElementById("novedadesTxt").value
             });
-            alert("✅ Turno Guardado con éxito");
+            alert("✅ Turno Cerrado con éxito");
             location.reload();
         } catch (e) { alert("Error al guardar"); }
     };
@@ -210,37 +190,36 @@
     onSnapshot(query(collection(db, "libro_de_turnos_pro"), orderBy("timestamp", "desc")), (snap) => {
         const list = document.getElementById("listaHistorial");
         list.innerHTML = "";
-        snap.forEach(doc => {
-            const d = doc.data();
-            let evsHtml = (d.eventos || []).map(e => `
-                <div style="border-top:1px solid #ddd; padding:10px; margin-top:5px;">
-                    <b>${e.tipo.toUpperCase()}:</b> ${e.nom}<br>
-                    <small>${e.obs}</small><br>
-                    ${e.foto ? `<img src="${e.foto}" class="foto-historial">` : ''}
-                </div>`).join('');
+        snap.forEach(docTurno => {
+            const d = docTurno.data();
+            const idT = d.idRelacion;
+            let divT = document.createElement("div");
+            divT.className = "historial-item";
+            divT.innerHTML = `<details>
+                <summary>📅 ${d.fecha} - Op: ${d.operador}</summary>
+                <div style="font-size:14px; margin-top:10px;">
+                    <p><b>🏠 Casa:</b> ${d.censo.enCasa} (Activos: ${d.censo.activos})</p>
+                    <div style="background:#fff5f5; padding:10px; border-radius:8px; border:1px solid #feb2b2;">
+                        <b>🔐 Seguridad:</b><br>• Grupos: ${d.seguridad.grupos}<br>• Llavero: ${d.seguridad.llavero}
+                    </div>
+                    <div id="galeria_${idT}" style="margin-top:10px;">Cargando fotos...</div>
+                    <p><b>🚨 Novedades:</b><br>${d.novedades}</p>
+                </div>
+            </details>`;
+            list.appendChild(divT);
 
-            list.innerHTML += `
-                <div class="historial-item">
-                    <details>
-                        <summary>📅 ${d.fecha} - Op: ${d.operador}</summary>
-                        <div class="historial-detail">
-                            <p><b>🏠 En Casa:</b> ${d.censo.enCasa} (Activos: ${d.censo.activos} | Fuera: ${d.censo.fuera})</p>
-                            <div style="background:#fff5f5; padding:10px; border-radius:8px; border:1px solid #feb2b2;">
-                                <b>🔐 Seguridad:</b><br>
-                                • Grupos: ${d.seguridad.grupos}<br>
-                                • Timbres: ${d.seguridad.timbres}<br>
-                                • Sombras: ${d.seguridad.sombras}<br>
-                                • Chivos: ${d.seguridad.chivos}<br>
-                                • Grilletes: ${d.seguridad.grilletes}<br>
-                                • Llavero: ${d.seguridad.llavero}
-                            </div>
-                            <div style="margin-top:10px;"><b>🎭 Actividades:</b> ${evsHtml || 'Ninguna'}</div>
-                            <div style="margin-top:10px; border-top:2px solid #2c3e50; padding-top:5px;">
-                                <b>🚨 Novedades Finales:</b><br>${d.novedades}
-                            </div>
-                        </div>
-                    </details>
-                </div>`;
+            const qF = query(collection(db, "evidencias_fotos"), where("idTurno", "==", idT), orderBy("timestamp", "asc"));
+            onSnapshot(qF, (sF) => {
+                const gal = document.getElementById(`galeria_${idT}`);
+                gal.innerHTML = sF.empty ? "Sin fotos" : "<b>📸 Evidencias:</b>";
+                sF.forEach(f => {
+                    const fd = f.data();
+                    gal.innerHTML += `<div style="border-top:1px solid #eee; padding:5px; margin-top:5px;">
+                        <b>${fd.tipo.toUpperCase()}:</b> ${fd.nom}<br><small>${fd.obs}</small><br>
+                        <img src="${fd.foto}" class="foto-historial">
+                    </div>`;
+                });
+            });
         });
     });
 </script>
