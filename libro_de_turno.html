@@ -15,15 +15,14 @@
         .seguridad-box { background: #fff5f5; padding: 15px; border-radius: 12px; border: 1px solid #feb2b2; margin-top: 10px; }
         label { display: block; font-weight: bold; margin-top: 12px; font-size: 13px; color: #c53030; }
         textarea, input, select { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 14px; }
-        textarea { height: 100px; resize: vertical; }
         .btn-actualizar { background: #3498db; color: white; padding: 15px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 15px; }
         .btn-guardar { background: #27ae60; color: white; padding: 18px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; }
-        .historial-item { background: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #ddd; border-left: 8px solid #27ae60; }
-        .foto-evidencia { width: 100%; border-radius: 10px; margin-top: 10px; border: 1px solid #ddd; }
-        summary { cursor: pointer; font-weight: bold; color: #2c3e50; padding: 5px; }
+        .historial-item { background: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; border-left: 8px solid #27ae60; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .soporte-jefe { background: #ebf5fb; padding: 10px; border-radius: 8px; margin-bottom: 10px; border-left: 4px solid #2980b9; font-size: 12px; }
     </style>
 </head>
 <body>
+
 <div class="container">
     <button onclick="location.href='index.html'" style="margin-bottom:15px; padding:10px; width:100%; border-radius:8px; border:none; background:#95a5a6; color:white; font-weight:bold; cursor:pointer;">🏠 Menú Principal</button>
     
@@ -33,76 +32,74 @@
         
         <div class="censo-grid">
             <div class="censo-item" style="background:#27ae60;">🏠 Activos: <span id="cntActivos">0</span></div>
-            <div class="censo-item" style="background:#e67e22;">🚶 Fuera: <input type="number" id="inpFuera" value="0" oninput="calcularPresencia()" style="width:50px;"></div>
+            <div class="censo-item" style="background:#e67e22;">🚶 Fuera: <input type="number" id="inpFuera" value="0" oninput="window.calcularPresencia()" style="width:50px; padding:5px;"></div>
         </div>
-        <div class="resultado-casa">📍 Total en Casa Actual: <span id="cntEnCasa">0</span></div>
+        <div class="resultado-casa">📍 Total en Casa: <span id="cntEnCasa">0</span></div>
 
         <div class="seguridad-box">
             <h3>🔐 Control de Seguridad e Inventario</h3>
-            <label>👥 Listado Grupos Altos:</label><textarea id="gruposAltos" placeholder="Detalles de grupos..."></textarea>
+            <label>👥 Listado Grupos Altos:</label><textarea id="gruposAltos"></textarea>
             <label>🔔 Timbres:</label><textarea id="timbres"></textarea>
-            <label>👣 Sombras:</label><textarea id="sombras"></textarea>
-            <label>🐐 Chivos:</label><textarea id="chivos"></textarea>
-            <label>🔗 Grilletes:</label><textarea id="grilletes"></textarea>
-            <label>🔑 Llavero:</label><textarea id="llavero"></textarea>
+            <label>🔑 Llavero y Grilletes:</label><textarea id="llavero"></textarea>
         </div>
 
-        <div class="card" style="margin-top:20px; border: 2px dashed #3498db; background: #f0f7ff; padding: 15px; border-radius: 15px;">
+        <div class="card" style="margin-top:20px; border: 2px dashed #3498db; background: #f0f7ff;">
             <h3>📸 Registro Actividad / Terapia</h3>
-            <select id="tipoEvento" onchange="prepararEvento()">
-                <option value="ninguno">-- Seleccionar Actividad --</option>
+            <select id="tipoEvento" onchange="window.prepararEvento()">
+                <option value="ninguno">-- Seleccionar --</option>
                 <option value="actividad">⚽ Actividad</option>
                 <option value="terapia">🧠 Terapia</option>
             </select>
             <div id="secDinamica" style="display:none; margin-top:15px;">
-                <p>⏰ Hora: <b id="horaEvento">--:--</b></p>
-                <label>Nombre del Evento:</label><input type="text" id="nomEvento" placeholder="Ej: Clase de Yoga">
-                <label>Asistencia:</label><textarea id="asistEvento" placeholder="Nombres..."></textarea>
-                <label>Observaciones:</label><textarea id="obsEvento" placeholder="Detalles..."></textarea>
-                <video id="videoEvidencia" autoplay playsinline style="width:100%; height:200px; background:black; border-radius:10px; object-fit:cover; margin-top:10px;"></video>
-                <button type="button" style="background:#3498db; color:white; width:100%; padding:15px; border:none; border-radius:10px; font-weight:bold; margin-top:10px;" onclick="tomarYSubir()">📸 Capturar y Guardar Foto</button>
-                <p id="statusCarga" style="font-size:12px; color:#2980b9; text-align:center; margin-top:10px; font-weight:bold;"></p>
+                <video id="videoEvidencia" autoplay playsinline style="width:100%; border-radius:10px; background:black;"></video>
+                <button type="button" class="btn-actualizar" onclick="window.tomarYSubir()">📸 Capturar Foto de Evidencia</button>
+                <p id="statusCarga" style="text-align:center; font-size:11px;"></p>
             </div>
         </div>
 
-        <label style="margin-top:20px;">👤 Operador Responsable:</label><input type="text" id="opTurno" placeholder="Su nombre">
-        <label>🚨 Novedades Finales:</label><textarea id="novedadesTxt" style="height:120px;" placeholder="Resumen general del turno..."></textarea>
+        <label>👤 Operador Responsable:</label><input type="text" id="opTurno" placeholder="Su nombre">
+        <label>🚨 Novedades del Turno:</label><textarea id="novedadesTxt" style="height:150px;"></textarea>
         
-        <button id="btnActualizar" type="button" class="btn-actualizar">💾 GUARDAR PROGRESO (RESPALDO)</button>
-        <button id="btnGuardar" type="button" class="btn-guardar">🚀 GUARDAR TURNO COMPLETO (CERRAR)</button>
+        <button id="btnActualizar" type="button" class="btn-actualizar">💾 GUARDAR PROGRESO (Soporte para Jefe)</button>
+        <button id="btnGuardar" type="button" class="btn-guardar">🚀 CERRAR TURNO Y ARCHIVAR</button>
 
-        <button id="btnVerHistorial" type="button" style="background: #7f8c8d; color: white; padding: 12px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 20px;">📂 VER ARCHIVO DE TURNOS</button>
+        <!-- SECCIÓN DE SEGUIMIENTO EN TIEMPO REAL PARA LA JEFE -->
+        <div style="margin-top:30px; border-top: 2px solid #eee; padding-top:20px;">
+            <h3>👩‍⚕️ Monitoreo de Avances (Jefe)</h3>
+            <div id="lineaDeTiempoJefe" style="max-height:200px; overflow-y:auto;"></div>
+        </div>
 
-        <div id="historial" style="display: none; margin-top: 20px;">
-            <h3>📋 Archivo de Turnos Cerrados</h3>
-            <div id="listaHistorial">Cargando...</div>
+        <button id="btnVerHistorial" type="button" style="margin-top:20px; width:100%; padding:10px; border-radius:10px; border:none; background:#7f8c8d; color:white; font-weight:bold;">📂 VER ARCHIVO HISTÓRICO</button>
+        <div id="historial" style="display:none; margin-top:20px;">
+            <h3>📋 Turnos Cerrados</h3>
+            <div id="listaHistorial"></div>
         </div>
     </div>
 </div>
 
-   <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, where, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        const firebaseConfig = {
-            apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
-            authDomain: "caminosnuevosdatabase.firebaseapp.com",
-            projectId: "caminosnuevosdatabase",
-            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
-            appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
-        };
+<script type="module">
+    import { initializeApp } from "https://gstatic.com";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, where, getDocs, deleteDoc, doc } from "https://gstatic.com";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP", 
+        authDomain: "://firebaseapp.com",
+        projectId: "caminosnuevosdatabase",
+        storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+        appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+    };
+
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     let totalActivos = 0;
     const ID_RELACION = "turno_" + Date.now();
+
     document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
 
-    // 1. CENSO AUTOMÁTICO
+    // 1. CENSO EN TIEMPO REAL
     onSnapshot(collection(db, "pacientes"), (snap) => {
         let cuenta = 0;
-        snap.forEach(d => {
-            const est = (d.data().estado || "").toLowerCase().trim();
-            if (est.includes("activo")) cuenta++;
-        });
+        snap.forEach(d => { if((d.data().estado || "").toLowerCase().includes("activo")) cuenta++; });
         totalActivos = cuenta;
         document.getElementById("cntActivos").innerText = totalActivos;
         window.calcularPresencia();
@@ -113,126 +110,94 @@
         document.getElementById("cntEnCasa").innerText = totalActivos - f;
     };
 
-    // 2. CÁMARA E INDUCCIÓN
+    // 2. CÁMARA
     window.prepararEvento = () => {
         const t = document.getElementById("tipoEvento").value;
         const s = document.getElementById("secDinamica");
-        if(t === "ninguno") { s.style.display="none"; return; }
-        s.style.display="block";
-        document.getElementById("horaEvento").innerText = new Date().toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'});
-        navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}})
-            .then(stream => { document.getElementById("videoEvidencia").srcObject = stream; })
-            .catch(err => alert("Cámara no disponible"));
+        s.style.display = (t === "ninguno") ? "none" : "block";
+        if(t !== "ninguno") {
+            navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}})
+            .then(stream => { document.getElementById("videoEvidencia").srcObject = stream; });
+        }
     };
 
     window.tomarYSubir = async () => {
         const status = document.getElementById("statusCarga");
-        status.innerText = "⏳ Guardando foto...";
+        status.innerText = "⏳ Procesando foto...";
         const v = document.getElementById("videoEvidencia");
         const c = document.createElement("canvas");
-        const escala = 600 / v.videoWidth;
-        c.width = 600; c.height = v.videoHeight * escala;
+        c.width = 600; c.height = v.videoHeight * (600 / v.videoWidth);
         c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
         const fotoFinal = c.toDataURL("image/jpeg", 0.3);
+
         try {
             await addDoc(collection(db, "evidencias_fotos"), {
                 idTurno: ID_RELACION,
                 tipo: document.getElementById("tipoEvento").value,
-                nom: document.getElementById("nomEvento").value || "Sin nombre",
-                obs: document.getElementById("obsEvento").value || "",
-                asistencia: document.getElementById("asistEvento").value || "",
                 foto: fotoFinal,
                 creado: Date.now()
             });
-            status.innerText = "✅ Foto guardada correctamente";
+            status.innerText = "✅ Foto enviada al servidor";
         } catch (e) { alert("Error al subir foto"); }
     };
 
-    // 3. GUARDAR PROGRESO (BOTÓN AZUL)
+    // 3. GUARDAR PROGRESO (SOPORTE PARA JEFE)
     document.getElementById('btnActualizar').onclick = async () => {
+        const op = document.getElementById("opTurno").value;
+        if(!op) return alert("⚠️ Escriba su nombre");
         try {
-            await addDoc(collection(db, "libro_de_turnos_pro"), {
-                idRelacion: ID_RELACION, tipo: "progreso", creado: Date.now(),
-                fecha: new Date().toLocaleString(), operador: document.getElementById("opTurno").value || "No especificado",
+            const data = {
+                idTurno: ID_RELACION,
+                operador: op,
+                fecha: new Date().toLocaleString(),
+                censo: document.getElementById("cntEnCasa").innerText,
                 novedades: document.getElementById("novedadesTxt").value,
-                seguridad: { grupos: document.getElementById("gruposAltos").value, llavero: document.getElementById("llavero").value, timbres: document.getElementById("timbres").value, sombras: document.getElementById("sombras").value, chivos: document.getElementById("chivos").value, grilletes: document.getElementById("grilletes").value },
-                censo: { activos: totalActivos, fuera: document.getElementById("inpFuera").value, enCasa: document.getElementById("cntEnCasa").innerText }
-            });
-            alert("💾 Progreso respaldado en la nube.");
-        } catch (e) { alert("Error al respaldar"); }
+                timestamp: Date.now()
+            };
+            await addDoc(collection(db, "soporte_jefe"), data);
+            alert("💾 Progreso guardado. La jefe ya puede verlo.");
+        } catch (e) { alert("Error"); }
     };
 
-    // 4. GUARDAR FINAL Y LIMPIEZA (BOTÓN VERDE)
+    // 4. MONITOREO JEFE (Timeline)
+    onSnapshot(query(collection(db, "soporte_jefe"), where("idTurno", "==", ID_RELACION), orderBy("timestamp", "desc")), (snap) => {
+        const cont = document.getElementById("lineaDeTiempoJefe");
+        cont.innerHTML = "";
+        snap.forEach(doc => {
+            const d = doc.data();
+            cont.innerHTML += `<div class="soporte-jefe"><b>🕒 ${d.fecha.split(',')[1]}</b>: ${d.novedades.substring(0, 50)}...</div>`;
+        });
+    });
+
+    // 5. CERRAR TURNO (Limpia y Archiva)
     document.getElementById('btnGuardar').onclick = async () => {
+        if(!confirm("¿Cerrar turno definitivamente?")) return;
         try {
-            // Guardamos el Final
             await addDoc(collection(db, "libro_de_turnos_pro"), {
                 idRelacion: ID_RELACION, tipo: "final", creado: Date.now(),
-                fecha: new Date().toLocaleString(), operador: document.getElementById("opTurno").value || "No especificado",
-                censo: { activos: totalActivos, fuera: document.getElementById("inpFuera").value, enCasa: document.getElementById("cntEnCasa").innerText },
-                seguridad: { grupos: document.getElementById("gruposAltos").value, timbres: document.getElementById("timbres").value, sombras: document.getElementById("sombras").value, chivos: document.getElementById("chivos").value, grilletes: document.getElementById("grilletes").value, llavero: document.getElementById("llavero").value },
-                novedades: document.getElementById("novedadesTxt").value
+                fecha: new Date().toLocaleString(), operador: document.getElementById("opTurno").value,
+                novedades: document.getElementById("novedadesTxt").value,
+                censo: document.getElementById("cntEnCasa").innerText
             });
-
-            // Borramos los progresos de este turno específico
-            const q = query(collection(db, "libro_de_turnos_pro"), where("idRelacion", "==", ID_RELACION), where("tipo", "==", "progreso"));
-            const snapshot = await getDocs(q);
-            snapshot.forEach(async (d) => { await deleteDoc(doc(db, "libro_de_turnos_pro", d.id)); });
-
-            alert("✅ Turno Cerrado. El archivo ha sido actualizado.");
+            alert("✅ Turno Cerrado y Archivado.");
             location.reload();
-        } catch (e) { alert("Error al cerrar turno"); }
+        } catch (e) { alert("Error al cerrar"); }
     };
 
-    // 5. ARCHIVO MUERTO (HISTORIAL DETALLADO)
-    onSnapshot(query(collection(db, "libro_de_turnos_pro"), orderBy("creado", "desc")), (snap) => {
+    // 6. HISTORIAL
+    document.getElementById('btnVerHistorial').onclick = () => {
+        const h = document.getElementById('historial');
+        h.style.display = h.style.display === "none" ? "block" : "none";
+    };
+
+    onSnapshot(query(collection(db, "libro_de_turnos_pro"), where("tipo", "==", "final"), orderBy("creado", "desc")), (snap) => {
         const list = document.getElementById("listaHistorial");
         list.innerHTML = "";
         snap.forEach(docT => {
             const d = docT.data();
-            if (d.tipo === "progreso") return; // Oculta progresos del archivo principal
-
-            const div = document.createElement("div");
-            div.className = "historial-item";
-            div.innerHTML = `
-                <details>
-                    <summary>📁 TURNO: ${d.fecha} - Op: ${d.operador}</summary>
-                    <div style="margin-top:10px; font-size:13px; border-top:1px solid #eee; padding-top:10px;">
-                        <p><b>🏠 CENSO:</b> Casa: ${d.censo.enCasa} | Fuera: ${d.censo.fuera} | Activos: ${d.censo.activos}</p>
-                        <div style="background:#fff5f5; padding:10px; border-radius:8px; border:1px solid #feb2b2; margin-bottom:10px;">
-                            <b>🔐 SEGURIDAD:</b><br>
-                            • G. Altos: ${d.seguridad.grupos}<br>
-                            • Timbres: ${d.seguridad.timbres} | Sombras: ${d.seguridad.sombras}<br>
-                            • Chivos: ${d.seguridad.chivos} | Grilletes: ${d.seguridad.grilletes}<br>
-                            • Llavero: ${d.seguridad.llavero}
-                        </div>
-                        <p style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #ccc;">
-                            <b>🚨 NOVEDADES:</b><br>${d.novedades}
-                        </p>
-                        <div id="gal_${d.idRelacion}" style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:10px;"></div>
-                    </div>
-                </details>`;
-            list.appendChild(div);
-            cargarFotosArchivo(d.idRelacion);
+            list.innerHTML += `<div class="historial-item"><b>📅 ${d.fecha}</b><br><small>Op: ${d.operador}</small><p>${d.novedades}</p></div>`;
         });
     });
-
-    async function cargarFotosArchivo(id) {
-        const q = query(collection(db, "evidencias_fotos"), where("idTurno", "==", id));
-        const s = await getDocs(q);
-        const gal = document.getElementById(`gal_${id}`);
-        s.forEach(f => {
-            const fd = f.data();
-            gal.innerHTML += `<div style="border:1px solid #ddd; padding:5px; border-radius:5px;"><small>${fd.tipo}: ${fd.nom}</small><img src="${fd.foto}" style="width:100%; border-radius:5px;"></div>`;
-        });
-    }
-
-    document.getElementById('btnVerHistorial').onclick = () => {
-        const h = document.getElementById('historial');
-        const b = document.getElementById('btnVerHistorial');
-        h.style.display = h.style.display === "none" ? "block" : "none";
-        b.innerText = h.style.display === "none" ? "📂 VER ARCHIVO DE TURNOS" : "❌ CERRAR ARCHIVO";
-    };
 </script>
 </body>
 </html>
