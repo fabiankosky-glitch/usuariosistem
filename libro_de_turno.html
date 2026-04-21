@@ -137,22 +137,20 @@ serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-fires
  let totalActivos = 0; let movsAuto = [];
  const ID_RELACION = "turno_" + Date.now();
  document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
- // 1. Censo y Movimientos (Corregido para evitar errores de carga)
- onSnapshot(collection(db, "pacientes"), (snap) => {
- totalActivos = 0; movsAuto = [];
- const hoy = new Date().toLocaleDateString();
- const alertCont = document.getElementById("contAlertas");
- if (alertCont) alertCont.innerHTML = "";
 
- snap.forEach(doc => {
- const p = doc.data();
- if((p.estado || "").toLowerCase().includes("activo")) totalActivos++;
- if(p.fechaRegistro === hoy || p.fecha === hoy) {
- const m = `• ${p.nombre}: ${p.estado}`;
- movsAuto.push(m);
- if (alertCont) alertCont.innerHTML += `<div class="mov-auto">${m}</div>`;
- }
- });
+  // 1. Censo y Movimientos (Limpiado de errores)
+onSnapshot(collection(db, "pacientes"), (snap) => {
+    let total = 0;
+    snap.forEach(doc => {
+        const p = doc.data();
+        const est = (p.estado || "").toLowerCase().trim();
+        if (est.includes("activo")) total++;
+    });
+    totalActivos = total;
+    document.getElementById("cntActivos").innerText = totalActivos;
+    window.calcularPresencia();
+});
+  
  if(movsAuto.length === 0 && alertCont) alertCont.innerHTML = "<p style='color:gray;
 font-size:12px;'>No hay movimientos hoy.</p>";
  document.getElementById("cntActivos").innerText = totalActivos;
