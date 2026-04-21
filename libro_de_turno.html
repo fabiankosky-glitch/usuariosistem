@@ -209,38 +209,21 @@
             location.reload();
         } catch (e) { console.error(e); alert("Error al guardar turno"); }
     };
-// NUEVA FUNCIÓN: GUARDAR PROGRESO (SIN RECARGAR PÁGINA)
+// NUEVA FUNCIÓN: ACTUALIZAR SIN ENSUCIAR EL HISTORIAL
 document.getElementById('btnActualizar').onclick = async () => {
     try {
         await addDoc(collection(db, "libro_de_turnos_pro"), {
             idRelacion: ID_RELACION,
-            fecha: new Date().toLocaleString() + " (ACTUALIZACIÓN)",
-            creado: Date.now(),
+            fecha: new Date().toLocaleString(),
+            tipo: "progreso", // <--- Etiqueta para saber que es solo una actualización
             operador: document.getElementById("opTurno").value || "No especificado",
-            censo: { 
-                activos: totalActivos, 
-                fuera: document.getElementById("inpFuera").value, 
-                enCasa: document.getElementById("cntEnCasa").innerText 
-            },
-            seguridad: {
-                grupos: document.getElementById("gruposAltos").value || "",
-                timbres: document.getElementById("timbres").value || "",
-                sombras: document.getElementById("sombras").value || "",
-                chivos: document.getElementById("chivos").value || "",
-                grilletes: document.getElementById("grilletes").value || "",
-                llavero: document.getElementById("llavero").value || ""
-            },
-            movimientos: movsAuto,
             novedades: document.getElementById("novedadesTxt").value || ""
         });
-        alert("💾 Progreso guardado en el historial. ¡Sigue editando!");
-    } catch (e) { 
-        console.error(e); 
-        alert("Error al guardar progreso"); 
-    }
+        alert("💾 Progreso guardado. No aparecerá en el historial final hasta que cierres el turno.");
+    } catch (e) { console.error(e); }
 };
     // Historial (Corregido para evitar errores de índice)
-    onSnapshot(query(collection(db, "libro_de_turnos_pro"), orderBy("creado", "desc")), (snap) => {
+onSnapshot(query(collection(db, "libro_de_turnos_pro"), where("tipo", "!=", "progreso")), (snap) => {
         const list = document.getElementById("listaHistorial");
         if (list) list.innerHTML = "";
         snap.forEach(docTurno => {
