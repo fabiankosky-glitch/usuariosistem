@@ -91,7 +91,9 @@
         <!-- 5. CIERRE DE TURNO -->
         <label>👤 Operador Responsable:</label><input type="text" id="opTurno" placeholder="Su nombre">
         <label>🚨 Novedades Finales:</label><textarea id="novedadesTxt" style="height:120px;" placeholder="Resumen general..."></textarea>
-
+        
+        <!-- Nuevo botón para actualizar sin cerrar el turno -->
+        <button id="btnActualizar" style="background: #3498db; color: white; padding: 15px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px;">💾 GUARDAR PROGRESO (SEGUIR EDITANDO)</button>
         <button id="btnGuardar" class="btn-guardar">🚀 GUARDAR TURNO COMPLETO</button>
     </div>
 
@@ -207,7 +209,36 @@
             location.reload();
         } catch (e) { console.error(e); alert("Error al guardar turno"); }
     };
-
+// NUEVA FUNCIÓN: GUARDAR PROGRESO (SIN RECARGAR PÁGINA)
+document.getElementById('btnActualizar').onclick = async () => {
+    try {
+        await addDoc(collection(db, "libro_de_turnos_pro"), {
+            idRelacion: ID_RELACION,
+            fecha: new Date().toLocaleString() + " (ACTUALIZACIÓN)",
+            creado: Date.now(),
+            operador: document.getElementById("opTurno").value || "No especificado",
+            censo: { 
+                activos: totalActivos, 
+                fuera: document.getElementById("inpFuera").value, 
+                enCasa: document.getElementById("cntEnCasa").innerText 
+            },
+            seguridad: {
+                grupos: document.getElementById("gruposAltos").value || "",
+                timbres: document.getElementById("timbres").value || "",
+                sombras: document.getElementById("sombras").value || "",
+                chivos: document.getElementById("chivos").value || "",
+                grilletes: document.getElementById("grilletes").value || "",
+                llavero: document.getElementById("llavero").value || ""
+            },
+            movimientos: movsAuto,
+            novedades: document.getElementById("novedadesTxt").value || ""
+        });
+        alert("💾 Progreso guardado en el historial. ¡Sigue editando!");
+    } catch (e) { 
+        console.error(e); 
+        alert("Error al guardar progreso"); 
+    }
+};
     // Historial (Corregido para evitar errores de índice)
     onSnapshot(query(collection(db, "libro_de_turnos_pro"), orderBy("creado", "desc")), (snap) => {
         const list = document.getElementById("listaHistorial");
