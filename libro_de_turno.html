@@ -257,26 +257,37 @@ solid #ccc; margin-top:10px;">
  </div>
  </details>`;
  list.appendChild(divT);
- // Búsqueda de fotos (filtro simple para evitar error de Index)
- onSnapshot(query(collection(db, "evidencias_fotos"), where("idTurno", "==", idT)), (sF)
-=> {
- const gal = document.getElementById(`galeria_${idT}`);
- if (gal) {
- gal.innerHTML = sF.empty ? "<i>Sin evidencias registradas.</i>" : "<b>📸
-Evidencias:</b>";
- sF.forEach(f => {
- const fd = f.data();
- gal.innerHTML += `
- <div class="item-evidencia-historial">
- <b>${fd.tipo.toUpperCase()}: ${fd.nom}</b><br>
- <small><b>Obs:</b> ${fd.obs}</small><br>
- <img src="${fd.foto}" class="foto-evidencia">
- </div>`;
- });
- }
- });
- });
- });
+        // Búsqueda de fotos (filtro simple para evitar error de Index)
+        onSnapshot(query(collection(db, "evidencias_fotos"), where("idTurno", "==", idT)), (sF) => {
+            const gal = document.getElementById(`galeria_${idT}`);
+            if (gal) {
+                gal.innerHTML = sF.empty ? "<i>Sin evidencias registradas.</i>" : "<b>📸 Evidencias:</b>";
+                sF.forEach(f => {
+                    const fd = f.data();
+                    gal.innerHTML += `
+                        <div class="item-evidencia-historial">
+                            <b>${fd.tipo.toUpperCase()}: ${fd.nom}</b><br>
+                            <small><b>Obs:</b> ${fd.obs}</small><br>
+                            <img src="${fd.foto}" class="foto-evidencia">
+                        </div>`;
+                });
+            }
+        });
+    }); // Cierra snap.forEach
+}); // Cierra onSnapshot historial
+
+// Lógica para que el botón de archivo funcione
+document.getElementById('btnVerHistorial').onclick = () => {
+    const caja = document.getElementById('historial');
+    const btn = document.getElementById('btnVerHistorial');
+    if (caja.style.display === "none") {
+        caja.style.display = "block";
+        btn.innerText = "❌ CERRAR ARCHIVO";
+    } else {
+        caja.style.display = "none";
+        btn.innerText = "📂 VER ARCHIVO DE TURNOS";
+    }
+};
 </script>
 </body>
 </html>
