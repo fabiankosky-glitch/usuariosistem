@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Libro de Turno Digital - Supervisión Total</title>
+    <title>Libro de Turno Digital - Caminos Nuevos</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 15px; margin: 0; }
         .container { max-width: 750px; margin: auto; }
@@ -17,11 +17,9 @@
         textarea, input, select { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
         .btn-actualizar { background: #3498db; color: white; padding: 15px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 15px; }
         .btn-guardar { background: #27ae60; color: white; padding: 18px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; }
-        /* Estilos de Monitoreo Real Time */
-        .monitor-item { background: white; border-left: 5px solid #3498db; padding: 12px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .foto-monitor { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; float: right; margin-left: 10px; border: 1px solid #ddd; cursor: pointer; }
-        .badge-terapia { background: #8e44ad; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; }
-        .badge-novedad { background: #2980b9; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; }
+        .monitor-item { background: white; border-left: 5px solid #3498db; padding: 12px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow: hidden; }
+        .foto-monitor { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; float: right; margin-left: 10px; border: 1px solid #ddd; }
+        .historial-item { background: #fff; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 8px solid #2c3e50; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; }
     </style>
 </head>
 <body>
@@ -46,7 +44,6 @@
             <label>🔑 Llaveros/Grilletes:</label><textarea id="llavero"></textarea>
         </div>
 
-        <!-- SECCIÓN DE EVIDENCIAS (Terapeutas / Operadores) -->
         <div class="card" style="margin-top:20px; border: 2px dashed #3498db; background: #f0f7ff;">
             <h3>📸 Registro de Actividad / Terapia</h3>
             <select id="tipoEvento" onchange="window.prepararEvento()">
@@ -54,33 +51,30 @@
                 <option value="terapia">🧠 Terapia</option>
                 <option value="actividad">⚽ Actividad</option>
             </select>
-
             <div id="secDinamica" style="display:none; margin-top:15px;">
                 <label id="lblNombre">Nombre:</label><input type="text" id="nombreEvidencia">
                 <label>Asistencia y Novedades:</label><textarea id="asistenciaEvidencia"></textarea>
                 <label>Observaciones:</label><textarea id="obsEvidencia"></textarea>
                 <video id="videoEvidencia" autoplay playsinline style="width:100%; border-radius:10px; background:black; margin-top:10px;"></video>
-                <button type="button" class="btn-actualizar" onclick="window.tomarYSubir()">📸 Capturar y Subir para Jefe</button>
-                <p id="statusCarga" style="text-align:center; font-size:12px; font-weight:bold; color:#2c3e50;"></p>
+                <button type="button" class="btn-actualizar" onclick="window.tomarYSubir()">📸 Capturar y Subir</button>
+                <p id="statusCarga" style="text-align:center; font-size:12px; font-weight:bold;"></p>
             </div>
         </div>
 
         <label>👤 Operador Responsable:</label><input type="text" id="opTurno">
-        <label>🚨 Novedades Generales:</label><textarea id="novedadesTxt" style="height:120px;"></textarea>
+        <label>🚨 Novedades Generales:</label><textarea id="novedadesTxt" style="height:100px;"></textarea>
         
-        <button id="btnActualizar" type="button" class="btn-actualizar">💾 ENVIAR NOVEDAD A JEFE</button>
-        <button id="btnGuardar" type="button" class="btn-guardar">🚀 FINALIZAR Y ARCHIVAR TURNO</button>
+        <button id="btnActualizar" type="button" class="btn-actualizar">💾 ENVIAR AVANCE A JEFE</button>
+        <button id="btnGuardar" type="button" class="btn-guardar">🚀 CERRAR Y ARCHIVAR TURNO</button>
 
-        <!-- MONITOREO TOTAL EN TIEMPO REAL -->
         <div style="margin-top:30px; border-top: 3px solid #2c3e50; padding-top:20px;">
-            <h3>👩‍⚕️ Panel de Supervisión en Vivo (Jefe)</h3>
-            <div id="lineaDeTiempoJefe" style="max-height:400px; overflow-y:auto; background:#eaeded; padding:15px; border-radius:10px;">
-                <p style="text-align:center; color:gray;">Cargando flujo de trabajo...</p>
-            </div>
+            <h3>👩‍⚕️ Monitoreo en Vivo (Jefe)</h3>
+            <div id="lineaDeTiempoJefe" style="max-height:300px; overflow-y:auto; background:#eaeded; padding:15px; border-radius:10px;"></div>
         </div>
 
-        <button id="btnVerHistorial" type="button" style="margin-top:20px; width:100%; padding:10px; border-radius:10px; border:none; background:#7f8c8d; color:white; font-weight:bold;">📂 ARCHIVO HISTÓRICO</button>
+        <button id="btnVerHistorial" type="button" style="margin-top:20px; width:100%; padding:10px; border-radius:10px; border:none; background:#7f8c8d; color:white; font-weight:bold;">📂 VER ARCHIVO HISTÓRICO</button>
         <div id="historial" style="display:none; margin-top:20px;">
+            <h3>📋 Turnos Anteriores</h3>
             <div id="listaHistorial"></div>
         </div>
     </div>
@@ -88,7 +82,7 @@
 
    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import {getFirestore, collection, addDoc, onSnapshot, query, orderBy, where, getDocs, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
             authDomain: "caminosnuevosdatabase.firebaseapp.com",
@@ -100,11 +94,11 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     let totalActivos = 0;
-    const ID_RELACION = "turno_" + new Date().toLocaleDateString().replace(/\//g, '-');
+    const ID_ACTUAL = "T-" + new Date().toLocaleDateString().replace(/\//g, '-');
 
     document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
 
-    // CENSO
+    // 1. CENSO
     onSnapshot(collection(db, "pacientes"), (snap) => {
         let cuenta = 0;
         snap.forEach(d => { if((d.data().estado || "").toLowerCase().includes("activo")) cuenta++; });
@@ -118,99 +112,108 @@
         document.getElementById("cntEnCasa").innerText = totalActivos - f;
     };
 
-    // CÁMARA Y FORMULARIOS
+    // 2. CÁMARA
     window.prepararEvento = () => {
         const t = document.getElementById("tipoEvento").value;
-        const sec = document.getElementById("secDinamica");
-        if(t === "ninguno") return sec.style.display = "none";
-        sec.style.display = "block";
-        document.getElementById("lblNombre").innerText = t === "terapia" ? "Nombre de la Terapia:" : "Nombre de la Actividad:";
-        navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}})
-        .then(stream => { document.getElementById("videoEvidencia").srcObject = stream; });
+        document.getElementById("secDinamica").style.display = (t === "ninguno") ? "none" : "block";
+        if(t !== "ninguno") {
+            navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}})
+            .then(s => { document.getElementById("videoEvidencia").srcObject = s; });
+        }
     };
 
     window.tomarYSubir = async () => {
-        const status = document.getElementById("statusCarga");
-        status.innerText = "⏳ Subiendo reporte visual...";
-        const v = document.getElementById("videoEvidencia");
         const c = document.createElement("canvas");
+        const v = document.getElementById("videoEvidencia");
         c.width = 600; c.height = v.videoHeight * (600 / v.videoWidth);
         c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
-        
         try {
             await addDoc(collection(db, "monitoreo_total"), {
-                idTurno: ID_RELACION,
-                tipo: "terapia_foto",
+                idTurno: ID_ACTUAL, tipo: "foto",
                 subTipo: document.getElementById("tipoEvento").value,
                 nombre: document.getElementById("nombreEvidencia").value,
                 asistencia: document.getElementById("asistenciaEvidencia").value,
-                observaciones: document.getElementById("obsEvidencia").value,
+                obs: document.getElementById("obsEvidencia").value,
                 foto: c.toDataURL("image/jpeg", 0.4),
                 timestamp: Date.now()
             });
-            status.innerText = "✅ Reporte enviado a la Jefe";
-        } catch (e) { status.innerText = "❌ Error al subir"; }
+            document.getElementById("statusCarga").innerText = "✅ Subido";
+        } catch (e) { alert("Error al subir foto"); }
     };
 
-    // BOTÓN ENVIAR NOVEDAD (SOLO TEXTO)
+    // 3. NOVEDAD TEXTO
     document.getElementById('btnActualizar').onclick = async () => {
-        const op = document.getElementById("opTurno").value;
-        if(!op) return alert("Ingrese Operador");
         try {
             await addDoc(collection(db, "monitoreo_total"), {
-                idTurno: ID_RELACION,
-                tipo: "novedad_texto",
-                operador: op,
+                idTurno: ID_ACTUAL, tipo: "texto",
+                operador: document.getElementById("opTurno").value,
                 texto: document.getElementById("novedadesTxt").value,
                 timestamp: Date.now()
             });
-            alert("✅ Novedad enviada");
+            alert("✅ Avance enviado");
         } catch (e) { alert("Error"); }
     };
 
-    // PANEL DE SUPERVISIÓN EN VIVO (LA JEFE VE TODO AQUÍ)
-    onSnapshot(query(collection(db, "monitoreo_total"), where("idTurno", "==", ID_RELACION), orderBy("timestamp", "desc")), (snap) => {
+    // 4. MONITOR REAL TIME
+    onSnapshot(query(collection(db, "monitoreo_total"), where("idTurno", "==", ID_ACTUAL), orderBy("timestamp", "desc")), (snap) => {
         const cont = document.getElementById("lineaDeTiempoJefe");
         cont.innerHTML = "";
         snap.forEach(doc => {
             const d = doc.data();
-            const hora = new Date(d.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
             const item = document.createElement("div");
             item.className = "monitor-item";
-            
-            if(d.tipo === "terapia_foto") {
-                item.innerHTML = `
-                    <img src="${d.foto}" class="foto-monitor" onclick="window.open(this.src)">
-                    <span class="badge-terapia">${d.subTipo.toUpperCase()}</span> <b>${hora}</b><br>
-                    <b>${d.nombre}</b><br>
-                    <small>👥 Asistencia: ${d.asistencia}</small><br>
-                    <small>📝 Obs: ${d.observaciones}</small>
-                `;
-            } else {
-                item.innerHTML = `
-                    <span class="badge-novedad">NOVEDAD</span> <b>${hora}</b><br>
-                    <b>Operador: ${d.operador}</b><br>
-                    <p style="margin:5px 0; font-size:13px;">${d.texto}</p>
-                `;
-            }
+            item.innerHTML = d.tipo === "foto" ? 
+                `<img src="${d.foto}" class="foto-monitor"><b>${d.nombre}</b><br><small>${d.obs}</small>` :
+                `<b>${d.operador}:</b> <small>${d.texto}</small>`;
             cont.appendChild(item);
         });
     });
 
-    // CERRAR Y ARCHIVAR
+    // 5. BOTÓN GUARDAR (ARCHIVO)
     document.getElementById('btnGuardar').onclick = async () => {
-        if(!confirm("¿Cerrar turno y archivar?")) return;
-        try {
-            await addDoc(collection(db, "libro_de_turnos_pro"), {
-                idRelacion: ID_RELACION, tipo: "final", creado: Date.now(),
-                fecha: new Date().toLocaleDateString(), operador: document.getElementById("opTurno").value,
-                novedades: document.getElementById("novedadesTxt").value,
-                censo: document.getElementById("cntEnCasa").innerText,
-                seguridad: { grupos: document.getElementById("gruposAltos").value, llavero: document.getElementById("llavero").value }
-            });
-            location.reload();
-        } catch (e) { alert("Error"); }
+        if(!confirm("¿Archivar turno?")) return;
+        await addDoc(collection(db, "archivo_turnos"), {
+            idTurno: ID_ACTUAL, fecha: new Date().toLocaleDateString(),
+            operador: document.getElementById("opTurno").value,
+            novedades: document.getElementById("novedadesTxt").value,
+            censo: document.getElementById("cntEnCasa").innerText,
+            creado: Date.now()
+        });
+        location.reload();
     };
+
+    // 6. HISTORIAL (CORREGIDO)
+    document.getElementById('btnVerHistorial').onclick = () => {
+        const h = document.getElementById('historial');
+        h.style.display = h.style.display === "none" ? "block" : "none";
+    };
+
+    onSnapshot(query(collection(db, "archivo_turnos"), orderBy("creado", "desc")), (snap) => {
+        const list = document.getElementById("listaHistorial");
+        list.innerHTML = "";
+        snap.forEach(async (docArchive) => {
+            const d = docArchive.data();
+            const idT = d.idTurno;
+            const item = document.createElement("div");
+            item.className = "historial-item";
+            item.innerHTML = `<div onclick="this.nextElementSibling.style.display='block'">
+                <b>📅 ${d.fecha}</b> - Op: ${d.operador}<br><small>Click para ver todo ▼</small>
+            </div>
+            <div style="display:none; margin-top:10px; border-top:1px solid #eee;">
+                <p>Censo: ${d.censo} | Novedades: ${d.novedades}</p>
+                <div id="gal_hist_${idT}" style="display:grid; grid-template-columns:1fr 1fr; gap:5px;"></div>
+            </div>`;
+            list.appendChild(item);
+
+            const fotos = await getDocs(query(collection(db, "monitoreo_total"), where("idTurno", "==", idT)));
+            fotos.forEach(f => {
+                if(f.data().tipo === "foto") {
+                    document.getElementById(`gal_hist_${idT}`).innerHTML += 
+                    `<img src="${f.data().foto}" style="width:100%; border-radius:5px;">`;
+                }
+            });
+        });
+    });
 </script>
 </body>
 </html>
