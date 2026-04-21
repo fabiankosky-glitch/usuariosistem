@@ -112,15 +112,12 @@ nombre">
 placeholder="Resumen general..."></textarea>
  <button id="btnGuardar" class="btn-guardar">🚀 GUARDAR TURNO COMPLETO</button>
  </div>
-    
-<!-- 6. ARCHIVO DE TURNOS (OCULTO POR DEFECTO) -->
-<button id="btnVerHistorial" type="button" style="background: #7f8c8d; color: white; padding: 12px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 20px;">📂 VER ARCHIVO DE TURNOS</button>
-
-<div id="historial" style="display: none; margin-top: 20px;">
-    <h3>📋 Historial Detallado</h3>
-    <div id="listaHistorial">Cargando registros...</div>
+ <!-- 6. HISTORIAL DETALLADO -->
+ <div id="historial">
+ <h3>📋 Historial Detallado</h3>
+ <div id="listaHistorial">Cargando registros...</div>
+ </div>
 </div>
-    
  <script type="module">
  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
  import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, where,
@@ -137,20 +134,22 @@ serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-fires
  let totalActivos = 0; let movsAuto = [];
  const ID_RELACION = "turno_" + Date.now();
  document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
+ // 1. Censo y Movimientos (Corregido para evitar errores de carga)
+ onSnapshot(collection(db, "pacientes"), (snap) => {
+ totalActivos = 0; movsAuto = [];
+ const hoy = new Date().toLocaleDateString();
+ const alertCont = document.getElementById("contAlertas");
+ if (alertCont) alertCont.innerHTML = "";
 
-  // 1. Censo y Movimientos (Limpiado de errores)
-onSnapshot(collection(db, "pacientes"), (snap) => {
-    let total = 0;
-    snap.forEach(doc => {
-        const p = doc.data();
-        const est = (p.estado || "").toLowerCase().trim();
-        if (est.includes("activo")) total++;
-    });
-    totalActivos = total;
-    document.getElementById("cntActivos").innerText = totalActivos;
-    window.calcularPresencia();
-});
-  
+ snap.forEach(doc => {
+ const p = doc.data();
+ if((p.estado || "").toLowerCase().includes("activo")) totalActivos++;
+ if(p.fechaRegistro === hoy || p.fecha === hoy) {
+ const m = `• ${p.nombre}: ${p.estado}`;
+ movsAuto.push(m);
+ if (alertCont) alertCont.innerHTML += `<div class="mov-auto">${m}</div>`;
+ }
+ });
  if(movsAuto.length === 0 && alertCont) alertCont.innerHTML = "<p style='color:gray;
 font-size:12px;'>No hay movimientos hoy.</p>";
  document.getElementById("cntActivos").innerText = totalActivos;
@@ -226,8 +225,6 @@ enCasa: document.getElementById("cntEnCasa").innerText },
  if (list) list.innerHTML = "";
  snap.forEach(docTurno => {
  const d = docTurno.data();
- // Si es un progreso, lo ignoramos para que el historial esté limpio
- if (d.tipo === "progreso") return;     
  const idT = d.idRelacion;
  let divT = document.createElement("div");
  divT.className = "historial-item";
@@ -255,38 +252,26 @@ solid #ccc; margin-top:10px;">
  </div>
  </details>`;
  list.appendChild(divT);
-        // Búsqueda de fotos (filtro simple para evitar error de Index)
-        onSnapshot(query(collection(db, "evidencias_fotos"), where("idTurno", "==", idT)), (sF) => {
-            const gal = document.getElementById(`galeria_${idT}`);
-            if (gal) {
-                gal.innerHTML = sF.empty ? "<i>Sin evidencias registradas.</i>" : "<b>📸 Evidencias:</b>";
-                sF.forEach(f => {
-                    const fd = f.data();
-                    gal.innerHTML += `
-                        <div class="item-evidencia-historial">
-                            <b>${fd.tipo.toUpperCase()}: ${fd.nom}</b><br>
-                            <small><b>Obs:</b> ${fd.obs}</small><br>
-                            <img src="${fd.foto}" class="foto-evidencia">
-                        </div>`;
-                });
-            }
-        });
-    }); // Cierra snap.forEach
-}); // Cierra onSnapshot historial
-
-// Lógica para que el botón de archivo funcione
-document.getElementById('btnVerHistorial').onclick = () => {
-    const caja = document.getElementById('historial');
-    const btn = document.getElementById('btnVerHistorial');
-    
-    if (caja.style.display === "none") {
-        caja.style.display = "block";
-        btn.innerText = "❌ CERRAR ARCHIVO";
-    } else {
-        caja.style.display = "none";
-        btn.innerText = "📂 VER ARCHIVO DE TURNOS";
-    }
-};
+ // Búsqueda de fotos (filtro simple para evitar error de Index)
+ onSnapshot(query(collection(db, "evidencias_fotos"), where("idTurno", "==", idT)), (sF)
+=> {
+ const gal = document.getElementById(`galeria_${idT}`);
+ if (gal) {
+ gal.innerHTML = sF.empty ? "<i>Sin evidencias registradas.</i>" : "<b>📸
+Evidencias:</b>";
+ sF.forEach(f => {
+ const fd = f.data();
+ gal.innerHTML += `
+ <div class="item-evidencia-historial">
+ <b>${fd.tipo.toUpperCase()}: ${fd.nom}</b><br>
+ <small><b>Obs:</b> ${fd.obs}</small><br>
+ <img src="${fd.foto}" class="foto-evidencia">
+ </div>`;
+ });
+ }
+ });
+ });
+ });
 </script>
 </body>
 </html>
