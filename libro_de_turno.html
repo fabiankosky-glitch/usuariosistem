@@ -120,24 +120,26 @@
 
     document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
 
-// 1. Censo y Movimientos (Filtro Corregido)
-onSnapshot(collection(db, "pacientes"), (snap) => {
-    let conteoActivos = 0;
-
-    snap.forEach(doc => {
-        const p = doc.data();
-        const estadoLimpio = (p.estado || "").toUpperCase().trim();
+    // 1. Censo y Movimientos (Corregido para evitar errores de carga)
+    onSnapshot(collection(db, "pacientes"), (snap) => {
+        totalActivos = 0; movsAuto = [];
+        const hoy = new Date().toLocaleDateString();
+        const alertCont = document.getElementById("contAlertas");
+        if (alertCont) alertCont.innerHTML = "";
         
-        // Comprobamos si es "USUARIOS ACTIVOS" o simplemente "ACTIVO"
-        if (estadoLimpio === "USUARIOS ACTIVOS" || estadoLimpio === "ACTIVO") {
-            conteoActivos++;
-        }
+        snap.forEach(doc => {
+            const p = doc.data();
+            if((p.estado || "").toLowerCase().includes("activo")) totalActivos++;
+            if(p.fechaRegistro === hoy || p.fecha === hoy) {
+                const m = `• ${p.nombre}: ${p.estado}`;
+                movsAuto.push(m);
+                if (alertCont) alertCont.innerHTML += `<div class="mov-auto">${m}</div>`;
+            }
+        });
+        if(movsAuto.length === 0 && alertCont) alertCont.innerHTML = "<p style='color:gray; font-size:12px;'>No hay movimientos hoy.</p>";
+        document.getElementById("cntActivos").innerText = totalActivos;
+        window.calcularPresencia();
     });
-
-    totalActivos = conteoActivos;
-    document.getElementById("cntActivos").innerText = totalActivos;
-    window.calcularPresencia();
-});
 
     window.calcularPresencia = () => {
         const f = parseInt(document.getElementById("inpFuera").value) || 0;
