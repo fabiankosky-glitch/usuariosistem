@@ -9,22 +9,18 @@
         .container { max-width: 700px; margin: auto; }
         .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
         h2, h3 { text-align: center; color: #2c3e50; margin-top: 0; }
-        
         .censo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
         .censo-item { padding: 12px; border-radius: 10px; color: white; text-align: center; font-weight: bold; }
         .resultado-casa { background: #2c3e50; color: white; padding: 12px; border-radius: 10px; text-align: center; margin-bottom: 15px; font-weight: bold; }
-        
         .seguridad-box { background: #fff5f5; padding: 15px; border-radius: 12px; border: 1px solid #feb2b2; margin-top: 10px; }
         label { display: block; font-weight: bold; margin-top: 12px; font-size: 13px; color: #c53030; }
         textarea, input, select { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 14px; }
         textarea { height: 100px; resize: vertical; }
-
         .btn-actualizar { background: #3498db; color: white; padding: 15px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 15px; }
         .btn-guardar { background: #27ae60; color: white; padding: 18px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; }
-        
-        .historial-item { background: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .historial-item { background: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; border: 1px solid #ddd; border-left: 8px solid #27ae60; }
         .foto-evidencia { width: 100%; border-radius: 10px; margin-top: 10px; border: 1px solid #ddd; }
-        summary { cursor: pointer; font-weight: bold; padding: 5px; color: #2c3e50; }
+        summary { cursor: pointer; font-weight: bold; color: #2c3e50; padding: 5px; }
     </style>
 </head>
 <body>
@@ -43,7 +39,7 @@
 
         <div class="seguridad-box">
             <h3>🔐 Control de Seguridad e Inventario</h3>
-            <label>👥 Listado Grupos Altos:</label><textarea id="gruposAltos"></textarea>
+            <label>👥 Listado Grupos Altos:</label><textarea id="gruposAltos" placeholder="Detalles de grupos..."></textarea>
             <label>🔔 Timbres:</label><textarea id="timbres"></textarea>
             <label>👣 Sombras:</label><textarea id="sombras"></textarea>
             <label>🐐 Chivos:</label><textarea id="chivos"></textarea>
@@ -51,31 +47,50 @@
             <label>🔑 Llavero:</label><textarea id="llavero"></textarea>
         </div>
 
+        <div class="card" style="margin-top:20px; border: 2px dashed #3498db; background: #f0f7ff; padding: 15px; border-radius: 15px;">
+            <h3>📸 Registro Actividad / Terapia</h3>
+            <select id="tipoEvento" onchange="prepararEvento()">
+                <option value="ninguno">-- Seleccionar Actividad --</option>
+                <option value="actividad">⚽ Actividad</option>
+                <option value="terapia">🧠 Terapia</option>
+            </select>
+            <div id="secDinamica" style="display:none; margin-top:15px;">
+                <p>⏰ Hora: <b id="horaEvento">--:--</b></p>
+                <label>Nombre del Evento:</label><input type="text" id="nomEvento" placeholder="Ej: Clase de Yoga">
+                <label>Asistencia:</label><textarea id="asistEvento" placeholder="Nombres..."></textarea>
+                <label>Observaciones:</label><textarea id="obsEvento" placeholder="Detalles..."></textarea>
+                <video id="videoEvidencia" autoplay playsinline style="width:100%; height:200px; background:black; border-radius:10px; object-fit:cover; margin-top:10px;"></video>
+                <button type="button" style="background:#3498db; color:white; width:100%; padding:15px; border:none; border-radius:10px; font-weight:bold; margin-top:10px;" onclick="tomarYSubir()">📸 Capturar y Guardar Foto</button>
+                <p id="statusCarga" style="font-size:12px; color:#2980b9; text-align:center; margin-top:10px; font-weight:bold;"></p>
+            </div>
+        </div>
+
         <label style="margin-top:20px;">👤 Operador Responsable:</label><input type="text" id="opTurno" placeholder="Su nombre">
         <label>🚨 Novedades Finales:</label><textarea id="novedadesTxt" style="height:120px;" placeholder="Resumen general del turno..."></textarea>
         
-        <button id="btnActualizar" type="button" class="btn-actualizar">💾 GUARDAR PROGRESO (SIN CERRAR)</button>
-        <button id="btnGuardar" type="button" class="btn-guardar">🚀 GUARDAR TURNO COMPLETO</button>
+        <button id="btnActualizar" type="button" class="btn-actualizar">💾 GUARDAR PROGRESO (RESPALDO)</button>
+        <button id="btnGuardar" type="button" class="btn-guardar">🚀 GUARDAR TURNO COMPLETO (CERRAR)</button>
 
         <button id="btnVerHistorial" type="button" style="background: #7f8c8d; color: white; padding: 12px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 20px;">📂 VER ARCHIVO DE TURNOS</button>
 
         <div id="historial" style="display: none; margin-top: 20px;">
-            <h3>📋 Historial de Turnos y Progresos</h3>
-            <div id="listaHistorial">Cargando registros...</div>
+            <h3>📋 Archivo de Turnos Cerrados</h3>
+            <div id="listaHistorial">Cargando...</div>
         </div>
     </div>
 </div>
 
-   <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import {  getFirestore, collection, addDoc, onSnapshot, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        const firebaseConfig = {
-            apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
-            authDomain: "caminosnuevosdatabase.firebaseapp.com",
-            projectId: "caminosnuevosdatabase",
-            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
-            appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
-        };
+<script type="module">
+    import { initializeApp } from "https://gstatic.com";
+    import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, where, getDocs, deleteDoc, doc } from "https://gstatic.com";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+        authDomain: "://firebaseapp.com",
+        projectId: "caminosnuevosdatabase",
+        storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+        appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
@@ -83,13 +98,12 @@
     const ID_RELACION = "turno_" + Date.now();
     document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
 
-    // 1. Censo Automático
+    // 1. CENSO AUTOMÁTICO
     onSnapshot(collection(db, "pacientes"), (snap) => {
         let cuenta = 0;
-        snap.forEach(doc => {
-            const p = doc.data();
-            const est = (p.estado || "").toLowerCase().trim();
-            if (est.includes("activo") || est.includes("activos")) cuenta++;
+        snap.forEach(d => {
+            const est = (d.data().estado || "").toLowerCase().trim();
+            if (est.includes("activo")) cuenta++;
         });
         totalActivos = cuenta;
         document.getElementById("cntActivos").innerText = totalActivos;
@@ -101,69 +115,125 @@
         document.getElementById("cntEnCasa").innerText = totalActivos - f;
     };
 
-    // 2. Guardar Progreso (Azul)
+    // 2. CÁMARA E INDUCCIÓN
+    window.prepararEvento = () => {
+        const t = document.getElementById("tipoEvento").value;
+        const s = document.getElementById("secDinamica");
+        if(t === "ninguno") { s.style.display="none"; return; }
+        s.style.display="block";
+        document.getElementById("horaEvento").innerText = new Date().toLocaleTimeString([],{hour:'2-digit', minute:'2-digit'});
+        navigator.mediaDevices.getUserMedia({video:{facingMode:"environment"}})
+            .then(stream => { document.getElementById("videoEvidencia").srcObject = stream; })
+            .catch(err => alert("Cámara no disponible"));
+    };
+
+    window.tomarYSubir = async () => {
+        const status = document.getElementById("statusCarga");
+        status.innerText = "⏳ Guardando foto...";
+        const v = document.getElementById("videoEvidencia");
+        const c = document.createElement("canvas");
+        const escala = 600 / v.videoWidth;
+        c.width = 600; c.height = v.videoHeight * escala;
+        c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
+        const fotoFinal = c.toDataURL("image/jpeg", 0.3);
+        try {
+            await addDoc(collection(db, "evidencias_fotos"), {
+                idTurno: ID_RELACION,
+                tipo: document.getElementById("tipoEvento").value,
+                nom: document.getElementById("nomEvento").value || "Sin nombre",
+                obs: document.getElementById("obsEvento").value || "",
+                asistencia: document.getElementById("asistEvento").value || "",
+                foto: fotoFinal,
+                creado: Date.now()
+            });
+            status.innerText = "✅ Foto guardada correctamente";
+        } catch (e) { alert("Error al subir foto"); }
+    };
+
+    // 3. GUARDAR PROGRESO (BOTÓN AZUL)
     document.getElementById('btnActualizar').onclick = async () => {
         try {
             await addDoc(collection(db, "libro_de_turnos_pro"), {
-                idRelacion: ID_RELACION, tipo: "progreso", fecha: new Date().toLocaleString(), creado: Date.now(),
-                operador: document.getElementById("opTurno").value || "Operador",
-                censo: { activos: totalActivos, fuera: document.getElementById("inpFuera").value, enCasa: document.getElementById("cntEnCasa").innerText },
-                seguridad: { grupos: document.getElementById("gruposAltos").value, llavero: document.getElementById("llavero").value },
-                novedades: document.getElementById("novedadesTxt").value
+                idRelacion: ID_RELACION, tipo: "progreso", creado: Date.now(),
+                fecha: new Date().toLocaleString(), operador: document.getElementById("opTurno").value || "No especificado",
+                novedades: document.getElementById("novedadesTxt").value,
+                seguridad: { grupos: document.getElementById("gruposAltos").value, llavero: document.getElementById("llavero").value, timbres: document.getElementById("timbres").value, sombras: document.getElementById("sombras").value, chivos: document.getElementById("chivos").value, grilletes: document.getElementById("grilletes").value },
+                censo: { activos: totalActivos, fuera: document.getElementById("inpFuera").value, enCasa: document.getElementById("cntEnCasa").innerText }
             });
-            alert("💾 Progreso guardado correctamente.");
-        } catch (e) { alert("Error al guardar progreso"); }
+            alert("💾 Progreso respaldado en la nube.");
+        } catch (e) { alert("Error al respaldar"); }
     };
 
-    // 3. Guardar Turno Final (Verde)
+    // 4. GUARDAR FINAL Y LIMPIEZA (BOTÓN VERDE)
     document.getElementById('btnGuardar').onclick = async () => {
         try {
+            // Guardamos el Final
             await addDoc(collection(db, "libro_de_turnos_pro"), {
-                idRelacion: ID_RELACION, tipo: "final", fecha: new Date().toLocaleString(), creado: Date.now(),
-                operador: document.getElementById("opTurno").value || "No especificado",
+                idRelacion: ID_RELACION, tipo: "final", creado: Date.now(),
+                fecha: new Date().toLocaleString(), operador: document.getElementById("opTurno").value || "No especificado",
                 censo: { activos: totalActivos, fuera: document.getElementById("inpFuera").value, enCasa: document.getElementById("cntEnCasa").innerText },
                 seguridad: { grupos: document.getElementById("gruposAltos").value, timbres: document.getElementById("timbres").value, sombras: document.getElementById("sombras").value, chivos: document.getElementById("chivos").value, grilletes: document.getElementById("grilletes").value, llavero: document.getElementById("llavero").value },
                 novedades: document.getElementById("novedadesTxt").value
             });
-            alert("✅ Turno Cerrado con éxito");
+
+            // Borramos los progresos de este turno específico
+            const q = query(collection(db, "libro_de_turnos_pro"), where("idRelacion", "==", ID_RELACION), where("tipo", "==", "progreso"));
+            const snapshot = await getDocs(q);
+            snapshot.forEach(async (d) => { await deleteDoc(doc(db, "libro_de_turnos_pro", d.id)); });
+
+            alert("✅ Turno Cerrado. El archivo ha sido actualizado.");
             location.reload();
         } catch (e) { alert("Error al cerrar turno"); }
     };
 
-    // 4. Historial Formateado
+    // 5. ARCHIVO MUERTO (HISTORIAL DETALLADO)
     onSnapshot(query(collection(db, "libro_de_turnos_pro"), orderBy("creado", "desc")), (snap) => {
         const list = document.getElementById("listaHistorial");
         list.innerHTML = "";
         snap.forEach(docT => {
             const d = docT.data();
-            const esProg = d.tipo === "progreso";
-            const color = esProg ? "#3498db" : "#27ae60";
-            const titulo = esProg ? "🕒 ACTUALIZACIÓN" : "✅ TURNO CERRADO";
-            
+            if (d.tipo === "progreso") return; // Oculta progresos del archivo principal
+
             const div = document.createElement("div");
             div.className = "historial-item";
-            div.style.borderLeft = `8px solid ${color}`;
             div.innerHTML = `
                 <details>
-                    <summary>${titulo} | ${d.fecha}</summary>
-                    <div style="margin-top:10px; font-size:14px; border-top:1px solid #eee; padding-top:10px;">
-                        <p><b>👤 Operador:</b> ${d.operador}</p>
-                        <p><b>🏠 Casa:</b> ${d.censo ? d.censo.enCasa : '--'} (Activos: ${d.censo ? d.censo.activos : '--'})</p>
-                        <p><b>🚨 Novedades:</b></p>
-                        <p style="white-space:pre-wrap; background:#f9f9f9; padding:10px; border-radius:5px;">${d.novedades || 'Sin novedades'}</p>
+                    <summary>📁 TURNO: ${d.fecha} - Op: ${d.operador}</summary>
+                    <div style="margin-top:10px; font-size:13px; border-top:1px solid #eee; padding-top:10px;">
+                        <p><b>🏠 CENSO:</b> Casa: ${d.censo.enCasa} | Fuera: ${d.censo.fuera} | Activos: ${d.censo.activos}</p>
+                        <div style="background:#fff5f5; padding:10px; border-radius:8px; border:1px solid #feb2b2; margin-bottom:10px;">
+                            <b>🔐 SEGURIDAD:</b><br>
+                            • G. Altos: ${d.seguridad.grupos}<br>
+                            • Timbres: ${d.seguridad.timbres} | Sombras: ${d.seguridad.sombras}<br>
+                            • Chivos: ${d.seguridad.chivos} | Grilletes: ${d.seguridad.grilletes}<br>
+                            • Llavero: ${d.seguridad.llavero}
+                        </div>
+                        <p style="background:#f9f9f9; padding:10px; border-radius:8px; border:1px solid #ccc;">
+                            <b>🚨 NOVEDADES:</b><br>${d.novedades}
+                        </p>
+                        <div id="gal_${d.idRelacion}" style="display:grid; grid-template-columns:1fr 1fr; gap:5px; margin-top:10px;"></div>
                     </div>
                 </details>`;
             list.appendChild(div);
+            cargarFotosArchivo(d.idRelacion);
         });
     });
 
-    // 5. Lógica del Botón Gris
+    async function cargarFotosArchivo(id) {
+        const q = query(collection(db, "evidencias_fotos"), where("idTurno", "==", id));
+        const s = await getDocs(q);
+        const gal = document.getElementById(`gal_${id}`);
+        s.forEach(f => {
+            const fd = f.data();
+            gal.innerHTML += `<div style="border:1px solid #ddd; padding:5px; border-radius:5px;"><small>${fd.tipo}: ${fd.nom}</small><img src="${fd.foto}" style="width:100%; border-radius:5px;"></div>`;
+        });
+    }
+
     document.getElementById('btnVerHistorial').onclick = () => {
         const h = document.getElementById('historial');
         const b = document.getElementById('btnVerHistorial');
         h.style.display = h.style.display === "none" ? "block" : "none";
         b.innerText = h.style.display === "none" ? "📂 VER ARCHIVO DE TURNOS" : "❌ CERRAR ARCHIVO";
-        b.style.background = h.style.display === "none" ? "#7f8c8d" : "#e74c3c";
     };
 </script>
 </body>
