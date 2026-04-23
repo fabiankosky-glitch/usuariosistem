@@ -34,7 +34,7 @@
         .menu-item h3 { margin: 0; font-size: 16px; color: #34495e; }
 
         /* Colores de las secciones */
-        .libros { border-color: #f1c40f; }
+        .libros { border-color: #f1c40f; } /* Amarillo/Naranja para Libros */
         .historias { border-color: #3498db; }
         .ingresos { border-color: #e67e22; }
         .admin { border-color: #95a5a6; }
@@ -48,22 +48,25 @@
 </div>
 
 <div class="main-action">
-    <!-- Este botón ahora apunta a registro.html -->
     <button class="btn-registro" onclick="window.location.href='registro.html'">
         ➕ AGREGAR PACIENTE
     </button>
 </div>
 
 <div class="menu-grid">
-   <div class="menu-item libros" onclick="window.location.href='libro_de_turno.html'">
+   <!-- MEJORA: Ahora apunta al menú de selección de los 4 libros -->
+   <div class="menu-item libros" onclick="window.location.href='libros.html'">
         <h3>📚 Libros</h3>
     </div>
-<div class="menu-item historias" onclick="window.location.href='historias.html?v=' + Date.now()">
-    <h3>📋 Historias Clínicas</h3>
-</div>
+
+    <div class="menu-item historias" onclick="window.location.href='historias.html?v=' + Date.now()">
+        <h3>📋 Historias Clínicas</h3>
+    </div>
+
     <div class="menu-item ingresos" onclick="window.location.href='ingresos.html'">
         <h3>📝 Libro de Ingresos</h3>
     </div>
+
     <div class="menu-item admin" onclick="window.location.href='administracion.html'">
         <h3>⚙️ Administración</h3>
     </div>
