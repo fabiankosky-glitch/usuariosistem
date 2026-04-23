@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libro Correcto - Control de Medicación</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #fdf2e9; padding: 15px; margin: 0; }
+        .container { max-width: 700px; margin: auto; }
+        h2 { text-align: center; color: #d35400; margin-bottom: 20px; }
+        
+        .usuario-item { 
+            background: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; 
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-left: 8px solid #e67e22;
+        }
+        
+        .header-user { display: flex; justify-content: space-between; align-items: center; }
+        .info-user b { font-size: 18px; color: #2c3e50; text-transform: uppercase; }
+
+        /* Botón Medicado */
+        .btn-toggle { padding: 10px 20px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .estado-no { background: #ecf0f1; color: #95a5a6; }
+        .estado-si { background: #e74c3c; color: white; box-shadow: 0 0 10px rgba(231, 76, 60, 0.3); }
+
+        /* Carpeta Correcta */
+        .carpeta-correcta { 
+            display: none; background: #fffcf9; margin-top: 15px; padding: 15px; 
+            border-radius: 12px; border: 2px dashed #e67e22; 
+        }
+        .visible { display: block; }
+
+        .grid-7-reglas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        label { font-size: 11px; font-weight: bold; color: #d35400; display: block; margin-top: 5px; }
+        input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        
+        .btn-guardar { 
+            background: #27ae60; color: white; width: 100%; padding: 15px; border: none; 
+            border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button onclick="location.href='libros.html'" style="margin-bottom:15px; padding:10px; background:#95a5a6; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">⬅ Volver a Libros</button>
+    
+    <h2>💊 Libro Correcto: Control de Suministro</h2>
+
+    <div id="listaPacientes">
+        <p style="text-align:center;">Cargando lista de pacientes...</p>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://gstatic.com";
+    import { getFirestore, collection, onSnapshot, doc, updateDoc, addDoc } from "https://gstatic.com";
+
+    // Reemplaza con tu configuración de Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+        authDomain: "://firebaseapp.com",
+        projectId: "caminosnuevosdatabase",
+        storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+        appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    // 1. CARGAR PACIENTES Y SUS CARPETAS
+    onSnapshot(collection(db, "pacientes"), (snap) => {
+        const contenedor = document.getElementById('listaPacientes');
+        contenedor.innerHTML = "";
+        
+        snap.forEach(d => {
+            const p = d.data();
+            const esMedicado = p.medicado === "si";
+            
+            const item = document.createElement('div');
+            item.className = "usuario-item";
+            item.innerHTML = `
+                <div class="header-user">
+                    <div class="info-user">
+                        <b>${p.nombre}</b><br>
+                        <small style="color:#7f8c8d;">Estado: ${p.estado || 'Activo'}</small>
+                    </div>
+                    <button class="btn-toggle ${esMedicado ? 'estado-si' : 'estado-no'}" 
+                        onclick="toggleMedicado('${d.id}', '${p.medicado || 'no'}')">
+                        ${esMedicado ? '💊 MEDICADO' : '⚪ NO MEDICADO'}
+                    </button>
+                </div>
+
+                <div class="carpeta-correcta ${esMedicado ? 'visible' : ''}">
+                    <label>🧪 Medicamento Correcto:</label>
+                    <input type="text" id="med_${d.id}" placeholder="Nombre del fármaco">
+                    
+                    <div class="grid-7-reglas">
+                        <div><label>🔢 Cantidad:</label><input type="text" id="can_${d.id}"></div>
+                        <div><label>⚖️ Dosis:</label><input type="text" id="dos_${d.id}"></div>
+                        <div><label>⏰ Hora:</label><input type="time" id="hor_${d.id}"></div>
+                        <div><label>🛤️ Vía:</label><input type="text" id="via_${d.id}" placeholder="Ej: Oral"></div>
+                    </div>
+                    
+                    <label>👩‍⚕️ Proveedor Responsable:</label>
+                    <input type="text" id="pro_${d.id}" placeholder="Nombre del enfermero">
+
+                    <button class="btn-guardar" onclick="registrarSuministro('${d.id}', '${p.nombre}')">
+                        💾 GUARDAR REGISTRO DE SUMINISTRO
+                    </button>
+                </div>
+            `;
+            contenedor.appendChild(item);
+        });
+    });
+
+    // 2. ACTIVAR / DESACTIVAR CARPETA
+    window.toggleMedicado = async (id, estado) => {
+        const nuevo = estado === "si" ? "no" : "si";
+        await updateDoc(doc(db, "pacientes", id), { medicado: nuevo });
+    };
+
+    // 3. GUARDAR EN EL LIBRO CORRECTO
+    window.registrarSuministro = async (id, nombre) => {
+        const registro = {
+            paciente: nombre,
+            medicamento: document.getElementById(`med_${id}`).value,
+            cantidad: document.getElementById(`can_${id}`).value,
+            dosis: document.getElementById(`dos_${id}`).value,
+            hora: document.getElementById(`hor_${id}`).value,
+            via: document.getElementById(`via_${id}`).value,
+            proveedor: document.getElementById(`pro_${id}`).value,
+            fecha: new Date().toLocaleString(),
+            timestamp: Date.now()
+        };
+
+        if(!registro.medicamento) return alert("Escribe el medicamento");
+
+        try {
+            await addDoc(collection(db, "libro_correcto"), registro);
+            alert("✅ Registro exitoso para " + nombre);
+            // Limpiar campos
+            document.getElementById(`med_${id}`).value = "";
+            document.getElementById(`pro_${id}`).value = "";
+        } catch (e) { alert("Error al guardar"); }
+    };
+</script>
+
+</body>
+</html>
