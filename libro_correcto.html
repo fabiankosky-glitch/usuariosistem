@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Libro Correcto - Control de Medicación</title>
+    <title>Libro Correcto - Pacientes Activos</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #fdf2e9; padding: 15px; margin: 0; }
         .container { max-width: 700px; margin: auto; }
@@ -37,40 +37,49 @@
             background: #27ae60; color: white; width: 100%; padding: 15px; border: none; 
             border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer;
         }
+        .back-btn { background: #95a5a6; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; margin-bottom: 15px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <button onclick="location.href='libros.html'" style="margin-bottom:15px; padding:10px; background:#95a5a6; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">⬅ Volver a Libros</button>
+    <button class="back-btn" onclick="location.href='libros.html'">⬅ Volver a Libros</button>
     
     <h2>💊 Libro Correcto: Control de Suministro</h2>
 
     <div id="listaPacientes">
-        <p style="text-align:center;">Cargando lista de pacientes...</p>
+        <p style="text-align:center;">Cargando pacientes activos...</p>
     </div>
 </div>
 
-   <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        const firebaseConfig = {
-            apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
-            authDomain: "caminosnuevosdatabase.firebaseapp.com",
-            projectId: "caminosnuevosdatabase",
-            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
-            appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
-        };
+<script type="module">
+    import { initializeApp } from "https://gstatic.com";
+    import { getFirestore, collection, onSnapshot, doc, updateDoc, addDoc, query, where } from "https://gstatic.com";
 
+    // Configuración de Firebase
+    const firebaseConfig = {
+        apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+        authDomain: "://firebaseapp.com",
+        projectId: "caminosnuevosdatabase",
+        storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+        appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // 1. CARGAR PACIENTES Y SUS CARPETAS
-    onSnapshot(collection(db, "pacientes"), (snap) => {
+    // 1. CARGAR SOLO PACIENTES ACTIVOS
+    const q = query(collection(db, "pacientes"), where("estado", "==", "Activo"));
+
+    onSnapshot(q, (snap) => {
         const contenedor = document.getElementById('listaPacientes');
         contenedor.innerHTML = "";
         
+        if (snap.empty) {
+            contenedor.innerHTML = "<p style='text-align:center;'>No hay pacientes activos en la lista.</p>";
+            return;
+        }
+
         snap.forEach(d => {
             const p = d.data();
             const esMedicado = p.medicado === "si";
@@ -81,7 +90,7 @@
                 <div class="header-user">
                     <div class="info-user">
                         <b>${p.nombre}</b><br>
-                        <small style="color:#7f8c8d;">Estado: ${p.estado || 'Activo'}</small>
+                        <small style="color:#27ae60;">● Paciente Activo</small>
                     </div>
                     <button class="btn-toggle ${esMedicado ? 'estado-si' : 'estado-no'}" 
                         onclick="toggleMedicado('${d.id}', '${p.medicado || 'no'}')">
@@ -90,21 +99,22 @@
                 </div>
 
                 <div class="carpeta-correcta ${esMedicado ? 'visible' : ''}">
+                    <h4 style="margin:0; color:#e67e22;">📂 Carpeta Correcta</h4>
                     <label>🧪 Medicamento Correcto:</label>
-                    <input type="text" id="med_${d.id}" placeholder="Nombre del fármaco">
+                    <input type="text" id="med_${d.id}" placeholder="Fármaco">
                     
                     <div class="grid-7-reglas">
                         <div><label>🔢 Cantidad:</label><input type="text" id="can_${d.id}"></div>
                         <div><label>⚖️ Dosis:</label><input type="text" id="dos_${d.id}"></div>
                         <div><label>⏰ Hora:</label><input type="time" id="hor_${d.id}"></div>
-                        <div><label>🛤️ Vía:</label><input type="text" id="via_${d.id}" placeholder="Ej: Oral"></div>
+                        <div><label>🛤️ Vía:</label><input type="text" id="via_${d.id}" placeholder="Vía"></div>
                     </div>
                     
                     <label>👩‍⚕️ Proveedor Responsable:</label>
-                    <input type="text" id="pro_${d.id}" placeholder="Nombre del enfermero">
+                    <input type="text" id="pro_${d.id}" placeholder="Nombre responsable">
 
                     <button class="btn-guardar" onclick="registrarSuministro('${d.id}', '${p.nombre}')">
-                        💾 GUARDAR REGISTRO DE SUMINISTRO
+                        💾 GUARDAR REGISTRO
                     </button>
                 </div>
             `;
@@ -112,13 +122,17 @@
         });
     });
 
-    // 2. ACTIVAR / DESACTIVAR CARPETA
+    // 2. ACTUALIZAR ESTADO DE MEDICADO
     window.toggleMedicado = async (id, estado) => {
         const nuevo = estado === "si" ? "no" : "si";
-        await updateDoc(doc(db, "pacientes", id), { medicado: nuevo });
+        try {
+            await updateDoc(doc(db, "pacientes", id), { medicado: nuevo });
+        } catch (e) {
+            console.error("Error al actualizar:", e);
+        }
     };
 
-    // 3. GUARDAR EN EL LIBRO CORRECTO
+    // 3. REGISTRAR EL SUMINISTRO EN EL LIBRO
     window.registrarSuministro = async (id, nombre) => {
         const registro = {
             paciente: nombre,
@@ -132,15 +146,18 @@
             timestamp: Date.now()
         };
 
-        if(!registro.medicamento) return alert("Escribe el medicamento");
+        if (!registro.medicamento || !registro.proveedor) {
+            return alert("Por favor, completa al menos el medicamento y el responsable.");
+        }
 
         try {
             await addDoc(collection(db, "libro_correcto"), registro);
-            alert("✅ Registro exitoso para " + nombre);
+            alert("✅ ¡Registrado! Medicamento guardado para " + nombre);
             // Limpiar campos
-            document.getElementById(`med_${id}`).value = "";
-            document.getElementById(`pro_${id}`).value = "";
-        } catch (e) { alert("Error al guardar"); }
+            document.querySelectorAll(`#med_${id}, #can_${id}, #dos_${id}, #via_${id}, #pro_${id}`).forEach(i => i.value = "");
+        } catch (e) {
+            alert("Error al guardar en el libro.");
+        }
     };
 </script>
 
