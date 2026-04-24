@@ -14,19 +14,22 @@
             box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-left: 8px solid #e67e22;
         }
         
-        .header-user { display: flex; justify-content: space-between; align-items: center; }
+        .header-user { display: flex; flex-direction: column; gap: 10px; }
+        @media(min-width: 400px) { .header-user { flex-direction: row; justify-content: space-between; align-items: center; } }
+
         .info-user b { font-size: 18px; color: #2c3e50; text-transform: uppercase; }
 
-        /* Botón Medicado */
-        .btn-toggle { padding: 10px 20px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        /* Botones de Acción */
+        .btn-group { display: flex; gap: 8px; }
+        .btn-toggle { padding: 10px 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; transition: 0.3s; font-size: 12px; }
         .estado-no { background: #ecf0f1; color: #95a5a6; }
         .estado-si { background: #e74c3c; color: white; box-shadow: 0 0 10px rgba(231, 76, 60, 0.3); }
+        .btn-control { background: #3498db; color: white; }
 
-        /* Carpeta Correcta */
-        .carpeta-correcta { 
-            display: none; background: #fffcf9; margin-top: 15px; padding: 15px; 
-            border-radius: 12px; border: 2px dashed #e67e22; 
-        }
+        /* Carpetas */
+        .carpeta { display: none; margin-top: 15px; padding: 15px; border-radius: 12px; }
+        .carpeta-correcta { background: #fffcf9; border: 2px dashed #e67e22; }
+        .carpeta-control { background: #f0f7ff; border: 2px dashed #3498db; }
         .visible { display: block; }
 
         .grid-7-reglas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
@@ -37,7 +40,11 @@
             background: #27ae60; color: white; width: 100%; padding: 15px; border: none; 
             border-radius: 10px; font-weight: bold; margin-top: 15px; cursor: pointer;
         }
-        .back-btn { background: #95a5a6; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; margin-bottom: 15px; width: 100%; font-weight: bold; }
+        .back-btn { background: #2c3e50; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; margin-bottom: 15px; width: 100%; font-weight: bold; }
+        
+        /* Estilo para tabla de historial */
+        .tabla-historial { width: 100%; font-size: 11px; border-collapse: collapse; margin-top: 10px; }
+        .tabla-historial th, .tabla-historial td { border-bottom: 1px solid #ddd; padding: 5px; text-align: left; }
     </style>
 </head>
 <body>
@@ -52,30 +59,28 @@
     </div>
 </div>
 
-   <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, doc, updateDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        const firebaseConfig = {
-            apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
-            authDomain: "caminosnuevosdatabase.firebaseapp.com",
-            projectId: "caminosnuevosdatabase",
-            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
-            appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
-        };
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, onSnapshot, doc, updateDoc, addDoc, query, where, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+        authDomain: "caminosnuevosdatabase.firebaseapp.com",
+        projectId: "caminosnuevosdatabase",
+        storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+        appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+    };
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
 
-    // LÓGICA DE FILTRO ADAPTADA DE TU LIBRO DE TURNO (PÁGINA 5 DEL PDF)
     onSnapshot(collection(db, "pacientes"), (snap) => {
         const contenedor = document.getElementById('listaPacientes');
         contenedor.innerHTML = "";
-        
         let hayPacientes = false;
 
         snap.forEach(d => {
             const p = d.data();
-            // Filtro manual igual al que usaste en el Libro de Turno
             const est = (p.estado || "").toLowerCase().trim();
             
             if (est.includes("activo")) {
@@ -90,51 +95,72 @@
                             <b>${p.nombre}</b><br>
                             <small style="color:#27ae60;">● PACIENTE EN CASA</small>
                         </div>
-                        <button class="btn-toggle ${esMedicado ? 'estado-si' : 'estado-no'}" 
-                            onclick="toggleMedicado('${d.id}', '${p.medicado || 'no'}')">
-                            ${esMedicado ? '💊 MEDICADO' : '⚪ NO MEDICADO'}
-                        </button>
+                        <div class="btn-group">
+                            <button class="btn-toggle ${esMedicado ? 'estado-si' : 'estado-no'}" 
+                                onclick="toggleMedicado('${d.id}', '${p.medicado || 'no'}')">
+                                ${esMedicado ? '💊 CERRAR' : '💊 MEDICAR'}
+                            </button>
+                            <button class="btn-toggle btn-control" onclick="abrirControl('${d.id}', '${p.nombre}')">
+                                📋 REGISTRO
+                            </button>
+                        </div>
                     </div>
 
-                    <div id="carpeta_${d.id}" class="carpeta-correcta ${esMedicado ? 'visible' : ''}">
+                    <!-- CARPETA 1: SUMINISTRO -->
+                    <div id="carpeta_${d.id}" class="carpeta carpeta-correcta ${esMedicado ? 'visible' : ''}">
                         <h4 style="margin:0; color:#e67e22;">📂 Carpeta de Medicación</h4>
-                        
                         <label>🧪 Medicamento Correcto:</label>
                         <input type="text" id="med_${d.id}" placeholder="Fármaco">
-                        
                         <div class="grid-7-reglas">
                             <div><label>🔢 Cantidad:</label><input type="text" id="can_${d.id}"></div>
                             <div><label>⚖️ Dosis:</label><input type="text" id="dos_${d.id}"></div>
                             <div><label>⏰ Hora:</label><input type="time" id="hor_${d.id}"></div>
-                            <div><label>🛤️ Vía:</label><input type="text" id="via_${d.id}" placeholder="Vía"></div>
+                            <div><label>🛤️ Vía:</label><input type="text" id="via_${d.id}"></div>
                         </div>
-                        
                         <label>👩‍⚕️ Proveedor Responsable:</label>
                         <input type="text" id="pro_${d.id}" placeholder="Nombre responsable">
-
                         <button class="btn-guardar" onclick="registrarSuministro('${d.id}', '${p.nombre}')">
-                            💾 GUARDAR REGISTRO DE SUMINISTRO
+                            💾 GUARDAR REGISTRO
+                        </button>
+                    </div>
+
+                    <!-- CARPETA 2: REGISTRO DE CONTROL -->
+                    <div id="control_${d.id}" class="carpeta carpeta-control">
+                        <h4 style="margin:0; color:#2980b9;">📋 Registro de Control: ${p.nombre}</h4>
+                        <div id="tabla_${d.id}">Cargando historial...</div>
+                        <button class="btn-guardar" style="background:#3498db;" onclick="document.getElementById('control_${d.id}').classList.remove('visible')">
+                            CERRAR REGISTRO
                         </button>
                     </div>
                 `;
                 contenedor.appendChild(item);
             }
         });
-
-        if (!hayPacientes) {
-            contenedor.innerHTML = "<p style='text-align:center;'>No se encontraron pacientes con estado 'Activo'.</p>";
-        }
+        if (!hayPacientes) contenedor.innerHTML = "<p style='text-align:center;'>No hay pacientes activos.</p>";
     });
 
-    // Función para activar/desactivar la Carpeta Correcta
     window.toggleMedicado = async (id, estado) => {
         const nuevo = estado === "si" ? "no" : "si";
-        try {
-            await updateDoc(doc(db, "pacientes", id), { medicado: nuevo });
-        } catch (e) { console.error("Error:", e); }
+        try { await updateDoc(doc(db, "pacientes", id), { medicado: nuevo }); } catch (e) { console.error(e); }
     };
 
-    // Función para guardar el registro en la colección 'libro_correcto'
+    window.abrirControl = async (id, nombre) => {
+        const div = document.getElementById(`control_${id}`);
+        div.classList.toggle('visible');
+        if (div.classList.contains('visible')) {
+            const q = query(collection(db, "libro_correcto"), where("paciente", "==", nombre), orderBy("creado", "desc"), limit(5));
+            onSnapshot(q, (snapshot) => {
+                let html = `<table class="tabla-historial"><tr><th>Fecha</th><th>Med</th><th>Dosis</th></tr>`;
+                snapshot.forEach(doc => {
+                    const r = doc.data();
+                    html += `<tr><td>${r.fecha.split(',')[0]}</td><td>${r.medicamento}</td><td>${r.dosis}</td></tr>`;
+                });
+                html += `</table>`;
+                document.getElementById(`tabla_${id}`).innerHTML = snapshot.empty ? "Sin registros previos." : html;
+            });
+        }
+    };
+
     window.registrarSuministro = async (id, nombre) => {
         const registro = {
             paciente: nombre,
@@ -147,17 +173,14 @@
             fecha: new Date().toLocaleString(),
             creado: Date.now()
         };
-
-        if (!registro.medicamento) return alert("Por favor, escribe el nombre del medicamento.");
-
+        if (!registro.medicamento) return alert("Escribe el medicamento.");
         try {
             await addDoc(collection(db, "libro_correcto"), registro);
-            alert("✅ Registro guardado exitosamente para " + nombre);
-            // Limpiar los campos de esa carpeta específica
+            alert("✅ Registro guardado para " + nombre);
             document.querySelectorAll(`#carpeta_${id} input`).forEach(i => i.value = "");
-        } catch (e) { alert("Error al guardar en el libro."); }
+            await updateDoc(doc(db, "pacientes", id), { medicado: "no" });
+        } catch (e) { alert("Error al guardar."); }
     };
 </script>
-
 </body>
 </html>
