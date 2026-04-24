@@ -3,52 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Libro Correcto Pro - Caminos Nuevos</title>
-    <!-- Librerías para el Reporte PDF -->
+    <title>Libro Correcto Pro - Gestión Farmacéutica</title>
     <script src="https://cloudflare.com"></script>
     <script src="https://cloudflare.com"></script>
     
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #fdf2e9; padding: 15px; margin: 0; }
-        .container { max-width: 750px; margin: auto; }
-        h2 { text-align: center; color: #d35400; margin-bottom: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        h2 { text-align: center; color: #d35400; font-size: 22px; }
         
         .usuario-item { background: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-left: 8px solid #e67e22; }
         .header-user { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         
-        .btn-group { display: flex; gap: 8px; }
-        .btn-accion { padding: 10px 15px; border-radius: 10px; border: none; font-weight: bold; cursor: pointer; font-size: 11px; color: white; transition: 0.3s; }
-        
-        .btn-medicar-off { background: #95a5a6; }
-        .btn-medicar-on { background: #e74c3c; }
+        .btn-group { display: flex; gap: 5px; }
+        .btn-accion { padding: 8px 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 11px; color: white; }
         .btn-agregar { background: #27ae60; }
         .btn-reporte { background: #2c3e50; }
 
-        /* Carpeta de Entrada Dinámica */
+        /* Carpetas de Datos */
         .carpeta-registro { display: none; background: #fff; padding: 20px; border-radius: 15px; border: 2px solid #27ae60; margin-top: 15px; }
         .visible { display: block; }
         
-        .farmaco-entry { background: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #dee2e6; position: relative; }
-        .grid-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-top: 10px; }
+        .seccion-titulo { background: #e67e22; color: white; padding: 8px; border-radius: 5px; font-size: 14px; margin: 15px 0 10px 0; font-weight: bold; }
         
-        input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 14px; }
+        .grid-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+        .campo-bloque { margin-bottom: 10px; }
         label { font-size: 11px; font-weight: bold; color: #555; display: block; margin-bottom: 3px; }
+        input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; font-size: 13px; }
         
-        .btn-add-more { background: #e67e22; color: white; border: none; padding: 10px; border-radius: 8px; cursor: pointer; font-weight: bold; margin-bottom: 15px; width: 100%; }
-        .btn-guardar-final { background: #27ae60; color: white; width: 100%; padding: 15px; border-radius: 10px; font-size: 16px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-guardar-pro { background: #27ae60; color: white; width: 100%; padding: 18px; margin-top: 20px; border-radius: 10px; font-size: 16px; border: none; font-weight: bold; cursor: pointer; box-shadow: 0 4px 10px rgba(39, 174, 96, 0.3); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <button style="width:100%; padding:12px; margin-bottom:15px; background:#2c3e50; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="location.href='libros.html'">⬅ Volver al Menú</button>
-    <h2>💊 Libro Correcto: Protocolo Multi-Suministro</h2>
-    <div id="listaPacientes">Cargando pacientes...</div>
+    <button style="width:100%; padding:12px; margin-bottom:15px; background:#2c3e50; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="location.href='libros.html'">⬅ Volver al Menú de Libros</button>
+    <h2>💊 Libro Correcto: Control Integral de Medicación</h2>
+    <div id="listaPacientes">Cargando base de datos...</div>
 </div>
 
    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, addDoc, doc, updateDoc, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
             authDomain: "caminosnuevosdatabase.firebaseapp.com",
@@ -66,50 +62,48 @@
         snap.forEach(d => {
             const p = d.data();
             if ((p.estado || "").toLowerCase().includes("activo")) {
-                const esMedicado = p.medicado === "si";
                 const item = document.createElement('div');
                 item.className = "usuario-item";
                 item.innerHTML = `
                     <div class="header-user">
-                        <div>
-                            <b>${p.nombre}</b><br>
-                            <small style="color:#27ae60;">● PACIENTE ACTIVO</small>
-                        </div>
+                        <div><b>${p.nombre}</b><br><small>● PACIENTE ACTIVO</small></div>
                         <div class="btn-group">
-                            <button class="btn-accion ${esMedicado ? 'btn-medicar-on' : 'btn-medicar-off'}" onclick="toggleMedicar('${d.id}', '${p.medicado || 'no'}')">
-                                ${esMedicado ? '💊 MEDICADO' : '⚪ POR MEDICAR'}
-                            </button>
-                            <button class="btn-accion btn-agregar" onclick="abrirCarpeta('${d.id}')">➕ AGREGAR</button>
+                            <button class="btn-accion btn-agregar" onclick="abrirCarpeta('${d.id}')">➕ AGREGAR MEDICAMENTO</button>
                             <button class="btn-accion btn-reporte" onclick="generarPDF('${p.nombre}')">📄 REPORTE</button>
                         </div>
                     </div>
 
                     <div id="form_${d.id}" class="carpeta-registro">
-                        <h4 style="margin:0 0 15px 0; color:#27ae60;">📝 Registrar Múltiples Medicamentos</h4>
                         
-                        <div id="contenedor_meds_${d.id}">
-                            <!-- Bloque inicial -->
-                            <div class="farmaco-entry">
-                                <label>Medicamento Correcto:</label>
-                                <input type="text" class="med-nombre" placeholder="Nombre del fármaco">
-                                <div class="grid-campos">
-                                    <div><label>Dosis:</label><input type="text" class="med-dosis" placeholder="500mg"></div>
-                                    <div><label>Vía:</label><input type="text" class="med-via" placeholder="Oral"></div>
-                                    <div><label>Cant:</label><input type="text" class="med-can" placeholder="1"></div>
-                                    <div><label>Hora:</label><input type="time" class="med-hora"></div>
-                                </div>
-                            </div>
+                        <div class="seccion-titulo">1. PROTOCOLO SUMINISTRO (8 CORRECTOS)</div>
+                        <div class="grid-campos">
+                            <div class="campo-bloque"><label>Paciente Correcto:</label><input type="text" value="${p.nombre}" readonly></div>
+                            <div class="campo-bloque"><label>Medicamento Correcto:</label><input type="text" id="med_${d.id}"></div>
+                            <div class="campo-bloque"><label>Cantidad Correcta:</label><input type="text" id="can_${d.id}"></div>
+                            <div class="campo-bloque"><label>Dosis Correcta:</label><input type="text" id="dos_${d.id}"></div>
+                            <div class="campo-bloque"><label>Hora Correcta:</label><input type="time" id="hor_${d.id}"></div>
+                            <div class="campo-bloque"><label>Vía Correcta:</label><input type="text" id="via_${d.id}"></div>
+                            <div class="campo-bloque"><label>Proveedor:</label><input type="text" id="pro_${d.id}"></div>
                         </div>
 
-                        <button class="btn-add-more" onclick="añadirFilaMed('${d.id}')">➕ AÑADIR OTRO MEDICAMENTO</button>
-                        
-                        <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
-                        
-                        <label>👩‍⚕️ Proveedor / Responsable del Suministro:</label>
-                        <input type="text" id="resp_${d.id}" placeholder="Nombre del profesional">
-                        
-                        <button class="btn-guardar-final" onclick="guardarTodo('${d.id}', '${p.nombre}')">💾 GUARDAR TODO EL REGISTRO</button>
-                        <button style="background:none; border:none; color:grey; width:100%; margin-top:10px; cursor:pointer;" onclick="abrirCarpeta('${d.id}')">Cerrar sin guardar</button>
+                        <div class="seccion-titulo">2. TRAZABILIDAD Y CONTROL DE INVENTARIO</div>
+                        <div class="grid-campos">
+                            <div class="campo-bloque"><label>Nombre del Producto:</label><input type="text" id="prod_${d.id}"></div>
+                            <div class="campo-bloque"><label>Presentación:</label><input type="text" id="pres_${d.id}"></div>
+                            <div class="campo-bloque"><label>Concentración:</label><input type="text" id="conc_${d.id}"></div>
+                            <div class="campo-bloque"><label>Componente Activo:</label><input type="text" id="comp_${d.id}"></div>
+                            <div class="campo-bloque"><label>Registro INVIMA:</label><input type="text" id="inv_${d.id}"></div>
+                            <div class="campo-bloque"><label>Número de Lote:</label><input type="text" id="lot_${d.id}"></div>
+                            <div class="campo-bloque"><label>Fecha Vencimiento:</label><input type="date" id="ven_${d.id}"></div>
+                            <div class="campo-bloque"><label>Casa Matriz:</label><input type="text" id="casa_${d.id}"></div>
+                            <div class="campo-bloque"><label>Estado Presentación:</label><input type="text" id="estp_${d.id}"></div>
+                            <div class="campo-bloque"><label>Cantidad Inicial:</label><input type="number" id="canti_${d.id}"></div>
+                            <div class="campo-bloque"><label>Salida:</label><input type="number" id="sal_${d.id}"></div>
+                            <div class="campo-bloque"><label>Cantidad Final:</label><input type="number" id="cantf_${d.id}"></div>
+                        </div>
+
+                        <button class="btn-guardar-pro" onclick="guardarTodo('${d.id}', '${p.nombre}')">💾 GUARDAR REGISTRO COMPLETO</button>
+                        <button style="width:100%; margin-top:10px; background:none; border:none; color:red; cursor:pointer;" onclick="abrirCarpeta('${d.id}')">Cancelar</button>
                     </div>
                 `;
                 contenedor.appendChild(item);
@@ -117,65 +111,44 @@
         });
     });
 
-    window.toggleMedicar = async (id, estado) => {
-        const nuevo = estado === "si" ? "no" : "si";
-        await updateDoc(doc(db, "pacientes", id), { medicado: nuevo });
-    };
-
-    window.abrirCarpeta = (id) => {
-        document.getElementById(`form_${id}`).classList.toggle('visible');
-    };
-
-    // Función para añadir una nueva fila de medicamento dinámicamente
-    window.añadirFilaMed = (id) => {
-        const nuevoBloque = document.createElement('div');
-        nuevoBloque.className = "farmaco-entry";
-        nuevoBloque.innerHTML = `
-            <label>Siguiente Medicamento:</label>
-            <input type="text" class="med-nombre" placeholder="Nombre del fármaco">
-            <div class="grid-campos">
-                <div><label>Dosis:</label><input type="text" class="med-dosis" placeholder="Dosis"></div>
-                <div><label>Vía:</label><input type="text" class="med-via" placeholder="Vía"></div>
-                <div><label>Cant:</label><input type="text" class="med-can" placeholder="Cant"></div>
-                <div><label>Hora:</label><input type="time" class="med-hora"></div>
-            </div>
-            <button onclick="this.parentElement.remove()" style="background:none; border:none; color:red; font-size:11px; cursor:pointer; margin-top:5px;">[Eliminar fila]</button>
-        `;
-        document.getElementById(`contenedor_meds_${id}`).appendChild(nuevoBloque);
-    };
+    window.abrirCarpeta = (id) => document.getElementById(`form_${id}`).classList.toggle('visible');
 
     window.guardarTodo = async (id, nombre) => {
-        const responsable = document.getElementById(`resp_${id}`).value;
-        if(!responsable) return alert("Debe indicar el nombre del responsable.");
+        const data = {
+            paciente: nombre,
+            // Parte 1
+            suministro_med: document.getElementById(`med_${id}`).value,
+            suministro_can: document.getElementById(`can_${id}`).value,
+            suministro_dos: document.getElementById(`dos_${id}`).value,
+            suministro_hor: document.getElementById(`hor_${id}`).value,
+            suministro_via: document.getElementById(`via_${id}`).value,
+            suministro_pro: document.getElementById(`pro_${id}`).value,
+            // Parte 2
+            prod_nombre: document.getElementById(`prod_${id}`).value,
+            prod_pres: document.getElementById(`pres_${id}`).value,
+            prod_conc: document.getElementById(`conc_${id}`).value,
+            prod_comp: document.getElementById(`comp_${id}`).value,
+            prod_invima: document.getElementById(`inv_${id}`).value,
+            prod_lote: document.getElementById(`lot_${id}`).value,
+            prod_vence: document.getElementById(`ven_${id}`).value,
+            prod_casa: document.getElementById(`casa_${id}`).value,
+            prod_estado: document.getElementById(`estp_${id}`).value,
+            prod_cant_ini: document.getElementById(`canti_${id}`).value,
+            prod_salida: document.getElementById(`sal_${id}`).value,
+            prod_cant_fin: document.getElementById(`cantf_${id}`).value,
+            // Metadatos
+            fecha_registro: new Date().toLocaleDateString(),
+            hora_registro: new Date().toLocaleTimeString(),
+            creado: Date.now()
+        };
 
-        const bloques = document.querySelectorAll(`#contenedor_meds_${id} .farmaco-entry`);
-        let guardados = 0;
+        if(!data.suministro_med) return alert("El nombre del medicamento es obligatorio.");
 
-        for(let bloque of bloques) {
-            const med = bloque.querySelector('.med-nombre').value;
-            if(med.trim() !== "") {
-                await addDoc(collection(db, "libro_correcto"), {
-                    paciente: nombre,
-                    medicamento: med,
-                    dosis: bloque.querySelector('.med-dosis').value,
-                    via: bloque.querySelector('.med-via').value,
-                    cantidad: bloque.querySelector('.med-can').value,
-                    hora_prog: bloque.querySelector('.med-hora').value,
-                    proveedor: responsable,
-                    fecha: new Date().toLocaleDateString(),
-                    hora_real: new Date().toLocaleTimeString(),
-                    creado: Date.now()
-                });
-                guardados++;
-            }
-        }
-
-        if(guardados > 0) {
-            alert(`✅ Se han registrado ${guardados} medicamentos para ${nombre}`);
+        try {
+            await addDoc(collection(db, "libro_correcto"), data);
+            alert("✅ Registro Integral Guardado Exitosamente.");
             abrirCarpeta(id);
-        } else {
-            alert("No se ingresó ningún medicamento válido.");
-        }
+        } catch(e) { alert("Error al conectar con la base de datos."); }
     };
 
     window.generarPDF = async (nombre) => {
@@ -186,16 +159,16 @@
         const filas = [];
         snap.forEach(d => {
             const r = d.data();
-            filas.push([r.fecha, r.hora_real, r.medicamento, r.dosis, r.via, r.cantidad, r.proveedor]);
+            filas.push([r.fecha_registro, r.suministro_med, r.prod_lote, r.prod_invima, r.prod_vence, r.prod_cant_fin, r.suministro_pro]);
         });
-        doc.text(`REPORTE DE MEDICACIÓN - ${nombre}`, 14, 15);
+        doc.text("REPORTE TÉCNICO DE FARMACIA - " + nombre, 14, 15);
         doc.autoTable({
             startY: 25,
-            head: [['Fecha', 'Hora Real', 'Medicamento', 'Dosis', 'Vía', 'Cant.', 'Responsable']],
+            head: [['Fecha', 'Medicamento', 'Lote', 'INVIMA', 'Vencimiento', 'Stock Final', 'Responsable']],
             body: filas,
             theme: 'grid'
         });
-        doc.save(`Reporte_${nombre}.pdf`);
+        doc.save(`Kardex_${nombre}.pdf`);
     };
 </script>
 </body>
