@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Libro Correcto Pro - Reporte RA22</title>
+    <title>Libro Correcto - Sistema RA22 Integral</title>
     
-    <!-- LIBRERÍAS CORREGIDAS PARA EVITAR EL ERROR DE CONSOLA -->
-    <script src="https://unpkg.com"></script>
-    <script src="https://unpkg.com"></script>
+    <!-- LIBRERÍAS DE PDF CORREGIDAS -->
+    <script src="https://cloudflare.com"></script>
+    <script src="https://cloudflare.com"></script>
     
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #fdf2e9; padding: 15px; margin: 0; }
@@ -23,24 +23,25 @@
         .btn-reporte { background: #2c3e50; }
         .carpeta-registro { display: none; background: #fff; padding: 20px; border-radius: 15px; border: 2px solid #27ae60; margin-top: 15px; }
         .visible { display: block; }
-        .seccion-titulo { background: #e67e22; color: white; padding: 8px; border-radius: 5px; font-size: 12px; margin: 15px 0 10px 0; font-weight: bold; text-align: center; }
-        .grid-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+        .bloque-med { background: #fef9f5; border: 1px solid #f39c12; padding: 15px; border-radius: 10px; margin-bottom: 20px; }
+        .subtitulo { background: #d35400; color: white; padding: 5px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; margin-bottom: 10px; display: inline-block; }
+        .grid-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
         label { font-size: 9px; font-weight: bold; color: #555; display: block; margin-bottom: 2px; text-transform: uppercase; }
         input { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; font-size: 12px; }
-        .btn-guardar-final { background: #27ae60; color: white; width: 100%; padding: 15px; margin-top: 20px; border-radius: 10px; font-size: 15px; border: none; font-weight: bold; cursor: pointer; }
+        .btn-guardar-pro { background: #27ae60; color: white; width: 100%; padding: 18px; margin-top: 20px; border-radius: 10px; font-size: 16px; border: none; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <button style="width:100%; padding:10px; margin-bottom:15px; background:#2c3e50; color:white; border:none; border-radius:8px; font-weight:bold; cursor:pointer;" onclick="location.href='libros.html'">⬅ Volver al Menú</button>
-    <h2>💊 Libro Correcto: Protocolo RA22 Proyectado</h2>
-    <div id="listaPacientes">Iniciando sistema...</div>
+    <h2>💊 Libro Correcto: Protocolo RA22 Integral</h2>
+    <div id="listaPacientes">Cargando base de datos...</div>
 </div>
 
    <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, doc, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import {getFirestore, collection, onSnapshot, addDoc, updateDoc, doc, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
             authDomain: "caminosnuevosdatabase.firebaseapp.com",
@@ -74,23 +75,11 @@
                     </div>
 
                     <div id="form_${d.id}" class="carpeta-registro">
-                        <div class="seccion-titulo">ESTRUCTURA DE SUMINISTRO Y TRAZABILIDAD RA22</div>
-                        <div class="grid-campos">
-                            <div><label>Fecha Primer Dosis:</label><input type="date" id="fec_${d.id}"></div>
-                            <div><label>Nombre Producto:</label><input type="text" id="prod_${d.id}"></div>
-                            <div><label>Presentación:</label><input type="text" id="pres_${d.id}"></div>
-                            <div><label>Componente Activo:</label><input type="text" id="comp_${d.id}"></div>
-                            <div><label>Registro INVIMA:</label><input type="text" id="inv_${d.id}"></div>
-                            <div><label>Número de Lote:</label><input type="text" id="lot_${d.id}"></div>
-                            <div><label>Fecha Vencimiento:</label><input type="date" id="ven_${d.id}"></div>
-                            <div><label>Casa Matriz:</label><input type="text" id="casa_${d.id}"></div>
-                            <div><label>Proveedor:</label><input type="text" id="pro_${d.id}"></div>
-                            <div><label>Estado Pres.:</label><input type="text" id="estp_${d.id}"></div>
-                            <div><label>Cantidad Inicial:</label><input type="number" id="canti_${d.id}"></div>
-                            <div><label>Salida (Dosis Diaria):</label><input type="number" id="sal_${d.id}"></div>
-                            <div><label>Cantidad Final:</label><input type="number" id="cantf_${d.id}"></div>
+                        <div id="contenedor_meds_${d.id}">
+                            ${generarHTMLBloque(d.id)}
                         </div>
-                        <button class="btn-guardar-final" onclick="guardarRegistroRA22('${d.id}', '${p.nombre}')">💾 GUARDAR Y ACTIVAR MEDICACIÓN</button>
+                        <button style="width:100%; padding:10px; background:#e67e22; color:white; border:none; border-radius:8px; cursor:pointer; font-weight:bold; margin-bottom:10px;" onclick="añadirOtro('${d.id}')">➕ AÑADIR OTRO MEDICAMENTO</button>
+                        <button class="btn-guardar-pro" onclick="guardarTodoRA22('${d.id}', '${p.nombre}')">💾 GUARDAR Y ACTIVAR MEDICACIÓN</button>
                     </div>
                 `;
                 contenedor.appendChild(item);
@@ -98,91 +87,104 @@
         });
     });
 
+    function generarHTMLBloque(id) {
+        return `
+        <div class="bloque-med">
+            <div class="subtitulo">PARTE 1: PROTOCOLO 8 CORRECTOS</div>
+            <div class="grid-campos">
+                <div><label>Fecha Primer Dosis:</label><input type="date" class="f_ini"></div>
+                <div><label>Medicamento:</label><input type="text" class="m_nom"></div>
+                <div><label>Cantidad:</label><input type="text" class="m_can"></div>
+                <div><label>Dosis:</label><input type="text" class="m_dos"></div>
+                <div><label>Hora:</label><input type="time" class="m_hor"></div>
+                <div><label>Vía:</label><input type="text" class="m_via"></div>
+                <div><label>Proveedor:</label><input type="text" class="m_pro"></div>
+            </div>
+            <div class="subtitulo" style="margin-top:10px; background:#2980b9;">PARTE 2: TRAZABILIDAD RA22</div>
+            <div class="grid-campos">
+                <div><label>Nombre Producto:</label><input type="text" class="t_nom"></div>
+                <div><label>Presentación:</label><input type="text" class="t_pre"></div>
+                <div><label>Comp. Activo:</label><input type="text" class="t_com"></div>
+                <div><label>Reg. INVIMA:</label><input type="text" class="t_inv"></div>
+                <div><label>Lote:</label><input type="text" class="t_lot"></div>
+                <div><label>Vencimiento:</label><input type="date" class="t_ven"></div>
+                <div><label>Casa Matriz:</label><input type="text" class="t_cas"></div>
+                <div><label>Estado Pres.:</label><input type="text" class="t_est"></div>
+                <div><label>Cant. Inicial:</label><input type="number" class="t_cini"></div>
+                <div><label>Salida (Día):</label><input type="number" class="t_sal"></div>
+                <div><label>Cant. Final:</label><input type="number" class="t_cfin"></div>
+            </div>
+        </div>`;
+    }
+
     window.abrirCarpeta = (id) => document.getElementById(`form_${id}`).classList.toggle('visible');
+    window.añadirOtro = (id) => {
+        const div = document.createElement('div');
+        div.innerHTML = generarHTMLBloque(id);
+        document.getElementById(`contenedor_meds_${id}`).appendChild(div);
+    };
 
-    window.guardarRegistroRA22 = async (id, nombre) => {
-        const prod = document.getElementById(`prod_${id}`).value;
-        if(!prod) return alert("Debe ingresar el nombre del producto.");
-
-        const data = {
-            paciente: nombre,
-            fecha_inicio: document.getElementById(`fec_${id}`).value,
-            producto: prod,
-            presentacion: document.getElementById(`pres_${id}`).value,
-            componente: document.getElementById(`comp_${id}`).value,
-            invima: document.getElementById(`inv_${id}`).value,
-            lote: document.getElementById(`lot_${id}`).value,
-            vencimiento: document.getElementById(`ven_${id}`).value,
-            casa: document.getElementById(`casa_${id}`).value,
-            proveedor: document.getElementById(`pro_${id}`).value,
-            estado: document.getElementById(`estp_${id}`).value,
-            cant_inicial: parseInt(document.getElementById(`canti_${id}`).value),
-            salida: parseInt(document.getElementById(`sal_${id}`).value),
-            cant_final: parseInt(document.getElementById(`cantf_${id}`).value),
-            creado: Date.now()
-        };
-
-        try {
-            await addDoc(collection(db, "libro_correcto"), data);
-            await updateDoc(doc(db, "pacientes", id), { medicado: "si" });
-            alert("✅ Registro RA22 guardado. Paciente marcado como MEDICADO.");
-            abrirCarpeta(id);
-        } catch(e) { alert("Error de conexión."); }
+    window.guardarTodoRA22 = async (id, nombre) => {
+        const bloques = document.querySelectorAll(`#contenedor_meds_${id} .bloque-med`);
+        for (let b of bloques) {
+            const data = {
+                paciente: nombre,
+                fecha_inicio: b.querySelector('.f_ini').value,
+                producto: b.querySelector('.t_nom').value,
+                presentacion: b.querySelector('.t_pre').value,
+                componente: b.querySelector('.t_com').value,
+                invima: b.querySelector('.t_inv').value,
+                lote: b.querySelector('.t_lot').value,
+                vencimiento: b.querySelector('.t_ven').value,
+                casa: b.querySelector('.t_cas').value,
+                proveedor: b.querySelector('.m_pro').value,
+                estado: b.querySelector('.t_est').value,
+                cant_inicial: parseInt(b.querySelector('.t_cini').value),
+                salida: parseInt(b.querySelector('.t_sal').value),
+                cant_final: parseInt(b.querySelector('.t_cfin').value),
+                creado: Date.now()
+            };
+            if(data.producto) await addDoc(collection(db, "libro_correcto"), data);
+        }
+        await updateDoc(doc(db, "pacientes", id), { medicado: "si" });
+        alert("✅ Registros guardados y paciente MEDICADO.");
+        abrirCarpeta(id);
     };
 
     window.generarRA22 = async (nombre) => {
+        if (!window.jspdf) return alert("Cargando librerías...");
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('l', 'mm', 'a4');
-        
         const q = query(collection(db, "libro_correcto"), where("paciente", "==", nombre), orderBy("creado", "desc"));
         const snap = await getDocs(q);
         
-        if(snap.empty) return alert("No hay registros para este paciente.");
-        
-        const rBase = snap.docs[0].data();
-        const filas = [];
-        let cantActual = rBase.cant_inicial;
-        let fechaActual = new Date(rBase.fecha_inicio);
-
-        while (cantActual > 0) {
-            let salida = Math.min(cantActual, rBase.salida);
-            let final = cantActual - salida;
-            
-            filas.push([
-                fechaActual.toLocaleDateString(),
-                rBase.producto,
-                rBase.presentacion,
-                rBase.componente,
-                rBase.invima,
-                rBase.lote,
-                rBase.vencimiento,
-                rBase.casa,
-                rBase.proveedor,
-                rBase.estado,
-                cantActual,
-                salida,
-                final,
-                "________________"
-            ]);
-            
-            cantActual = final;
-            fechaActual.setDate(fechaActual.getDate() + 1);
-        }
-
+        let yPos = 25;
         doc.setFontSize(14);
-        doc.text("REPORTE DE TRAZABILIDAD RA22 - CAMINOS NUEVOS", 14, 15);
-        doc.setFontSize(10);
-        doc.text(`Paciente: ${nombre}`, 14, 22);
+        doc.text(`REPORTE RA22 - ${nombre}`, 14, 15);
 
-        doc.autoTable({
-            startY: 28,
-            head: [['Fecha', 'Producto', 'Pres.', 'Comp.', 'INVIMA', 'Lote', 'Vence', 'Casa', 'Prov.', 'Est.', 'C.Ini', 'Sal', 'C.Fin', 'Firma']],
-            body: filas,
-            theme: 'grid',
-            styles: { fontSize: 6, cellPadding: 1 },
-            headStyles: { fillColor: [211, 84, 0] }
+        snap.forEach(d => {
+            const r = d.data();
+            const filas = [];
+            let cAct = r.cant_inicial;
+            let fAct = new Date(r.fecha_inicio);
+
+            while (cAct > 0) {
+                let sal = Math.min(cAct, r.salida);
+                let fin = cAct - sal;
+                filas.push([fAct.toLocaleDateString(), r.producto, r.presentacion, r.componente, r.invima, r.lote, r.vencimiento, r.casa, r.proveedor, r.estado, cAct, sal, fin, "_______"]);
+                cAct = fin;
+                fAct.setDate(fAct.getDate() + 1);
+            }
+
+            doc.autoTable({
+                startY: yPos,
+                head: [['Fecha', 'Prod', 'Pres', 'Comp', 'INVIMA', 'Lote', 'Venc', 'Casa', 'Prov', 'Est', 'C.Ini', 'Sal', 'C.Fin', 'Firma']],
+                body: filas,
+                styles: { fontSize: 5 },
+                theme: 'grid'
+            });
+            yPos = doc.lastAutoTable.finalY + 10;
         });
-
         doc.save(`RA22_${nombre}.pdf`);
     };
 </script>
