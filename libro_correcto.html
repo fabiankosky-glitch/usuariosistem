@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Libro Correcto - Reporte RA22</title>
-    <!-- Librerías de Reporte Actualizadas -->
-    <script src="https://cloudflare.com"></script>
-    <script src="https://cloudflare.com"></script>
+    <title>Libro Correcto Pro - Reporte RA22</title>
+    
+    <!-- LIBRERÍAS CORREGIDAS PARA EVITAR EL ERROR DE CONSOLA -->
+    <script src="https://unpkg.com"></script>
+    <script src="https://unpkg.com"></script>
     
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #fdf2e9; padding: 15px; margin: 0; }
@@ -132,32 +133,32 @@
     window.generarRA22 = async (nombre) => {
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('l', 'mm', 'a4');
+        
         const q = query(collection(db, "libro_correcto"), where("paciente", "==", nombre), orderBy("creado", "desc"));
         const snap = await getDocs(q);
         
         if(snap.empty) return alert("No hay registros para este paciente.");
         
-        const dataBase = snap.docs[0].data();
+        const rBase = snap.docs[0].data();
         const filas = [];
-        let cantActual = dataBase.cant_inicial;
-        let fechaActual = new Date(dataBase.fecha_inicio);
+        let cantActual = rBase.cant_inicial;
+        let fechaActual = new Date(rBase.fecha_inicio);
 
-        // LÓGICA DE DESCUENTO DÍA A DÍA HASTA CERO
         while (cantActual > 0) {
-            let salida = Math.min(cantActual, dataBase.salida);
+            let salida = Math.min(cantActual, rBase.salida);
             let final = cantActual - salida;
             
             filas.push([
                 fechaActual.toLocaleDateString(),
-                dataBase.producto,
-                dataBase.presentacion,
-                dataBase.componente,
-                dataBase.invima,
-                dataBase.lote,
-                dataBase.vencimiento,
-                dataBase.casa,
-                dataBase.proveedor,
-                dataBase.estado,
+                rBase.producto,
+                rBase.presentacion,
+                rBase.componente,
+                rBase.invima,
+                rBase.lote,
+                rBase.vencimiento,
+                rBase.casa,
+                rBase.proveedor,
+                rBase.estado,
                 cantActual,
                 salida,
                 final,
@@ -179,7 +180,7 @@
             body: filas,
             theme: 'grid',
             styles: { fontSize: 6, cellPadding: 1 },
-            headStyles: { fillColor: [230, 126, 34] }
+            headStyles: { fillColor: [211, 84, 0] }
         });
 
         doc.save(`RA22_${nombre}.pdf`);
