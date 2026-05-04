@@ -133,27 +133,54 @@ getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // 5. FUNCIONES GLOBALES (Asignadas a window para que funcionen con onclick)
 window.moverPaciente = async (nuevoEstado) => {
-    // 1. Verificación de seguridad rápida
     const rolActual = sessionStorage.getItem('rolActivo');
+    
+    // 1. Bloqueo de seguridad por rol
     if (rolActual === 'terapeuta') {
-        alert("🚫 No tienes permisos para realizar movimientos.");
+        alert("🚫 No tienes permisos legales para realizar movimientos de pacientes.");
         return;
     }
 
-    // 2. Confirmación y Ejecución
-    if (confirm("¿Mover a " + nuevoEstado.toUpperCase() + "?")) {
-        // Usamos la sintaxis que ya tienes funcionando en el resto de tu app
-        const docRef = doc(db, "pacientes", idPaciente);
-        
-        updateDoc(docRef, { 
-            estado: nuevoEstado 
-        }).then(() => {
-            alert("✅ Movido con éxito a " + nuevoEstado);
+    const motivo = prompt(`Escriba el motivo de la novedad (${nuevoEstado.toUpperCase()}):`);
+    
+    if (motivo === null || motivo.trim() === "") {
+        alert("❌ Operación cancelada. Debe ingresar un motivo legal para el cambio.");
+        return;
+    }
+
+    if (confirm(`¿Confirmar cambio a ${nuevoEstado.toUpperCase()}?`)) {
+        try {
+            const nombreP = document.getElementById("nombrePaciente").innerText;
+            const docRef = doc(db, "pacientes", idPaciente);
+
+            // --- INICIO DE REGISTRO DE NOVEDAD LEGAL ---
+            // Este es el documento que el auditor revisará
+            await addDoc(collection(db, "novedades"), {
+                pacienteId: idPaciente,
+                pacienteNombre: nombreP,
+                estadoAnterior: document.getElementById("badgeEstado").innerText,
+                estadoNuevo: nuevoEstado,
+                motivoNovedad: motivo,
+                usuarioResponsable: rolActual,
+                fechaHora: new Date().toLocaleString(), // Hora local de Colombia
+                timestamp: new Date().getTime(), // Para ordenamiento técnico
+                entidad: "Fundación Nuevos Caminos - Sede Guachinte"
+            });
+            // --- FIN DE REGISTRO DE NOVEDAD ---
+
+            // Actualizar el estado en la ficha principal
+            await updateDoc(docRef, { 
+                estado: nuevoEstado,
+                ultimaNovedad: new Date().toLocaleString()
+            });
+
+            alert("✅ Novedad registrada legalmente. El paciente ha sido movido.");
             location.reload();
-        }).catch((error) => {
-            alert("❌ Error: " + error.message);
-            console.error(error);
-        });
+
+        } catch (e) {
+            alert("Error al registrar novedad: " + e.message);
+            console.error(e);
+        }
     }
 };
 
