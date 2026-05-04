@@ -159,18 +159,34 @@ window.abrirFormulario = () => {
             video.style.display = "none";
         };
 
-        window.guardarRegistro = async () => {
-            const texto = document.getElementById("textoPsicologico").value;
-            const aspectos = document.getElementById("aspectos").value;
-            if (!texto || !fotoBase64) return alert("Falta texto o foto.");
-            try {
-                await addDoc(collection(db, "evoluciones_psicologicas"), {
-                    idPaciente, aspectos, texto, fotoDoc: fotoBase64, fecha: Date.now()
-                });
-                alert("✅ Guardado con éxito");
-                window.location.reload();
-            } catch (e) { alert("Error al guardar."); }
-        };
+window.guardarRegistro = async () => {
+    // 1. Capturamos los datos del formulario y la sesión
+    const texto = document.getElementById("textoPsicologico").value;
+    const aspectos = document.getElementById("aspectos").value;
+    const rolAutor = sessionStorage.getItem('rolActivo'); // TRAZABILIDAD: Quién firma
+
+    if (!texto) return alert("❌ Debe escribir la evolución clínica.");
+
+    try {
+        // 2. GUARDADO CON RESPALDO LEGAL
+        await addDoc(collection(db, "evoluciones_psicologicas"), {
+            idPaciente: idPaciente,
+            texto: texto,
+            aspectos: aspectos,
+            fotoBase64: fotoBase64, // Tu foto de la cámara
+            // --- BLOQUE DE TRAZABILIDAD ---
+            autorRol: rolAutor,
+            fechaHora: new Date().toLocaleString(),
+            timestamp: Date.now(),
+            sede: "Sede Guachinte"
+        });
+
+        alert("✅ Evolución guardada con firma de: " + rolAutor.toUpperCase());
+        location.reload();
+    } catch (e) { 
+        alert("❌ Error al guardar: " + e.message); 
+    }
+};
 
         window.volver = () => { if (streamActivo) streamActivo.getTracks().forEach(t => t.stop()); window.location.reload(); };
 
