@@ -20,7 +20,7 @@
         }
         .btn-registro:hover { transform: scale(1.03); background: #219150; }
 
-        /* Cuadrícula de 4 Opciones */
+        /* Cuadrícula de Opciones */
         .menu-grid { 
             display: grid; grid-template-columns: repeat(2, 1fr); 
             gap: 20px; width: 90%; max-width: 450px; 
@@ -34,7 +34,7 @@
         .menu-item h3 { margin: 0; font-size: 16px; color: #34495e; }
 
         /* Colores de las secciones */
-        .libros { border-color: #f1c40f; } /* Amarillo/Naranja para Libros */
+        .libros { border-color: #f1c40f; } 
         .historias { border-color: #3498db; }
         .ingresos { border-color: #e67e22; }
         .admin { border-color: #95a5a6; }
@@ -44,18 +44,17 @@
 
 <div class="header">
     <h2 style="margin:0; font-size: 18px;">💾 Sistema de Gestión</h2>
-    <a href="https://google.com" class="btn-exit">Cerrar Sesión</a>
+    <button id="logout" class="btn-exit">Cerrar Sesión</button>
 </div>
 
 <div class="main-action">
-    <button class="btn-registro" onclick="window.location.href='registro.html'">
+    <button id="btn-registro" class="btn-registro" onclick="window.location.href='registro.html'">
         ➕ AGREGAR PACIENTE
     </button>
 </div>
 
 <div class="menu-grid">
-   <!-- MEJORA: Ahora apunta al menú de selección de los 4 libros -->
-   <div class="menu-item libros" onclick="window.location.href='libros.html'">
+   <div id="item-libros" class="menu-item libros" onclick="window.location.href='libros.html'">
         <h3>📚 Libros</h3>
     </div>
 
@@ -67,10 +66,45 @@
         <h3>📝 Libro de Ingresos</h3>
     </div>
 
-    <div class="menu-item admin" onclick="window.location.href='administracion.html'">
+    <div id="item-admin" class="menu-item admin" onclick="window.location.href='administracion.html'">
         <h3>⚙️ Administración</h3>
     </div>
 </div>
+
+<script>
+    // 1. VALIDACIÓN DE SEGURIDAD (Mano Dura)
+    // Si no está autenticado, lo devuelve al login inmediatamente
+    if (sessionStorage.getItem('autenticado') !== 'true') {
+        window.location.href = 'login.html';
+    }
+
+    // 2. LÓGICA DE ROLES (Ocultar botones)
+    const rol = sessionStorage.getItem('rolActivo');
+
+    document.addEventListener("DOMContentLoaded", function() {
+        // Roles asistenciales: No ven Libros ni Administración
+        if (rol === 'psicologia' || rol === 'terapeuta') {
+            document.getElementById('item-libros').style.display = 'none';
+            document.getElementById('item-admin').style.display = 'none';
+            
+            // Si el terapeuta tampoco debe registrar pacientes, descomenta la línea de abajo:
+            // document.getElementById('btn-registro').style.display = 'none';
+        }
+
+        // Director Terapéutico: No ve Administración del sistema
+        if (rol === 'director_terapeutico') {
+            document.getElementById('item-admin').style.display = 'none';
+        }
+    });
+
+    // 3. FUNCIÓN DE CERRAR SESIÓN
+    document.getElementById('logout').addEventListener('click', function() {
+        if(confirm("¿Seguro que desea cerrar la sesión actual?")) {
+            sessionStorage.clear(); // Limpia toda la seguridad
+            window.location.href = 'login.html'; // Expulsa a la puerta
+        }
+    });
+</script>
 
 </body>
 </html>
