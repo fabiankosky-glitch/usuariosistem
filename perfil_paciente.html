@@ -117,7 +117,7 @@
         async function cargarNovedades() {
             const hist = document.getElementById("historialNovedades");
             try {
-                const q = query(collection(db, "novedades"), where("pacienteId", "==", idPaciente), orderBy("timestamp", "desc"));
+                const q = query(collection(db, "novedades"), where("pacienteId", "==", idPaciente));
                 const snap = await getDocs(q);
                 let html = "";
                 snap.forEach(doc => {
