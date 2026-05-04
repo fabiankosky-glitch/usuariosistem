@@ -2,48 +2,48 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Acceso Seguro - Nuevos Caminos</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #2c3e50; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
         .login-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; width: 100%; max-width: 400px; }
-        img { width: 100px; margin-bottom: 20px; }
-        h2 { color: #2c3e50; margin-bottom: 5px; }
-        p { color: #7f8c8d; font-size: 14px; margin-bottom: 30px; }
-        select, input { width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; box-sizing: border-box; outline: none; }
-        .btn-entrar { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-entrar:hover { background: #219150; }
+        select, input { width: 100%; padding: 12px; margin-bottom: 20px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; }
+        .btn-entrar { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 8px; font-size: 18px; cursor: pointer; }
     </style>
 </head>
 <body>
 
 <div class="login-card">
-    <img src="logo_fundacion.png" alt="Logo"> <!-- Pon tu logo aquí -->
     <h2>Nuevos Caminos</h2>
-    <p>Sistema de Gestión de Historias Clínicas</p>
-
-    <label style="display:block; text-align:left; font-weight:bold; margin-bottom:5px;">Seleccione su Rol:</label>
+    <p>Inicie sesión para acceder al sistema</p>
     <select id="rolUsuario">
         <option value="psicologia">Psicología</option>
         <option value="terapeuta">Terapeuta</option>
         <option value="director_terapeutico">Director Terapéutico</option>
         <option value="directora_general">Directora General</option>
-        <option value="admin">Administrador del Sistema (TI)</option>
+        <option value="admin">Administrador</option>
     </select>
-
-    <label style="display:block; text-align:left; font-weight:bold; margin-bottom:5px;">Contraseña de Acceso:</label>
-    <input type="password" id="passUsuario" placeholder="••••••••">
-
-    <button class="btn-entrar" onclick="validarAcceso()">Ingresar al Sistema</button>
+    <input type="password" id="passUsuario" placeholder="Contraseña">
+    <button class="btn-entrar" id="btnLogin">Ingresar al Sistema</button>
 </div>
 
-<script>
-    function validarAcceso() {
+<script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        const firebaseConfig = {
+            apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+            authDomain: "caminosnuevosdatabase.firebaseapp.com",
+            projectId: "caminosnuevosdatabase",
+            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+            appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+        };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    document.getElementById('btnLogin').addEventListener('click', async () => {
         const rol = document.getElementById('rolUsuario').value;
         const pass = document.getElementById('passUsuario').value;
 
-        // DEFINICIÓN DE CLAVES (En el futuro esto vendrá de Firebase Auth)
-        // Por ahora, para tus 12 horas de récord:
         const llaves = {
             "psicologia": "psico2024",
             "terapeuta": "tera2024",
@@ -53,17 +53,26 @@
         };
 
         if (pass === llaves[rol]) {
-            // Guardamos el rol en la sesión para que los botones sepan quién entró
-            sessionStorage.setItem('rolActivo', rol);
-            sessionStorage.setItem('autenticado', 'true');
-            
-            alert("✅ Acceso concedido como: " + rol.replace('_', ' ').toUpperCase());
-            window.location.href = "index.html"; 
-        } else {
-            alert("❌ Contraseña incorrecta para el perfil seleccionado.");
-        }
-    }
-</script>
+            try {
+                // REGISTRO DE TRAZABILIDAD (LOG DE ENTRADA)
+                await addDoc(collection(db, "auditoria"), {
+                    usuario: rol,
+                    accion: "Inicio de Sesión",
+                    fecha: serverTimestamp(),
+                    dispositivo: navigator.userAgent
+                });
 
+                sessionStorage.setItem('rolActivo', rol);
+                sessionStorage.setItem('autenticado', 'true');
+                window.location.href = "index.html";
+            } catch (e) {
+                console.error("Error en log:", e);
+                window.location.href = "index.html"; 
+            }
+        } else {
+            alert("❌ Contraseña incorrecta.");
+        }
+    });
+</script>
 </body>
 </html>
