@@ -4,17 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HCE Total Blindada - Nuevos Caminos</title>
+    <!-- Librería para interoperabilidad y preservación -->
     <script src="https://cloudflare.com"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; text-align: center; padding: 20px; margin: 0; }
         .container { max-width: 650px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .btn-abrir { background: #2c3e50; color: white; padding: 15px; width: 100%; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
+        .btn-abrir { background: #2c3e50; color: white; padding: 15px; width: 100%; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
         #areaRegistro { display: none; background: #f9f9f9; padding: 20px; border-radius: 15px; border: 1px solid #ddd; margin-bottom: 30px; animation: fadeIn 0.3s; }
-        textarea, input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; margin-bottom: 10px; }
+        textarea, input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; margin-bottom: 10px; font-family: inherit; }
         .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
-        .evolucion-item { text-align: left; background: #fff; border-left: 5px solid #9b59b6; padding: 15px; margin-bottom: 15px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-        .btn-ley { font-size: 10px; padding: 5px 8px; border: none; border-radius: 4px; color: white; cursor: pointer; margin-right: 5px; }
-        .aclaratoria-box { background: #fff3e0; border-left: 3px solid #ff9800; padding: 8px; margin-top: 5px; font-size: 12px; }
+        .evolucion-item { text-align: left; background: #fff; border-left: 5px solid #9b59b6; padding: 0; margin-bottom: 15px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; }
+        .btn-ley { font-size: 10px; padding: 5px 8px; border: none; border-radius: 4px; color: white; cursor: pointer; }
+        .aclaratoria-box { background: #fffcf5; border: 1px solid #ffe0b2; border-left: 3px solid #ff9800; padding: 10px; margin-top: 10px; border-radius: 5px; }
         .badge-anexo { background: #2980b9; color: white; font-size: 10px; padding: 3px 7px; border-radius: 5px; display: inline-block; margin-bottom: 5px; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -23,8 +24,9 @@
 
 <div class="container">
     <h2 id="nombrePaciente">Cargando...</h2>
-    <p style="color: #27ae60; font-size: 11px; font-weight: bold;">🛡️ PROTECCIÓN DE DATOS: CIERRE ACTIVO POR INACTIVIDAD</p>
+    <p style="color: #27ae60; font-size: 11px; font-weight: bold;">🛡️ PROTECCIÓN DE DATOS: CIERRE POR INACTIVIDAD ACTIVO</p>
 
+    <!-- ACCIÓN PRINCIPAL -->
     <button class="btn-abrir" onclick="toggleFormulario()">➕ NUEVA EVOLUCIÓN O ANEXO</button>
 
     <div id="areaRegistro">
@@ -39,21 +41,21 @@
             <option value="evolucion">Evolución Clínica Psicológica</option>
             <option value="anexo">Anexo Externo (Laboratorio / Remisión)</option>
         </select>
-        <textarea id="textoPsicologico" rows="4" placeholder="Descripción detallada del registro..."></textarea>
+        <textarea id="textoPsicologico" rows="4" placeholder="Escriba la nota clínica aquí..."></textarea>
         
-        <button class="btn" style="background:#9b59b6" onclick="guardarRegistro()">💾 Guardar Registro (Firma y Hash)</button>
+        <button class="btn" style="background:#9b59b6" onclick="guardarRegistro()">💾 Guardar y Firmar Registro</button>
         <button class="btn" style="background:#95a5a6" onclick="toggleFormulario()">❌ Cancelar</button>
     </div>
 
     <hr>
-    <h3>📋 Historial Clínico Digital Fidedigno</h3>
+    <h3>📋 Historial de Registros Inalterables</h3>
     <div id="listaEvoluciones">Cargando historial...</div>
     
     <button onclick="window.location.href='perfil_paciente.html?id=' + idPaciente" style="background:none; border:none; color:#3498db; cursor:pointer; font-weight:bold; margin-top:20px;">⬅ Volver al Perfil</button>
 </div>
 
 <script type="module">
-          import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+           import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, getDoc, collection, addDoc, query, where, getDocs, serverTimestamp, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
@@ -70,12 +72,12 @@
     const rolAutor = sessionStorage.getItem('rolActivo');
     let fotoBase64 = "", streamActivo = null;
 
-    // --- CANDADO: CIERRE POR INACTIVIDAD ---
+    // --- SEGURIDAD: CIERRE POR INACTIVIDAD ---
     let timer;
     window.resetTimer = () => {
         clearTimeout(timer);
         timer = setTimeout(() => {
-            alert("Sesión expirada por inactividad.");
+            alert("Sesión cerrada por seguridad.");
             sessionStorage.clear();
             window.location.href = 'login.html';
         }, 300000); 
@@ -89,7 +91,7 @@
             try {
                 streamActivo = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
                 video.srcObject = streamActivo;
-            } catch (e) { alert("Error cámara"); }
+            } catch (e) { alert("Active los permisos de cámara"); }
         } else {
             div.style.display = 'none';
             if (streamActivo) streamActivo.getTracks().forEach(t => t.stop());
@@ -112,16 +114,14 @@
         const tipo = document.getElementById("tipoRegistro").value;
         if (!texto || !cie) return alert("Faltan datos obligatorios.");
 
-        const motivo = prompt("Motivo de consulta:");
-        if(!motivo) return;
-
         try {
             await addDoc(collection(db, "evoluciones_psicologicas"), {
                 idPaciente, texto, cie10: cie.toUpperCase(), fotoBase64,
                 tipo, autorRol: rolAutor, fechaHora: new Date().toLocaleString(),
                 timestamp: serverTimestamp(), hash: btoa(texto + Date.now()).substring(0,12),
-                aclaratorias: [], motivoConsulta: motivo
+                aclaratorias: []
             });
+            alert("✅ Registro guardado con trazabilidad legal.");
             location.reload();
         } catch (e) { alert(e.message); }
     };
@@ -133,46 +133,63 @@
         const q = query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente));
         const snap = await getDocs(q);
         let html = "";
+        
         snap.forEach(d => {
             const ev = d.data();
+            const tieneAclaratorias = ev.aclaratorias && ev.aclaratorias.length > 0;
+
             html += `
             <div class="evolucion-item">
-                <span style="position:absolute; top:5px; right:10px; font-size:9px; color:#27ae60;">HASH: ${ev.hash || 'FIDEDIGNO'}</span>
-                ${ev.tipo === 'anexo' ? '<span class="badge-anexo">📁 ANEXO EXTERNO</span>' : ''}
-                <strong>📅 ${ev.fechaHora} | CIE-10: ${ev.cie10 || 'N/A'}</strong><br>
-                <p>${ev.texto}</p>
-                ${ev.fotoBase64 ? `<img src="${ev.fotoBase64}" style="width:100px; border-radius:5px; margin-bottom:10px; cursor:pointer;" onclick="window.open('${ev.fotoBase64}')">` : ''}
-                
-                <div style="margin-bottom:10px;">
-                    <button class="btn-ley" style="background:#2980b9" onclick="descargarJSON('${d.id}')">📤 JSON</button>
-                    <button class="btn-ley" style="background:#e67e22" onclick="imprimirNota('${d.id}')">🖨️ PDF/A</button>
-                    <button class="btn-ley" style="background:#95a5a6" onclick="añadirAclaratoria('${d.id}')">📝 Aclaración</button>
-                </div>
+                <span style="position:absolute; top:5px; right:10px; font-size:9px; color:#27ae60; font-weight:bold;">HASH: ${ev.hash || 'FIDEDIGNO'}</span>
+                <div style="padding:15px;">
+                    ${ev.tipo === 'anexo' ? '<span class="badge-anexo">📁 ANEXO EXTERNO</span>' : ''}
+                    <strong>📅 ${ev.fechaHora} | CIE-10: ${ev.cie10 || 'N/A'}</strong><br>
+                    <p style="margin:10px 0;">${ev.texto}</p>
+                    ${ev.fotoBase64 ? `<img src="${ev.fotoBase64}" style="width:100px; border-radius:5px; cursor:pointer;" onclick="window.open('${ev.fotoBase64}')">` : ''}
+                    
+                    <div style="display:flex; gap:5px; margin-bottom:10px;">
+                        <button class="btn-ley" style="background:#2980b9" onclick="descargarJSON('${d.id}')">📤 JSON</button>
+                        <button class="btn-ley" style="background:#e67e22" onclick="imprimirNota('${d.id}')">🖨️ PDF/A</button>
+                        <button class="btn-ley" style="background:#95a5a6" onclick="añadirAclaratoria('${d.id}')">📝 ACLARAR</button>
+                        ${tieneAclaratorias ? `<button class="btn-ley" style="background:#34495e" onclick="toggleAclaratorias('${d.id}')">🔔 VER ACLARACIONES (${ev.aclaratorias.length})</button>` : ''}
+                    </div>
 
-                ${(ev.aclaratorias || []).map(a => `<div class="aclaratoria-box"><strong>⚠️ ACLARACIÓN (${a.fecha}):</strong> ${a.texto}</div>`).join('')}
-                <div style="font-size:10px; color:gray; border-top:1px solid #eee; padding-top:5px;">Firmado: ${ev.autorRol.toUpperCase()}</div>
+                    <div id="acordeon-${d.id}" style="display:none; margin-top:10px; border-top: 2px solid #ff9800; background: #fffcf5; padding: 10px; border-radius: 5px;">
+                        <p style="font-size:10px; color:#e67e22; font-weight:bold; margin:0 0 10px 0;">⚠️ TRAZABILIDAD DE MODIFICACIONES:</p>
+                        ${(ev.aclaratorias || []).map(a => `<div style="margin-bottom:8px; border-left:2px solid #ff9800; padding-left:10px;"><small>${a.fecha} - Por: ${a.autor}</small><br><p style="margin:2px 0; font-size:13px;">${a.texto}</p></div>`).join('')}
+                    </div>
+
+                    <div style="font-size:10px; color:gray; border-top:1px solid #eee; padding-top:5px; margin-top:10px;">Firmado por: ${ev.autorRol ? ev.autorRol.toUpperCase() : 'SISTEMA'}</div>
+                </div>
             </div>`;
         });
         document.getElementById("listaEvoluciones").innerHTML = html || "Sin registros.";
     };
 
+    window.toggleAclaratorias = (id) => {
+        const el = document.getElementById(`acordeon-${id}`);
+        el.style.display = (el.style.display === 'none') ? 'block' : 'none';
+    };
+
     window.descargarJSON = async (id) => {
         const d = await getDoc(doc(db, "evoluciones_psicologicas", id));
         const blob = new Blob([JSON.stringify(d.data(), null, 2)], {type: "application/json"});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Interop_${id}.json`; a.click();
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `HCE_Interop_${id}.json`; a.click();
     };
 
     window.imprimirNota = async (id) => {
         const d = await getDoc(doc(db, "evoluciones_psicologicas", id));
         const ev = d.data();
         const win = window.open('', '_blank');
-        win.document.write(`<html><body style="font-family:Arial; padding:40px;"><h2>INFORME LEGAL</h2><p><strong>CIE-10:</strong> ${ev.cie10}</p><p>${ev.texto}</p>${ev.fotoBase64 ? `<img src="${ev.fotoBase64}" style="width:300px;">` : ''}<br>Firma: ${ev.autorRol.toUpperCase()}<script>window.print();<\/script></body></html>`);
+        win.document.write(`<html><body style="font-family:Arial; padding:40px;"><h2>INFORME PSICOLÓGICO LEGAL</h2><p><strong>CIE-10:</strong> ${ev.cie10} | <strong>Hash:</strong> ${ev.hash}</p><hr><p>${ev.texto}</p>${ev.fotoBase64 ? `<img src="${ev.fotoBase64}" style="width:300px;">` : ''}<br>Firma: ${ev.autorRol.toUpperCase()}<script>window.print();<\/script></body></html>`);
     };
 
     window.añadirAclaratoria = async (idDoc) => {
-        const nota = prompt("Escriba la nota aclaratoria:");
+        const nota = prompt("Escriba la nota aclaratoria (Este registro no borrará el original):");
         if (!nota) return;
-        await updateDoc(doc(db, "evoluciones_psicologicas", idDoc), { aclaratorias: arrayUnion({ texto: nota, fecha: new Date().toLocaleString(), autor: rolAutor }) });
+        await updateDoc(doc(db, "evoluciones_psicologicas", idDoc), {
+            aclaratorias: arrayUnion({ texto: nota, fecha: new Date().toLocaleString(), autor: rolAutor })
+        });
         location.reload();
     };
 
