@@ -132,23 +132,33 @@ getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         }
 
         // 5. FUNCIONES GLOBALES (Asignadas a window para que funcionen con onclick)
-        window.moverPaciente = async (nuevoEstado) => {
-            if (rolActual === 'terapeuta') {
-                alert("🚫 No tienes permisos para realizar movimientos de pacientes.");
-                return;
-            }
+window.moverPaciente = async (nuevoEstado) => {
+    if (rolActual === 'terapeuta') {
+        alert("🚫 No tienes permisos para realizar movimientos.");
+        return;
+    }
 
-            if (confirm(`¿Mover a ${nuevoEstado.toUpperCase()}?`)) {
-                try {
-                    const docRef = doc(db, "pacientes", idPaciente);
-                    await updateDoc(docRef, { estado: nuevoEstado });
-                    alert("✅ Estado actualizado con éxito");
-                    location.reload();
-                } catch (e) { 
-                    alert("Error al actualizar: " + e.message); 
-                }
-            }
-        };
+    if (confirm(`¿Mover a ${nuevoEstado.toUpperCase()}?`)) {
+        try {
+            const docRef = doc(db, "pacientes", idPaciente);
+            
+            // --- TRAZABILIDAD DEL MOVIMIENTO ---
+            await addDoc(collection(db, "auditoria"), {
+                usuario: rolActual,
+                accion: "Cambio de Estado",
+                paciente: document.getElementById("nombrePaciente").innerText,
+                nuevoEstado: nuevoEstado,
+                fecha: serverTimestamp()
+            });
+
+            await updateDoc(docRef, { estado: nuevoEstado });
+            alert("✅ Movimiento registrado con éxito");
+            location.reload();
+        } catch (e) { 
+            alert("Error: " + e.message); 
+        }
+    }
+};
 
         window.irA = (tipo) => {
             const archivos = {
