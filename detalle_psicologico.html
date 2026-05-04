@@ -201,12 +201,65 @@
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `HCE_Interop_${id}.json`; a.click();
     };
 
-    window.imprimirNotaCifrada = async (id) => {
-        const d = await getDoc(doc(db, "evoluciones_psicologicas", id));
-        const ev = d.data();
-        const win = window.open('', '_blank');
-        win.document.write(`<html><body style="font-family:Arial; padding:40px;"><h2>INFORME DESCIFRADO</h2><hr><p><strong>CIE-10:</strong> ${descifrar(ev.cie10)}</p><p>${descifrar(ev.texto)}</p><br>Firma: ${ev.autorRol.toUpperCase()}<script>window.print();<\/script></body></html>`);
-    };
+window.imprimirNotaCifrada = async (id) => {
+    const d = await getDoc(doc(db, "evoluciones_psicologicas", id));
+    const ev = d.data();
+    const pSnap = await getDoc(doc(db, "pacientes", idPaciente));
+    const p = pSnap.data();
+
+    const win = window.open('', '_blank');
+    win.document.write(`
+        <html>
+        <head>
+            <title>Informe Clínico Legal - Nuevos Caminos</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 40px; line-height: 1.5; color: #333; }
+                .header { text-align: center; border-bottom: 2px solid #2c3e50; margin-bottom: 20px; padding-bottom: 10px; }
+                .paciente-info { background: #f9f9f9; padding: 15px; border-radius: 5px; margin-bottom: 20px; font-size: 14px; }
+                .nota-clinica { min-height: 200px; padding: 10px; border: 1px solid #eee; }
+                .firma-espacio { margin-top: 50px; border-top: 1px solid #000; width: 300px; padding-top: 5px; }
+                .footer-legal { font-size: 9px; color: gray; margin-top: 30px; text-align: center; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <h1 style="margin:0; color:#2c3e50;">FUNDACIÓN NUEVOS CAMINOS</h1>
+                <small>NIT: 900.XXX.XXX-X | Sede Guachinte, Valle | IPS Habilitada</small>
+                <h3 style="text-transform: uppercase; margin-top:10px;">Resumen de Evolución Psicológica</h3>
+            </div>
+
+            <div class="paciente-info">
+                <strong>PACIENTE:</strong> ${p.nombre.toUpperCase()} <br>
+                <strong>DOCUMENTO:</strong> ${p.cedula || 'No registrado'} | <strong>EDAD:</strong> ${p.edad || '--'} años <br>
+                <strong>FECHA DE ATENCIÓN:</strong> ${ev.fechaHora}
+            </div>
+
+            <p><strong>CIE-10 (Diagnóstico):</strong> ${descifrar(ev.cie10)}</p>
+            <p><strong>Motivo de Consulta:</strong> ${descifrar(ev.motivoConsulta || "S3A1")}</p>
+            
+            <div class="nota-clinica">
+                <strong>EVOLUCIÓN CLÍNICA:</strong><br>
+                ${descifrar(ev.texto)}
+            </div>
+
+            <div class="firma-espacio">
+                <strong>Firma Electrónica Profesional</strong><br>
+                Profesional de ${ev.autorRol.toUpperCase()}<br>
+                Registro Profesional: [Cargar TP de Usuario]<br>
+                Fundación Nuevos Caminos
+            </div>
+
+            <div class="footer-legal">
+                Documento generado digitalmente con cifrado AES-256. 
+                Original custodiado bajo Hash: ${ev.hash || 'N/A'}. 
+                Copia fidedigna del historial clínico electrónico.
+            </div>
+
+            <script>window.print();<\/script>
+        </body>
+        </html>
+    `);
+};
 
     const snapP = await getDoc(doc(db, "pacientes", idPaciente));
     if (snapP.exists()) document.getElementById("nombrePaciente").innerText = snapP.data().nombre;
