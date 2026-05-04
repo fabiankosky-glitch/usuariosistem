@@ -3,52 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HCE Blindada - Nuevos Caminos</title>
+    <title>HCE Total Blindada - Nuevos Caminos</title>
     <script src="https://cloudflare.com"></script>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; text-align: center; padding: 20px; margin: 0; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .container { max-width: 650px; margin: auto; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .btn-abrir { background: #2c3e50; color: white; padding: 15px; width: 100%; border: none; border-radius: 10px; font-size: 18px; font-weight: bold; cursor: pointer; margin-bottom: 20px; }
-        #areaRegistro { display: none; background: #f9f9f9; padding: 20px; border-radius: 15px; border: 1px solid #ddd; margin-bottom: 30px; }
-        textarea, input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; margin-bottom: 10px; }
+        #areaRegistro { display: none; background: #f9f9f9; padding: 20px; border-radius: 15px; border: 1px solid #ddd; margin-bottom: 30px; animation: fadeIn 0.3s; }
+        textarea, input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; margin-bottom: 10px; }
         .btn { width: 100%; padding: 15px; border: none; border-radius: 10px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; margin-bottom: 10px; }
-        .evolucion-item { text-align: left; background: #fff; border-left: 5px solid #9b59b6; padding: 15px; margin-bottom: 15px; position: relative; }
-        .aclaratoria-box { background: #fff3e0; border-left: 3px solid #ff9800; padding: 10px; margin-top: 10px; font-size: 13px; }
-        .badge-anexo { background: #2980b9; color: white; font-size: 10px; padding: 3px 7px; border-radius: 5px; }
+        .evolucion-item { text-align: left; background: #fff; border-left: 5px solid #9b59b6; padding: 15px; margin-bottom: 15px; position: relative; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .btn-ley { font-size: 10px; padding: 5px 8px; border: none; border-radius: 4px; color: white; cursor: pointer; margin-right: 5px; }
+        .aclaratoria-box { background: #fff3e0; border-left: 3px solid #ff9800; padding: 8px; margin-top: 5px; font-size: 12px; }
+        .badge-anexo { background: #2980b9; color: white; font-size: 10px; padding: 3px 7px; border-radius: 5px; display: inline-block; margin-bottom: 5px; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body onmousemove="resetTimer()" onclick="resetTimer()" onkeypress="resetTimer()">
 
 <div class="container">
     <h2 id="nombrePaciente">Cargando...</h2>
-    <p style="color: #27ae60; font-size: 12px;">🛡️ SISTEMA DE SEGURIDAD ACTIVO: CIERRE POR INACTIVIDAD</p>
+    <p style="color: #27ae60; font-size: 11px; font-weight: bold;">🛡️ PROTECCIÓN DE DATOS: CIERRE ACTIVO POR INACTIVIDAD</p>
 
     <button class="btn-abrir" onclick="toggleFormulario()">➕ NUEVA EVOLUCIÓN O ANEXO</button>
 
     <div id="areaRegistro">
-        <div id="videoContainer"><video id="video" style="width:100%; border-radius:10px;" autoplay playsinline></video></div>
+        <video id="video" style="width:100%; border-radius:10px; background:#000;" autoplay playsinline></video>
         <canvas id="canvas" style="display:none;"></canvas>
         <img id="imgPreview" style="display:none; width:100%; border-radius:10px; margin-bottom:10px;">
         
-        <button class="btn" style="background:#34495e" onclick="tomarFoto()">📸 Capturar Evidencia / Anexo</button>
+        <button class="btn" style="background:#34495e" onclick="tomarFoto()">📸 Capturar Evidencia (Cámara)</button>
         
-        <input type="text" id="cie10" placeholder="CIE-10 (Obligatorio)">
-        <select id="tipoRegistro" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px;">
-            <option value="evolucion">Evolución Clínica</option>
-            <option value="anexo">Anexo Externo (Laboratorios, Remisiones)</option>
+        <input type="text" id="cie10" placeholder="Código CIE-10 (Obligatorio)">
+        <select id="tipoRegistro">
+            <option value="evolucion">Evolución Clínica Psicológica</option>
+            <option value="anexo">Anexo Externo (Laboratorio / Remisión)</option>
         </select>
-        <textarea id="textoPsicologico" rows="4" placeholder="Escriba aquí..."></textarea>
+        <textarea id="textoPsicologico" rows="4" placeholder="Descripción detallada del registro..."></textarea>
         
-        <button class="btn" style="background:#9b59b6" onclick="guardarRegistro()">💾 Guardar Registro Fidedigno</button>
+        <button class="btn" style="background:#9b59b6" onclick="guardarRegistro()">💾 Guardar Registro (Firma y Hash)</button>
         <button class="btn" style="background:#95a5a6" onclick="toggleFormulario()">❌ Cancelar</button>
     </div>
 
     <hr>
-    <div id="listaEvoluciones">Cargando...</div>
+    <h3>📋 Historial Clínico Digital Fidedigno</h3>
+    <div id="listaEvoluciones">Cargando historial...</div>
+    
+    <button onclick="window.location.href='perfil_paciente.html?id=' + idPaciente" style="background:none; border:none; color:#3498db; cursor:pointer; font-weight:bold; margin-top:20px;">⬅ Volver al Perfil</button>
 </div>
 
 <script type="module">
-            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+          import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, getDoc, collection, addDoc, query, where, getDocs, serverTimestamp, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
@@ -65,23 +70,26 @@
     const rolAutor = sessionStorage.getItem('rolActivo');
     let fotoBase64 = "", streamActivo = null;
 
-    // --- CANDADO 2: CIERRE POR INACTIVIDAD (5 MINUTOS) ---
+    // --- CANDADO: CIERRE POR INACTIVIDAD ---
     let timer;
     window.resetTimer = () => {
         clearTimeout(timer);
         timer = setTimeout(() => {
-            alert("Sesión cerrada por inactividad.");
+            alert("Sesión expirada por inactividad.");
             sessionStorage.clear();
             window.location.href = 'login.html';
-        }, 300000); // 5 minutos
+        }, 300000); 
     };
 
     window.toggleFormulario = async () => {
         const div = document.getElementById('areaRegistro');
+        const video = document.getElementById('video');
         if (div.style.display === 'none' || div.style.display === '') {
             div.style.display = 'block';
-            streamActivo = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-            document.getElementById('video').srcObject = streamActivo;
+            try {
+                streamActivo = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                video.srcObject = streamActivo;
+            } catch (e) { alert("Error cámara"); }
         } else {
             div.style.display = 'none';
             if (streamActivo) streamActivo.getTracks().forEach(t => t.stop());
@@ -104,49 +112,68 @@
         const tipo = document.getElementById("tipoRegistro").value;
         if (!texto || !cie) return alert("Faltan datos obligatorios.");
 
-        await addDoc(collection(db, "evoluciones_psicologicas"), {
-            idPaciente, texto, cie10: cie.toUpperCase(), fotoBase64,
-            tipo, autorRol: rolAutor, fechaHora: new Date().toLocaleString(),
-            timestamp: serverTimestamp(), hash: btoa(texto + Date.now()).substring(0,10),
-            aclaratorias: []
-        });
-        location.reload();
-    };
+        const motivo = prompt("Motivo de consulta:");
+        if(!motivo) return;
 
-    // --- CANDADO 1: NOTA ACLARATORIA (MANO DURA CONTRA EL ERROR) ---
-    window.añadirAclaratoria = async (idDoc) => {
-        const nota = prompt("Escriba la NOTA ACLARATORIA (No se puede borrar el error original):");
-        if (!nota) return;
-        const ref = doc(db, "evoluciones_psicologicas", idDoc);
-        await updateDoc(ref, {
-            aclaratorias: arrayUnion({
-                texto: nota,
-                fecha: new Date().toLocaleString(),
-                autor: rolAutor
-            })
-        });
-        location.reload();
+        try {
+            await addDoc(collection(db, "evoluciones_psicologicas"), {
+                idPaciente, texto, cie10: cie.toUpperCase(), fotoBase64,
+                tipo, autorRol: rolAutor, fechaHora: new Date().toLocaleString(),
+                timestamp: serverTimestamp(), hash: btoa(texto + Date.now()).substring(0,12),
+                aclaratorias: [], motivoConsulta: motivo
+            });
+            location.reload();
+        } catch (e) { alert(e.message); }
     };
 
     window.cargarHistorial = async () => {
         const snapP = await getDoc(doc(db, "pacientes", idPaciente));
         if (snapP.exists()) document.getElementById("nombrePaciente").innerText = snapP.data().nombre;
 
-        const snap = await getDocs(query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente)));
+        const q = query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente));
+        const snap = await getDocs(q);
         let html = "";
         snap.forEach(d => {
             const ev = d.data();
             html += `
             <div class="evolucion-item">
+                <span style="position:absolute; top:5px; right:10px; font-size:9px; color:#27ae60;">HASH: ${ev.hash || 'FIDEDIGNO'}</span>
                 ${ev.tipo === 'anexo' ? '<span class="badge-anexo">📁 ANEXO EXTERNO</span>' : ''}
-                <strong>📅 ${ev.fechaHora} | CIE-10: ${ev.cie10}</strong><br>
+                <strong>📅 ${ev.fechaHora} | CIE-10: ${ev.cie10 || 'N/A'}</strong><br>
                 <p>${ev.texto}</p>
-                ${ev.fotoBase64 ? `<img src="${ev.fotoBase64}" style="width:100px; cursor:pointer;" onclick="window.open('${ev.fotoBase64}')">` : ''}
-                ${(ev.aclaratorias || []).map(a => `<div class="aclaratoria-box"><strong>⚠️ ACLARACIÓN (${a.fecha}):</strong> ${a.texto} <br><small>Por: ${a.autor}</small></div>`).join('')}
-                <br><button onclick="añadirAclaratoria('${d.id}')" style="font-size:10px; color:#e67e22; border:none; background:none; cursor:pointer;">📝 Añadir Nota Aclaratoria</button>
+                ${ev.fotoBase64 ? `<img src="${ev.fotoBase64}" style="width:100px; border-radius:5px; margin-bottom:10px; cursor:pointer;" onclick="window.open('${ev.fotoBase64}')">` : ''}
+                
+                <div style="margin-bottom:10px;">
+                    <button class="btn-ley" style="background:#2980b9" onclick="descargarJSON('${d.id}')">📤 JSON</button>
+                    <button class="btn-ley" style="background:#e67e22" onclick="imprimirNota('${d.id}')">🖨️ PDF/A</button>
+                    <button class="btn-ley" style="background:#95a5a6" onclick="añadirAclaratoria('${d.id}')">📝 Aclaración</button>
+                </div>
+
+                ${(ev.aclaratorias || []).map(a => `<div class="aclaratoria-box"><strong>⚠️ ACLARACIÓN (${a.fecha}):</strong> ${a.texto}</div>`).join('')}
+                <div style="font-size:10px; color:gray; border-top:1px solid #eee; padding-top:5px;">Firmado: ${ev.autorRol.toUpperCase()}</div>
             </div>`;
         });
         document.getElementById("listaEvoluciones").innerHTML = html || "Sin registros.";
+    };
+
+    window.descargarJSON = async (id) => {
+        const d = await getDoc(doc(db, "evoluciones_psicologicas", id));
+        const blob = new Blob([JSON.stringify(d.data(), null, 2)], {type: "application/json"});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `Interop_${id}.json`; a.click();
+    };
+
+    window.imprimirNota = async (id) => {
+        const d = await getDoc(doc(db, "evoluciones_psicologicas", id));
+        const ev = d.data();
+        const win = window.open('', '_blank');
+        win.document.write(`<html><body style="font-family:Arial; padding:40px;"><h2>INFORME LEGAL</h2><p><strong>CIE-10:</strong> ${ev.cie10}</p><p>${ev.texto}</p>${ev.fotoBase64 ? `<img src="${ev.fotoBase64}" style="width:300px;">` : ''}<br>Firma: ${ev.autorRol.toUpperCase()}<script>window.print();<\/script></body></html>`);
+    };
+
+    window.añadirAclaratoria = async (idDoc) => {
+        const nota = prompt("Escriba la nota aclaratoria:");
+        if (!nota) return;
+        await updateDoc(doc(db, "evoluciones_psicologicas", idDoc), { aclaratorias: arrayUnion({ texto: nota, fecha: new Date().toLocaleString(), autor: rolAutor }) });
+        location.reload();
     };
 
     window.idPaciente = idPaciente;
