@@ -133,57 +133,58 @@ getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // 5. FUNCIONES GLOBALES (Asignadas a window para que funcionen con onclick)
 window.moverPaciente = async (nuevoEstado) => {
+    // 1. Recuperar datos necesarios
     const rolActual = sessionStorage.getItem('rolActivo');
-    
-    // 1. Bloqueo de seguridad por rol
+    const params = new URLSearchParams(window.location.search);
+    const idPaciente = params.get("id");
+    const nombreP = document.getElementById("nombrePaciente").innerText;
+    const estadoAnterior = document.getElementById("badgeEstado").innerText;
+
+    // 2. Seguridad de Rol
     if (rolActual === 'terapeuta') {
-        alert("🚫 No tienes permisos legales para realizar movimientos de pacientes.");
+        alert("🚫 No tienes permisos para realizar movimientos.");
         return;
     }
 
-    const motivo = prompt(`Escriba el motivo de la novedad (${nuevoEstado.toUpperCase()}):`);
-    
-    if (motivo === null || motivo.trim() === "") {
-        alert("❌ Operación cancelada. Debe ingresar un motivo legal para el cambio.");
+    // 3. Pedir Motivo (Obligatorio para la Ley)
+    const motivo = prompt(`Escriba el motivo del cambio a ${nuevoEstado.toUpperCase()}:`);
+    if (!motivo) {
+        alert("❌ Operación cancelada. El motivo es obligatorio.");
         return;
     }
 
-    if (confirm(`¿Confirmar cambio a ${nuevoEstado.toUpperCase()}?`)) {
+    if (confirm(`¿Confirmar movimiento de ${nombreP}?`)) {
         try {
-            const nombreP = document.getElementById("nombrePaciente").innerText;
-            const docRef = doc(db, "pacientes", idPaciente);
+            // USAMOS LAS FUNCIONES DE FIREBASE QUE YA TIENES IMPORTADAS
+            const { collection, addDoc, doc, updateDoc } = await import("https://gstatic.com");
 
-            // --- INICIO DE REGISTRO DE NOVEDAD LEGAL ---
-            // Este es el documento que el auditor revisará
+            // A. GUARDAR LA NOVEDAD (El rastro legal)
             await addDoc(collection(db, "novedades"), {
                 pacienteId: idPaciente,
                 pacienteNombre: nombreP,
-                estadoAnterior: document.getElementById("badgeEstado").innerText,
+                estadoAnterior: estadoAnterior,
                 estadoNuevo: nuevoEstado,
                 motivoNovedad: motivo,
                 usuarioResponsable: rolActual,
-                fechaHora: new Date().toLocaleString(), // Hora local de Colombia
-                timestamp: new Date().getTime(), // Para ordenamiento técnico
-                entidad: "Fundación Nuevos Caminos - Sede Guachinte"
+                fechaHora: new Date().toLocaleString(),
+                timestamp: Date.now()
             });
-            // --- FIN DE REGISTRO DE NOVEDAD ---
 
-            // Actualizar el estado en la ficha principal
+            // B. ACTUALIZAR EL ESTADO EN EL PACIENTE
+            const docRef = doc(db, "pacientes", idPaciente);
             await updateDoc(docRef, { 
-                estado: nuevoEstado,
-                ultimaNovedad: new Date().toLocaleString()
+                estado: nuevoEstado 
             });
 
-            alert("✅ Novedad registrada legalmente. El paciente ha sido movido.");
+            alert("✅ Novedad guardada y estado actualizado.");
             location.reload();
 
         } catch (e) {
-            alert("Error al registrar novedad: " + e.message);
-            console.error(e);
+            console.error("Error completo:", e);
+            alert("Error crítico: " + e.message);
         }
     }
 };
-
         window.irA = (tipo) => {
             const archivos = {
                 'medico': 'detalle_clinico.html',
