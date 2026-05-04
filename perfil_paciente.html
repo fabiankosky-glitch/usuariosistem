@@ -9,38 +9,37 @@
         .container { max-width: 500px; margin: auto; }
         .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
         .foto-perfil { width: 150px; height: 150px; border-radius: 50%; border: 5px solid #2c3e50; object-fit: cover; margin-bottom: 10px; background: #eee; }
-        .btn-folder { width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 10px; color: white; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; }
+        .btn-folder { width: 100%; padding: 15px; margin: 8px 0; border: none; border-radius: 10px; color: white; font-size: 18px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; text-decoration: none; }
         .btn-med { background: #e67e22; }
         .btn-ter { background: #27ae60; }
         .btn-psi { background: #9b59b6; }
         .grid-estados { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-        .btn-estado { padding: 10px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 12px; transition: 0.2s; }
-        .btn-estado:hover { opacity: 0.8; }
+        .btn-estado { padding: 10px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; font-size: 12px; }
         .status-badge { display: inline-block; padding: 5px 15px; border-radius: 20px; color: white; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
         .datos-lista { text-align: left; background: #f9f9f9; padding: 15px; border-radius: 10px; font-size: 14px; border: 1px solid #eee; margin-top: 15px; }
-        .datos-lista p { margin: 8px 0; border-bottom: 1px solid #eee; padding-bottom: 4px; }
+        .novedad-item { font-size:12px; border-left:3px solid #e74c3c; padding:8px; margin-bottom:10px; background:#fff; text-align: left; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <!-- CABECERA DEL PERFIL -->
+        <!-- FICHA PRINCIPAL -->
         <div class="card">
             <img id="fotoPaciente" src="https://placeholder.com" class="foto-perfil">
-            <h2 id="nombrePaciente" style="margin-bottom: 5px;">Cargando...</h2>
+            <h2 id="nombrePaciente">Cargando...</h2>
             <div id="badgeEstado" class="status-badge" style="background: #95a5a6;">ESTADO...</div>
             
-            <div class="datos-lista">
+            <div id="datosTecnicos" class="datos-lista">
                 <p><strong>🪪 Cédula:</strong> <span id="txtCedula">...</span></p>
                 <p><strong>🎂 Edad:</strong> <span id="txtEdad">...</span> años</p>
                 <p><strong>🚻 Sexo:</strong> <span id="txtSexo">...</span></p>
                 <p><strong>📅 Ingreso:</strong> <span id="txtFecha">...</span></p>
             </div>
             <br>
-            <button onclick="window.location.href='historias.html'" style="background:none; border:none; color:#3498db; cursor:pointer; font-weight:bold; font-size: 16px;">⬅ Volver al Listado</button>
+            <button onclick="window.location.href='historias.html'" style="background:none; border:none; color:#3498db; cursor:pointer; font-weight:bold;">⬅ Volver al Listado</button>
         </div>
 
-        <!-- CARPETAS (ACCESO RESTRINGIDO) -->
+        <!-- CARPETAS -->
         <div class="card">
             <h3>📂 Carpetas del Sistema</h3>
             <button id="btn-medico" class="btn-folder btn-med" onclick="irA('medico')">⚕️ Folder Médico</button>
@@ -48,7 +47,7 @@
             <button id="btn-psicologico" class="btn-folder btn-psi" onclick="irA('psicologico')">🧠 Folder Psicológico</button>
         </div>
 
-        <!-- CAMBIO DE ESTADO (SOLO ADMIN/PSICOLOGÍA) -->
+        <!-- CAMBIO DE CATEGORÍA -->
         <div id="seccion-estados" class="card">
             <h3>🔄 Cambiar de Categoría</h3>
             <div class="grid-estados">
@@ -59,165 +58,119 @@
                 <button class="btn-estado" style="background:#3498db; grid-column: span 2;" onclick="moverPaciente('movilizaciones')">🔵 Movilización</button>
             </div>
         </div>
+
+        <!-- HISTORIAL DE NOVEDADES -->
+        <div class="card">
+            <h3>📜 Historial de Novedades Legales</h3>
+            <div id="historialNovedades">Cargando historial...</div>
+        </div>
     </div>
 
     <script type="module">
-        // 1. SEGURIDAD DE ACCESO
-        if (sessionStorage.getItem('autenticado') !== 'true') {
-            window.location.href = 'login.html';
-        }
+        import { initializeApp } from "https://gstatic.com";
+        import { getFirestore, doc, getDoc, updateDoc, collection, addDoc, query, where, getDocs, orderBy } from "https://gstatic.com";
 
-        const rolActual = sessionStorage.getItem('rolActivo');
-
-        // 2. IMPORTACIÓN DE FIREBASE
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
- import { getFirestore, updateDoc, collection, addDoc, query, where, getDocs, orderBy, doc,
-getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
- const firebaseConfig = {
- apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
- authDomain: "caminosnuevosdatabase.firebaseapp.com",
- projectId: "caminosnuevosdatabase",
- storageBucket: "caminosnuevosdatabase.firebasestorage.app",
- appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
- };
-
+        const firebaseConfig = {
+            apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+            authDomain: "://firebaseapp.com",
+            projectId: "caminosnuevosdatabase",
+            storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+            appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+        };
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        
         const params = new URLSearchParams(window.location.search);
         const idPaciente = params.get("id");
+        const rolActual = sessionStorage.getItem('rolActivo');
 
-        // 3. APLICAR RESTRICCIONES DE ROL AL CARGAR EL DOM
-        document.addEventListener("DOMContentLoaded", () => {
-            if (rolActual === 'terapeuta') {
-                // El terapeuta no ve psicología ni puede mover pacientes
-                const btnPsi = document.getElementById('btn-psicologico');
-                if (btnPsi) btnPsi.style.display = 'none';
-                
-                const secEst = document.getElementById('seccion-estados');
-                if (secEst) secEst.style.display = 'none';
-            }
-        });
+        // SEGURIDAD INICIAL
+        if (sessionStorage.getItem('autenticado') !== 'true') { window.location.href = 'login.html'; }
 
-        // 4. CARGAR DATOS DEL PACIENTE
+        // APLICAR RESTRICCIONES DE ROL
+        if (rolActual === 'terapeuta') {
+            document.getElementById('btn-psicologico').style.display = 'none';
+            document.getElementById('seccion-estados').style.display = 'none';
+        }
+
+        // CARGAR PACIENTE
         async function cargarPaciente() {
-            if (!idPaciente) {
-                alert("ID de paciente no encontrado.");
-                return;
+            if (!idPaciente) return;
+            const snap = await getDoc(doc(db, "pacientes", idPaciente));
+            if (snap.exists()) {
+                const p = snap.data();
+                document.getElementById("nombrePaciente").innerText = p.nombre;
+                document.getElementById("txtCedula").innerText = p.cedula || "N/A";
+                document.getElementById("txtEdad").innerText = p.edad || "--";
+                document.getElementById("txtSexo").innerText = p.sexo || "N/A";
+                document.getElementById("txtFecha").innerText = p.fechaIngreso || "N/A";
+                document.getElementById("fotoPaciente").src = p.fotoID || p.foto || 'https://placeholder.com';
+                
+                const badge = document.getElementById("badgeEstado");
+                badge.innerText = (p.estado || "activos").toUpperCase();
+                const colores = { activos: '#27ae60', desprendimiento: '#16a085', abandonos: '#f39c12', fugas: '#e74c3c', movilizaciones: '#3498db' };
+                badge.style.background = colores[p.estado || "activos"];
             }
+        }
+
+        // CARGAR NOVEDADES
+        async function cargarNovedades() {
+            const hist = document.getElementById("historialNovedades");
             try {
-                const docRef = doc(db, "pacientes", idPaciente);
-                const snap = await getDoc(docRef);
+                const q = query(collection(db, "novedades"), where("pacienteId", "==", idPaciente), orderBy("timestamp", "desc"));
+                const snap = await getDocs(q);
+                let html = "";
+                snap.forEach(doc => {
+                    const n = doc.data();
+                    html += `<div class="novedad-item">
+                        <strong>${n.fechaHora}</strong>: ${n.estadoAnterior} ➔ ${n.estadoNuevo.toUpperCase()}<br>
+                        <em>Motivo: ${n.motivoNovedad}</em><br>
+                        <small>Responsable: ${n.usuarioResponsable}</small>
+                    </div>`;
+                });
+                hist.innerHTML = html || "No hay novedades registradas.";
+            } catch (e) { hist.innerHTML = "Aún sin historial (se requiere crear índice en Firebase)."; }
+        }
 
-                if (snap.exists()) {
-                    const p = snap.data();
-                    document.getElementById("nombrePaciente").innerText = p.nombre || "Sin Nombre";
-                    document.getElementById("txtCedula").innerText = p.cedula || "No registrada";
-                    document.getElementById("txtEdad").innerText = p.edad || "--";
-                    document.getElementById("txtSexo").innerText = p.sexo || "No definido";
-                    document.getElementById("txtFecha").innerText = p.fechaIngreso || "Sin fecha";
-                    document.getElementById("fotoPaciente").src = p.fotoID || p.foto || 'https://placeholder.com';
+        // FUNCIÓN GLOBAL MOVER PACIENTE
+        window.moverPaciente = async (nuevoEstado) => {
+            if (rolActual === 'terapeuta') return alert("🚫 Sin permisos.");
+            const motivo = prompt("Escriba el motivo legal del cambio:");
+            if (!motivo) return;
+
+            if (confirm("¿Confirmar movimiento?")) {
+                try {
+                    const nombreP = document.getElementById("nombrePaciente").innerText;
+                    const estadoAnt = document.getElementById("badgeEstado").innerText;
+
+                    // 1. Guardar Novedad
+                    await addDoc(collection(db, "novedades"), {
+                        pacienteId: idPaciente,
+                        pacienteNombre: nombreP,
+                        estadoAnterior: estadoAnt,
+                        estadoNuevo: nuevoEstado,
+                        motivoNovedad: motivo,
+                        usuarioResponsable: rolActual,
+                        fechaHora: new Date().toLocaleString(),
+                        timestamp: Date.now()
+                    });
+
+                    // 2. Actualizar Paciente
+                    await updateDoc(doc(db, "pacientes", idPaciente), { estado: nuevoEstado });
                     
-                    const badge = document.getElementById("badgeEstado");
-                    const estado = p.estado || "activos";
-                    badge.innerText = estado.toUpperCase();
-                    const colores = { activos: '#27ae60', desprendimiento: '#16a085', abandonos: '#f39c12', fugas: '#e74c3c', movilizaciones: '#3498db' };
-                    badge.style.background = colores[estado] || "#95a5a6";
-                } else {
-                    alert("El paciente no existe en la base de datos.");
-                }
-            } catch (e) { 
-                console.error("Error cargando datos:", e); 
+                    alert("✅ Novedad registrada.");
+                    location.reload();
+                } catch (e) { alert("Error: " + e.message); }
             }
-        }
+        };
 
-        // 5. FUNCIONES GLOBALES (Asignadas a window para que funcionen con onclick)
-window.moverPaciente = async (nuevoEstado) => {
-    // 1. Recuperar datos necesarios
-    const rolActual = sessionStorage.getItem('rolActivo');
-    const params = new URLSearchParams(window.location.search);
-    const idPaciente = params.get("id");
-    const nombreP = document.getElementById("nombrePaciente").innerText;
-    const estadoAnterior = document.getElementById("badgeEstado").innerText;
-
-    // 2. Seguridad de Rol
-    if (rolActual === 'terapeuta') {
-        alert("🚫 No tienes permisos para realizar movimientos.");
-        return;
-    }
-
-    // 3. Pedir Motivo (Obligatorio para la Ley)
-    const motivo = prompt(`Escriba el motivo del cambio a ${nuevoEstado.toUpperCase()}:`);
-    if (!motivo) {
-        alert("❌ Operación cancelada. El motivo es obligatorio.");
-        return;
-    }
-
-    if (confirm(`¿Confirmar movimiento de ${nombreP}?`)) {
-        try {
-            // USAMOS LAS FUNCIONES DE FIREBASE QUE YA TIENES IMPORTADAS
-            const { collection, addDoc, doc, updateDoc } = await import("https://gstatic.com");
-
-            // A. GUARDAR LA NOVEDAD (El rastro legal)
-            await addDoc(collection(db, "novedades"), {
-                pacienteId: idPaciente,
-                pacienteNombre: nombreP,
-                estadoAnterior: estadoAnterior,
-                estadoNuevo: nuevoEstado,
-                motivoNovedad: motivo,
-                usuarioResponsable: rolActual,
-                fechaHora: new Date().toLocaleString(),
-                timestamp: Date.now()
-            });
-
-            // B. ACTUALIZAR EL ESTADO EN EL PACIENTE
-            const docRef = doc(db, "pacientes", idPaciente);
-            await updateDoc(docRef, { 
-                estado: nuevoEstado 
-            });
-
-            alert("✅ Novedad guardada y estado actualizado.");
-            location.reload();
-
-        } catch (e) {
-            console.error("Error completo:", e);
-            alert("Error crítico: " + e.message);
-        }
-    }
-};
         window.irA = (tipo) => {
-            const archivos = {
-                'medico': 'detalle_clinico.html',
-                'terapeutico': 'detalle_terapeutico.html',
-                'psicologico': 'detalle_psicologico.html'
-            };
+            const archivos = { 'medico': 'detalle_clinico.html', 'terapeutico': 'detalle_terapeutico.html', 'psicologico': 'detalle_psicologico.html' };
             window.location.href = `${archivos[tipo]}?id=${idPaciente}`;
         };
 
-        // Iniciar carga
         cargarPaciente();
-                // --- VISUALIZADOR DE NOVEDADES (TRAZABILIDAD) ---
-        async function cargarNovedades() {
-            const contenedor = document.getElementById("datosTecnicos");
-            const q = query(collection(db, "novedades"), where("pacienteId", "==", idPaciente), orderBy("timestamp", "desc"));
-            
-            try {
-                const snap = await getDocs(q);
-                let html = "<hr><h4>📜 Historial de Novedades</h4>";
-                
-                snap.forEach((doc) => {
-                    const n = doc.data();
-                    html += `
-                        <div style="font-size:12px; border-left:3px solid #e74c3c; padding:5px; margin-bottom:10px; background:#fff;">
-                            <strong>${n.fechaHora}</strong>: de ${n.estadoAnterior} a ${n.estadoNuevo.toUpperCase()}<br>
-                            <em>Motivo: ${n.motivoNovedad}</em><br>
-                            <small>Por: ${n.usuarioResponsable}</small>
-                        </div>`;
-                });
-                contenedor.innerHTML += html;
-            } catch (e) { console.log("Aún sin novedades registradas."); }
-        }
-        // Llamamos a la función
         cargarNovedades();
     </script>
 </body>
