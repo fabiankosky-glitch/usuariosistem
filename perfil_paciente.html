@@ -195,6 +195,29 @@ window.moverPaciente = async (nuevoEstado) => {
 
         // Iniciar carga
         cargarPaciente();
+                // --- VISUALIZADOR DE NOVEDADES (TRAZABILIDAD) ---
+        async function cargarNovedades() {
+            const contenedor = document.getElementById("datosTecnicos");
+            const q = query(collection(db, "novedades"), where("pacienteId", "==", idPaciente), orderBy("timestamp", "desc"));
+            
+            try {
+                const snap = await getDocs(q);
+                let html = "<hr><h4>📜 Historial de Novedades</h4>";
+                
+                snap.forEach((doc) => {
+                    const n = doc.data();
+                    html += `
+                        <div style="font-size:12px; border-left:3px solid #e74c3c; padding:5px; margin-bottom:10px; background:#fff;">
+                            <strong>${n.fechaHora}</strong>: de ${n.estadoAnterior} a ${n.estadoNuevo.toUpperCase()}<br>
+                            <em>Motivo: ${n.motivoNovedad}</em><br>
+                            <small>Por: ${n.usuarioResponsable}</small>
+                        </div>`;
+                });
+                contenedor.innerHTML += html;
+            } catch (e) { console.log("Aún sin novedades registradas."); }
+        }
+        // Llamamos a la función
+        cargarNovedades();
     </script>
 </body>
 </html>
