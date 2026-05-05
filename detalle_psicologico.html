@@ -244,38 +244,75 @@
         } catch (e) { alert("Error: " + e.message); }
     };
 
-    window.cargarHistorial = async () => {
+window.cargarHistorial = async () => {
+    const contenedor = document.getElementById("listadoEvoluciones");
+    contenedor.innerHTML = "Descifrando información clínica...";
+
+    try {
         const snap = await getDocs(query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente)));
         let html = "";
-        snap.forEach(doc => {
-            const d = doc.data();
-            const diags = JSON.parse(descifrar(d.diagnosticos));
-            
+
+        snap.forEach(docSnap => {
+            const d = docSnap.data();
+            let diags = [];
+            let evolucionDescifrada = "";
+
+            // --- BLOQUE ANTIBLOQUEO (PROTECCIÓN CONTRA EL TOKEN 'E') ---
+            try {
+                // Desciframos evolución (manejamos ambos nombres posibles de variable)
+                evolucionDescifrada = descifrar(d.evolucion || d.texto);
+
+                // Desciframos diagnósticos con validación de JSON
+                const rawDiags = descifrar(d.diagnosticos || d.cie10_array);
+                diags = JSON.parse(rawDiags);
+            } catch (e) {
+                console.warn("Error en registro: " + d.firmaHash);
+                evolucionDescifrada = "<i>Error de descifrado: Registro antiguo o llave no válida.</i>";
+                diags = [{cod: "N/A", desc: "No recuperable"}];
+            }
+
+            // --- CONSTRUCCIÓN DE LA CARD CON TODOS TUS BOTONES ---
             html += `<div class="evolucion-card">
-                <span class="hash-tag">INTEGRITY-ID: ${d.firmaHash}</span>
-                <strong>📅 ${d.fecha} | AUTOR: ${d.autor}</strong>
+                <span class="hash-tag">INTEGRITY-ID: ${d.firmaHash || d.hash || 'S/H'}</span>
+                <strong>📅 ${d.fecha || d.fechaHora} | AUTOR: ${d.autor || 'PROFESIONAL'}</strong>
+                
                 <div style="margin: 15px 0; padding: 12px; background: #fcfcfc; border: 1px solid #eee; border-radius: 8px;">
                     <strong>DIAGNÓSTICOS ASOCIADOS:</strong><br>
                     ${diags.map(x => `<small style="display:block; margin-top:4px;">• <strong>${x.cod}</strong>: ${x.desc}</small>`).join('')}
                 </div>
-                <p style="line-height:1.6; color:#444;">${descifrar(d.evolucion)}</p>
+
+                <p style="line-height:1.6; color:#444;">${evolucionDescifrada}</p>
                 
                 <div class="botones-accion">
-                    <button class="btn-mini" style="background:#2c3e50" onclick="validarYAcceder('json', '${doc.id}')">JSON</button>
-                    <button class="btn-mini" style="background:#e67e22" onclick="validarYAcceder('pdf', '${doc.id}')">📄 GENERAR PDF/A</button>
-                    <button class="btn-mini" style="background:#9b59b6" onclick="validarYAcceder('aclarar', '${doc.id}')">ACLARAR</button>
-                    ${d.aclaratorias.length > 0 ? `<button class="btn-mini" style="background:#34495e" onclick="document.getElementById('acl-${doc.id}').style.display='block'">VER ACLARATORIA</button>` : ''}
+                    <button class="btn-mini" style="background:#2c3e50" onclick="validarYAcceder('json', '${docSnap.id}')">JSON</button>
+                    <button class="btn-mini" style="background:#e67e22" onclick="validarYAcceder('pdf', '${docSnap.id}')">📄 GENERAR PDF/A</button>
+                    <button class="btn-mini" style="background:#9b59b6" onclick="validarYAcceder('aclarar', '${docSnap.id}')">ACLARAR</button>
+                    
+                    ${(d.aclaratorias && d.aclaratorias.length > 0) ? 
+                        `<button class="btn-mini" style="background:#34495e" onclick="document.getElementById('acl-${docSnap.id}').style.display='block'">VER ACLARATORIA</button>` 
+                        : ''}
                 </div>
-                <div id="acl-${doc.id}" style="display:none; margin-top:15px; padding:15px; background:#fff3cd; border: 1px solid #ffeeba; border-radius:8px;">
+
+                <div id="acl-${docSnap.id}" style="display:none; margin-top:15px; padding:15px; background:#fff3cd; border: 1px solid #ffeeba; border-radius:8px;">
                     <h5 style="margin:0 0 10px 0;">NOTAS ACLARATORIAS POST-CIERRE:</h5>
-                    ${d.aclaratorias.map(a => `<div style="font-size:12px;"><strong>${a.fecha}:</strong> ${descifrar(a.texto)}<hr></div>`).join('')}
-                    <button class="btn-mini" style="background:#95a5a6; padding:4px 8px;" onclick="document.getElementById('acl-${doc.id}').style.display='none'">CERRAR</button>
+                    ${d.aclaratorias ? d.aclaratorias.map(a => `
+                        <div style="font-size:12px;">
+                            <strong>${a.fecha}:</strong> ${descifrar(a.texto)}
+                            <hr style="border:0.2px solid #ddd">
+                        </div>`).join('') : ''}
+                    <button class="btn-mini" style="background:#95a5a6; padding:4px 8px;" onclick="document.getElementById('acl-${docSnap.id}').style.display='none'">CERRAR</button>
                 </div>
             </div>`;
         });
-        document.getElementById("listadoEvoluciones").innerHTML = html || "No existen registros previos.";
+
+        contenedor.innerHTML = html || "No existen registros previos para este paciente.";
         document.getElementById("btnHistorial").style.display = 'none';
-    };
+
+    } catch (err) {
+        console.error("Error crítico de acceso:", err);
+        alert("No se pudo conectar con la bóveda de Firebase.");
+    }
+};
 
     window.abrirAclaratoria = async (id) => {
         const nota = prompt("Ingrese la aclaratoria (Este texto no altera el original, se anexa como nota marginal):");
