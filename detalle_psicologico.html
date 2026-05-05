@@ -9,7 +9,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <style>
+     <style>
         :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #1a1a2e; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: #333; margin: 0; padding: 20px; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 40px; border-radius: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
@@ -18,17 +18,16 @@
         #areaRegistro { display: none; background: #f8f9fa; padding: 30px; border-radius: 20px; border: 1.5px solid #dee2e6; margin-bottom: 40px; animation: slideDown 0.5s; }
         textarea, input, select { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #ced4da; margin-bottom: 12px; font-size: 14px; box-sizing: border-box; }
         
-        /* ESTILO EXACTO DE TU IMAGEN */
+        /* ESTILO EXACTO DE TU ESTRUCTURA */
         .evolucion-card { text-align: left; background: #fff; border-radius: 15px; padding: 25px; margin-bottom: 25px; position: relative; box-shadow: 0 8px 25px rgba(0,0,0,0.1); border: 1px solid #eee; }
         .hash-tag { position: absolute; top: 12px; right: 20px; font-size: 10px; color: var(--accent); font-family: 'Courier New', monospace; font-weight: bold; }
         .cie-box { background: #f9f9f9; border-radius: 10px; padding: 15px; margin: 15px 0; border: 1px solid #eee; font-size: 13px; }
-        .bloque-aclaratoria { background: #fff9e6; padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px solid #ffeeba; font-size: 12px; animation: fadeIn 0.4s; }
+        .bloque-aclaratoria { background: #fff9e6; padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px solid #ffeeba; font-size: 12px; }
         .btn-mini { padding: 12px 18px; border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-right: 8px; }
-        
-        /* MODALES EMERGENTES */
+
+        /* MODAL EMERGENTE INTEGRADO */
         .modal-legal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
-        .modal-content { background: white; margin: 10% auto; padding: 35px; border-radius: 25px; width: 85%; max-width: 550px; box-shadow: 0 30px 70px rgba(0,0,0,0.6); border: 3px solid var(--primary); }
-        
+        .modal-content { background: white; margin: 10% auto; padding: 35px; border-radius: 25px; width: 85%; max-width: 500px; border: 3px solid var(--primary); }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
@@ -75,7 +74,6 @@
     <div id="listadoEvoluciones"></div>
 </div>
 
-<!-- VENTANA MODAL PARA CLAVES Y ACLARATORIAS -->
 <div id="modalMaestro" class="modal-legal">
     <div class="modal-content">
         <h3 id="modalTitulo" style="color:var(--primary); margin-top:0; border-bottom:3px solid var(--primary);"></h3>
@@ -89,7 +87,7 @@
 
 <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import {  getFirestore, doc, getDoc, collection, addDoc, query, where, getDocs, serverTimestamp, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, getDoc, collection, addDoc, query, where, getDocs, serverTimestamp, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
             authDomain: "caminosnuevosdatabase.firebaseapp.com",
@@ -108,7 +106,6 @@
     let diagnosticosCie = [];
     let fotoData = "", camStream = null;
 
-    // MOTOR DE CIFRADO E2EE
     const cifrar = (t) => CryptoJS.AES.encrypt(t, LLAVE_MAESTRA).toString();
     const descifrar = (h) => {
         try { 
@@ -118,7 +115,6 @@
         } catch(e) { return "[]"; }
     };
 
-    // MODALES MAESTROS
     window.abrirModal = (tit, html, func) => {
         document.getElementById("modalTitulo").innerText = tit;
         document.getElementById("modalCuerpo").innerHTML = html;
@@ -132,6 +128,14 @@
                    <input type="password" id="passM" style="width:100%; padding:12px; border:2px solid #ccc; border-radius:10px;">`;
         abrirModal("🔒 AUTENTICACIÓN REQUERIDA", h, async () => {
             if (document.getElementById("passM").value === CLAVE_CLINICA) {
+                // ANEXO DE AUDITORÍA: LOG DE ACCESO (Obligatorio frente a auditor)
+                await addDoc(collection(db, "auditoria_accesos"), {
+                    usuario: "PROFESIONAL_AUTORIZADO",
+                    paciente: idPaciente,
+                    accion: tipo,
+                    fecha: new Date().toLocaleString(),
+                    serverTime: serverTimestamp()
+                });
                 cerrarModal();
                 if (tipo === 'registro') activarCamara();
                 if (tipo === 'historial') cargarHistorial();
@@ -169,7 +173,9 @@
 
     window.finalizarYGuardar = async () => {
         const ev = document.getElementById("evolucionTexto").value;
-        if (!ev || diagnosticosCie.length === 0) return alert("Faltan datos.");
+        const prof = prompt("INGRESE SU NOMBRE COMPLETO Y TARJETA PROFESIONAL:");
+        if (!ev || diagnosticosCie.length === 0 || !prof) return alert("Datos incompletos.");
+        
         await addDoc(collection(db, "evoluciones_psicologicas"), {
             idPaciente,
             evolucion: cifrar(ev),
@@ -178,7 +184,7 @@
             foto: fotoData,
             fecha: new Date().toLocaleString(),
             firmaHash: btoa(ev + Date.now()).substring(0,16),
-            autor: "PSICOLOGÍA - FUNDACIÓN NC",
+            autor: cifrar(prof), // ANEXO LEGAL: Firma vinculada
             aclaratorias: []
         });
         alert("REGISTRO SELLADO."); location.reload();
@@ -190,24 +196,20 @@
         snap.forEach(docSnap => {
             const d = docSnap.data();
             let diags = JSON.parse(descifrar(d.diagnosticos || d.cie10_array));
-            
             html += `<div class="evolucion-card">
                 <span class="hash-tag">HASH-ID: ${d.firmaHash || d.hash}</span>
                 <p>🗓️ <strong>${d.fecha || d.fechaHora}</strong></p>
-                <div class="cie-box">
-                    <strong>DIAGNÓSTICOS (CIE-10):</strong><br>
-                    ${diags.map(x => `• ${x.cod}: ${x.desc}`).join('<br>')}
-                </div>
+                <div class="cie-box"><strong>DIAGNÓSTICOS (CIE-10):</strong><br>${diags.map(x => `• ${x.cod}: ${x.desc}`).join('<br>')}</div>
                 <p>${descifrar(d.evolucion || d.texto)}</p>
+                <p style="font-size:10px; color:gray;">Firmado por: ${descifrar(d.autor || 'N/A')}</p>
                 <div class="botones-accion">
-                    <button class="btn-mini" style="background:#2c3e50">JSON</button>
                     <button class="btn-mini" style="background:#e67e22" onclick="validarYAcceder('pdf', '${docSnap.id}')">📄 PDF/A</button>
                     <button class="btn-mini" style="background:#9b59b6" onclick="validarYAcceder('aclarar', '${docSnap.id}')">ACLARAR</button>
                     ${(d.aclaratorias && d.aclaratorias.length > 0) ? `<button class="btn-mini" style="background:#34495e" onclick="document.getElementById('acl-${docSnap.id}').style.display='block'">VER ACLARATORIA</button>` : ''}
                 </div>
                 <div id="acl-${docSnap.id}" class="bloque-aclaratoria" style="display:none;">
                     <strong>NOTAS ACLARATORIAS (RES. 1995/99):</strong><hr>
-                    ${d.aclaratorias ? d.aclaratorias.map(a => `<div>[${a.fecha}] <strong>${descifrar(a.autor || '')}:</strong> ${descifrar(a.texto)}</div>`).join('<hr>') : ''}
+                    ${d.aclaratorias ? d.aclaratorias.map(a => `<div>[${a.fecha}] <strong>Motivo: ${descifrar(a.motivo || '')}:</strong> ${descifrar(a.texto)} <br><small>Por: ${descifrar(a.autor || '')}</small></div>`).join('<hr>') : ''}
                     <button class="btn-mini" style="background:#95a5a6; margin-top:10px;" onclick="document.getElementById('acl-${docSnap.id}').style.display='none'">CERRAR</button>
                 </div>
             </div>`;
@@ -216,16 +218,29 @@
     };
 
     window.prepararAclaratoria = (id) => {
-        const h = `<textarea id="tAcl" rows="4" style="width:100%; border-radius:10px;" placeholder="Nota aclaratoria..."></textarea>
-                   <input type="text" id="autAcl" placeholder="Nombre del profesional">`;
-        abrirModal("🖋️ NUEVA NOTA ACLARATORIA", h, async () => {
+        const h = `
+            <select id="motivoAcl" style="margin-bottom:10px;">
+                <option value="Error de digitación">Error de digitación</option>
+                <option value="Omisión de información">Omisión involuntaria</option>
+                <option value="Aclaración por auditoría">Aclaración por auditoría</option>
+            </select>
+            <textarea id="tAcl" rows="4" placeholder="Contenido de la nota aclaratoria..."></textarea>
+            <input type="text" id="autAcl" placeholder="Nombre y T.P. del profesional">
+        `;
+        abrirModal("🖋️ NUEVA NOTA ACLARATORIA LEGAL", h, async () => {
             const nota = document.getElementById("tAcl").value;
+            const mot = document.getElementById("motivoAcl").value;
             const aut = document.getElementById("autAcl").value;
             if (nota && aut) {
                 await updateDoc(doc(db, "evoluciones_psicologicas", id), {
-                    aclaratorias: arrayUnion({ texto: cifrar(nota), autor: cifrar(aut), fecha: new Date().toLocaleString() })
+                    aclaratorias: arrayUnion({ 
+                        texto: cifrar(nota), 
+                        motivo: cifrar(mot), 
+                        autor: cifrar(aut), 
+                        fecha: new Date().toLocaleString() 
+                    })
                 });
-                alert("Sellado."); location.reload();
+                alert("Nota sellada."); location.reload();
             }
         });
     };
@@ -236,15 +251,17 @@
         const diags = JSON.parse(descifrar(ev.diagnosticos));
         const vent = window.open('', '_blank');
         vent.document.write(`<html><body style="font-family:'Times New Roman'; padding:40px;">
-            <h2 style="text-align:center;">FUNDACIÓN NUEVOS CAMINOS</h2>
-            <div style="border:1px solid #000; padding:15px; margin:20px 0; background:#f2f2f2;">
+            <h2 style="text-align:center;">FUNDACIÓN NUEVOS CAMINOS - IPS</h2>
+            <p style="text-align:center;">NIT: 901.XXX.XXX-X | Guachinte, Valle</p>
+            <div style="border:1px solid #000; padding:15px; margin:20px 0;">
                 <strong>PACIENTE:</strong> ${pac.nombre.toUpperCase()} | <strong>FECHA:</strong> ${ev.fecha}
             </div>
             <strong>DIAGNÓSTICOS:</strong><ul>${diags.map(x=>`<li>${x.cod}: ${x.desc}</li>`).join('')}</ul>
-            <p style="white-space:pre-wrap;">${descifrar(ev.evolucion)}</p>
-            ${ev.aclaratorias.length > 0 ? `<div style="background:#fff9e6; padding:10px; border:1px solid #000;"><strong>ACLARATORIAS:</strong>
-                ${ev.aclaratorias.map(a => `<p style="font-size:12px;">[${a.fecha}] ${descifrar(a.autor)}: ${descifrar(a.texto)}</p>`).join('')}</div>` : ''}
-            <div style="margin-top:50px; border-top:1px solid #000; width:300px;">HASH INTEGRIDAD: ${ev.firmaHash}</div>
+            <p style="text-align:justify;">${descifrar(ev.evolucion)}</p>
+            <div style="margin-top:40px; border-top:1px solid #000; width:300px;">
+                FIRMADO POR: ${descifrar(ev.autor)}<br>HASH-ID: ${ev.firmaHash}
+            </div>
+            <p style="font-size:10px; text-align:center; margin-top:50px;">DOCUMENTO INALTERABLE PROTEGIDO POR LEY 1090 DE 2006</p>
             <script>setTimeout(()=>window.print(), 1000);<\/script></body></html>`);
     };
 
