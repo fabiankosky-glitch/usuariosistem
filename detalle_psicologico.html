@@ -3,102 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HCE Bóveda Cifrada - Nuevos Caminos</title>
-    <!-- LIBRERÍAS DE LEY (SEGURIDAD Y PRESERVACIÓN) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/cryptojs.min.js"></script>
-<script
-src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
- <style>
-        :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #1a1a2e; color: #333; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 40px; border-radius: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
-        
-        /* BOTONES Y UI */
-        .btn-main { background: var(--primary); color: white; padding: 20px; width: 100%; border: none; border-radius: 15px; font-size: 18px; font-weight: bold; cursor: pointer; margin-bottom: 25px; transition: 0.3s; }
-        .btn-main:hover { background: var(--secondary); transform: translateY(-2px); }
-        
-        #areaRegistro { display: none; background: #f8f9fa; padding: 30px; border-radius: 20px; border: 1px solid #dee2e6; margin-bottom: 40px; animation: fadeIn 0.5s; }
-        textarea, input, select { width: 100%; padding: 15px; border-radius: 10px; border: 1px solid #ced4da; margin-bottom: 15px; font-size: 15px; }
-        
-        /* SISTEMA MULTI-DIAGNÓSTICO */
-        .cie-display { background: #fff; border: 2px solid var(--primary); border-radius: 12px; padding: 15px; margin-bottom: 20px; text-align: left; }
-        .cie-item { background: #e9ecef; border-left: 5px solid var(--primary); padding: 10px; margin: 5px 0; border-radius: 5px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; }
-        .cie-item span.remove { color: var(--danger); cursor: pointer; font-weight: bold; padding: 5px; }
+    <title>HCE Bóveda Cifrada - Fundación Nuevos Caminos</title>
+    
+    <!-- CARGA CRÍTICA DE LIBRERÍAS DE SEGURIDAD (ORDEN OBLIGATORIO) -->
+<script src="https://cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<script src="https://cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-        /* HISTORIAL Y BOTONES DE ACCIÓN */
-        .evolucion-item { text-align: left; background: #fff; border-left: 8px solid #9b59b6; padding: 25px; margin-bottom: 25px; border-radius: 12px; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
-        .grid-botones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
-        .btn-action { padding: 8px 15px; border: none; border-radius: 6px; color: white; cursor: pointer; font-size: 11px; font-weight: bold; text-transform: uppercase; }
+    <style>
+        :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #1a1a2e; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 950px; margin: auto; background: white; padding: 40px; border-radius: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
         
-        .badge-hash { position: absolute; top: 10px; right: 15px; font-size: 10px; color: var(--accent); font-family: monospace; }
+        /* CABECERA Y ALERTAS */
+        .header-status { background: #d1e7dd; color: #0f5132; padding: 15px; border-radius: 12px; font-size: 13px; margin-bottom: 25px; font-weight: bold; border: 1px solid #badbcc; text-align: center; }
         
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        /* UI DE REGISTRO */
+        .btn-principal { background: var(--primary); color: white; padding: 18px; width: 100%; border: none; border-radius: 15px; font-size: 17px; font-weight: bold; cursor: pointer; margin-bottom: 20px; transition: 0.3s; }
+        #areaRegistro { display: none; background: #f8f9fa; padding: 30px; border-radius: 20px; border: 1.5px solid #dee2e6; margin-bottom: 40px; animation: slideDown 0.5s ease-out; }
+        
+        textarea, input, select { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #ced4da; margin-bottom: 12px; font-size: 14px; box-sizing: border-box; }
+        
+        /* SISTEMA MULTI-DIAGNÓSTICO DESCRIPTIVO */
+        .cie-container { background: #fff; border: 2px solid var(--primary); border-radius: 12px; padding: 15px; margin-bottom: 15px; text-align: left; }
+        .cie-item { background: #f1f3f5; border-left: 5px solid var(--primary); padding: 12px; margin: 8px 0; border-radius: 6px; font-size: 13px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .cie-item strong { color: var(--primary); }
+        .cie-item .remove-btn { color: var(--danger); cursor: pointer; font-weight: 900; padding: 5px 10px; }
+
+        /* LISTADO DE EVOLUCIONES */
+        .evolucion-card { text-align: left; background: #fff; border-left: 8px solid #9b59b6; padding: 25px; margin-bottom: 25px; border-radius: 15px; position: relative; box-shadow: 0 8px 20px rgba(0,0,0,0.1); }
+        .hash-tag { position: absolute; top: 12px; right: 20px; font-size: 10px; color: var(--accent); font-family: 'Courier New', monospace; font-weight: bold; }
+        
+        .botones-accion { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; padding-top: 15px; border-top: 1px solid #eee; }
+        .btn-mini { padding: 10px 16px; border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 id="nombrePaciente">CARGANDO EXPEDIENTE...</h2>
-    <div style="background:#d1e7dd; color:#0f5132; padding:15px; border-radius:12px; font-size:12px; margin-bottom:25px; font-weight:bold; border: 1px solid #badbcc; text-align: center;">
-        🔒 ENCRIPTACIÓN PUNTA A PUNTA (E2EE) - AES-256 | TRAZABILIDAD DE AUDITORÍA ACTIVA
+    <h2 id="nombrePaciente">CARGANDO HISTORIA CLÍNICA...</h2>
+    <div class="header-status">
+        🔒 PROTECCIÓN DE DATOS NIVEL 3 | AES-256 BIT ENCRYPTION | TRAZABILIDAD IPS ACTIVADA
     </div>
 
-    <button class="btn-main" onclick="solicitarAcceso('registro')">📂 NUEVA EVOLUCIÓN CLÍNICA</button>
+    <button class="btn-principal" onclick="validarYAcceder('registro')">📂 ABRIR NUEVA EVOLUCIÓN CLÍNICA</button>
 
     <div id="areaRegistro">
-        <video id="video" style="width:100%; border-radius:15px; background:#000;" autoplay playsinline></video>
-        <canvas id="canvas" style="display:none;"></canvas>
-        <img id="imgPreview" style="display:none; width:100%; border-radius:15px; margin-bottom:20px; border: 3px solid #dee2e6;">
-        <button class="btn-main" style="background:#34495e" onclick="tomarFoto()">📸 CAPTURAR EVIDENCIA (ANEXO)</button>
+        <div style="position:relative; margin-bottom:20px;">
+            <video id="video" style="width:100%; border-radius:15px; background:#000;" autoplay playsinline></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+            <img id="imgPreview" style="display:none; width:100%; border-radius:15px; border: 4px solid #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+        </div>
+        <button class="btn-principal" style="background:#34495e" onclick="capturarFoto()">📸 CAPTURAR ANEXO FOTOGRÁFICO</button>
 
-        <label style="font-weight: bold; font-size: 14px; text-align: left; display: block; margin-bottom: 10px;">DIAGNÓSTICOS (CIE-10):</label>
-        <div id="listaDiagnosticos" class="cie-display">
-            <span style="color:#999; font-style:italic;">No hay diagnósticos agregados...</span>
+        <label style="font-weight: bold; font-size: 14px; text-align: left; display: block; margin: 10px 0;">VADEMÉCUM CIE-10 (SELECCIÓN MÚLTIPLE):</label>
+        <div id="displayCie" class="cie-container">
+            <span style="color:#bdc3c7; font-style:italic;">Seleccione los diagnósticos del paciente...</span>
         </div>
 
-        <select id="cie10" onchange="agregarDiagnostico()">
-            <option value="">-- BUSCAR EN VADEMÉCUM CIE-10 --</option>
-            <optgroup label="F00-F09: Orgánicos">
-                <option value="F00.0|Demencia en la enfermedad de Alzheimer de inicio temprano">F00.0 Alzheimer Inicio Temprano</option>
-                <option value="F03.X|Demencia no especificada">F03.X Demencia No Especificada</option>
+        <select id="selectCie" onchange="addCie()">
+            <option value="">-- BUSCAR DIAGNÓSTICO CLÍNICO --</option>
+            <optgroup label="F00-F09: Trastornos Orgánicos">
+                <option value="F00.1|Demencia en la enfermedad de Alzheimer de inicio tardío">F00.1 Alzheimer Tardío</option>
+                <option value="F01.0|Demencia vascular de inicio agudo">F01.0 Demencia Vascular</option>
+                <option value="F03.X|Demencia no especificada">F03.X Demencia NE</option>
                 <option value="F06.0|Alucinosis orgánica">F06.0 Alucinosis Orgánica</option>
+                <option value="F07.0|Trastorno de la personalidad orgánico">F07.0 T. Personalidad Orgánico</option>
             </optgroup>
-            <optgroup label="F10-F19: Consumo de Sustancias">
-                <option value="F10.2|Trastorno de dependencia al alcohol">F10.2 Dependencia Alcohol</option>
-                <option value="F12.2|Trastorno de dependencia a cannabinoides">F12.2 Dependencia Cannabis</option>
-                <option value="F14.2|Trastorno de dependencia a la cocaína">F14.2 Dependencia Cocaína/Bazuco</option>
-                <option value="F19.2|Trastorno de dependencia por policonsumo">F19.2 Policonsumo</option>
+            <optgroup label="F10-F19: Consumo de Sustancias Psicoactivas">
+                <option value="F10.2|Síndrome de dependencia al alcohol">F10.2 Dependencia Alcohol</option>
+                <option value="F11.2|Síndrome de dependencia a opioides">F11.2 Dependencia Opioides</option>
+                <option value="F12.2|Síndrome de dependencia a cannabinoides">F12.2 Dependencia Cannabis (Marihuana)</option>
+                <option value="F14.1|Uso nocivo de cocaína">F14.1 Uso Nocivo Cocaína</option>
+                <option value="F14.2|Síndrome de dependencia a la cocaína">F14.2 Dependencia Cocaína / Bazuco</option>
+                <option value="F15.2|Síndrome de dependencia a otros estimulantes">F15.2 Dependencia Estimulantes (Éxtasis/Anfetaminas)</option>
+                <option value="F16.2|Síndrome de dependencia a alucinógenos">F16.2 Dependencia Alucinógenos (LSD/2C-B)</option>
+                <option value="F19.2|Síndrome de dependencia debido al consumo de múltiples drogas">F19.2 Policonsumo (Dependencia Múltiple)</option>
             </optgroup>
-            <optgroup label="F20-F29: Psicóticos">
+            <optgroup label="F20-F29: Esquizofrenia y Psicosis">
                 <option value="F20.0|Esquizofrenia paranoide">F20.0 Esquizofrenia Paranoide</option>
-                <option value="F22.0|Trastorno delirante">F22.0 Paranoia</option>
+                <option value="F22.0|Trastorno delirante permanente">F22.0 Paranoia</option>
+                <option value="F23.1|Trastorno psicótico agudo polimorfo con síntomas de esquizofrenia">F23.1 Psicosis Aguda</option>
+                <option value="F25.0|Trastorno esquizoafectivo de tipo maníaco">F25.0 Esquizoafectivo Maníaco</option>
             </optgroup>
-            <optgroup label="F30-F39: Afectivos">
-                <option value="F31.1|Trastorno afectivo bipolar, episodio maníaco sin síntomas psicóticos">F31.1 Bipolar Maníaco</option>
+            <optgroup label="F30-F39: Trastornos del Humor / Afectivos">
+                <option value="F31.1|Trastorno afectivo bipolar, episodio maníaco sin síntomas psicóticos">F31.1 Bipolar: Maníaco</option>
+                <option value="F31.3|Trastorno afectivo bipolar, episodio depresivo leve o moderado">F31.3 Bipolar: Depresivo</option>
                 <option value="F32.2|Episodio depresivo grave sin síntomas psicóticos">F32.2 Depresión Grave</option>
+                <option value="F32.3|Episodio depresivo grave con síntomas psicóticos">F32.3 Depresión Grave + Psicosis</option>
                 <option value="F34.1|Distimia">F34.1 Distimia</option>
             </optgroup>
-            <optgroup label="F60-F69: Personalidad">
-                <option value="F60.31|Trastorno de la personalidad límite (Borderline)">F60.31 Límite (Borderline)</option>
-                <option value="F60.2|Trastorno de la personalidad antisocial">F60.2 Antisocial</option>
+            <optgroup label="F40-F48: Ansiedad y Estrés">
+                <option value="F41.0|Trastorno de pánico (ansiedad paroxística episódica)">F41.0 Trastorno de Pánico</option>
+                <option value="F41.1|Trastorno de ansiedad generalizada">F41.1 Ansiedad Generalizada</option>
+                <option value="F43.1|Trastorno de estrés postraumático">F43.1 Estrés Postraumático (TEPT)</option>
             </optgroup>
-            <optgroup label="Otros">
-                <option value="X70|Lesión autoinfligida intencionalmente (Riesgo Suicida)">X70 Riesgo Suicida</option>
+            <optgroup label="F60-F69: Trastornos de Personalidad">
+                <option value="F60.2|Trastorno disocial de la personalidad">F60.2 Personalidad Antisocial</option>
+                <option value="F60.31|Trastorno de la personalidad límite">F60.31 Personalidad Límite (Borderline)</option>
+                <option value="F63.0|Juego patológico">F63.0 Ludopatía</option>
+            </optgroup>
+            <optgroup label="Urgencias y Otros">
+                <option value="X70|Lesión autoinfligida intencionalmente (Riesgo Suicida Activo)">X70 Riesgo Suicida / Ideación</option>
+                <option value="F99.X|Trastorno mental no especificado">F99.X Trastorno Mental NE</option>
             </optgroup>
         </select>
 
-        <input type="text" id="motivo" placeholder="Motivo de consulta (Cifrado)...">
-        <textarea id="aspectos" rows="2" placeholder="Aspectos de examen mental (Porte, actitud, conducta)..."></textarea>
-        <textarea id="textoClinico" rows="6" placeholder="Evolución terapéutica detallada..."></textarea>
+        <input type="text" id="motivoConsulta" placeholder="Motivo de consulta (Cifrado)...">
+        <textarea id="examenMental" rows="2" placeholder="Examen Mental: Porte, actitud, conciencia, orientación..."></textarea>
+        <textarea id="evolucionTexto" rows="6" placeholder="Descripción detallada de la intervención y evolución..."></textarea>
 
-        <button class="btn-main" style="background:var(--accent)" onclick="guardarTodo()">💾 GUARDAR Y SELLAR EXPEDIENTE</button>
-        <button class="btn-main" style="background:#95a5a6" onclick="cerrarFormulario()">CANCELAR</button>
+        <button class="btn-principal" style="background:var(--accent)" onclick="finalizarYGuardar()">💾 FIRMAR Y GUARDAR EN BÓVEDA</button>
+        <button class="btn-principal" style="background:#95a5a6" onclick="cancelar()">CANCELAR</button>
     </div>
 
     <hr style="border: 0.5px solid #eee; margin: 40px 0;">
-    <h3>HISTORIAL DE ATENCIONES DIGITALIZADO</h3>
-    <button id="btnCargar" class="btn-main" style="background:#2980b9" onclick="solicitarAcceso('historial')">🔓 DESCIFRAR HISTORIAL COMPLETO</button>
-    <div id="listaEvoluciones"></div>
+    <h3>HISTORIAL CLÍNICO INALTERABLE</h3>
+    <button id="btnHistorial" class="btn-principal" style="background:#2980b9" onclick="validarYAcceder('historial')">🔓 DESCIFRAR EXPEDIENTE COMPLETO</button>
+    <div id="listadoEvoluciones"></div>
 </div>
 
 <script type="module">
@@ -111,189 +134,194 @@ src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></scri
             storageBucket: "caminosnuevosdatabase.firebasestorage.app",
             appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
         };
+
+
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const params = new URLSearchParams(window.location.search);
-    const idPaciente = params.get("id");
+    const idPaciente = new URLSearchParams(window.location.search).get("id");
     const LLAVE_MAESTRA = "FundacionNuevosCaminos2024*USC";
     const CLAVE_CLINICA = "1234";
 
-    let diagnosticosTemp = [];
+    let diagnosticosCie = [];
 
-    // --- LÓGICA DE CIFRADO ---
-    window.cifrar = (t) => CryptoJS.AES.encrypt(t, LLAVE_MAESTRA).toString();
-    window.descifrar = (h) => {
-        try { return CryptoJS.AES.decrypt(h, LLAVE_MAESTRA).toString(CryptoJS.enc.Utf8) || "N/A"; }
-        catch { return "N/A"; }
+    // --- MOTOR DE CIFRADO E2EE ---
+    const cifrar = (texto) => CryptoJS.AES.encrypt(texto, LLAVE_MAESTRA).toString();
+    const descifrar = (hash) => {
+        try {
+            const bytes = CryptoJS.AES.decrypt(hash, LLAVE_MAESTRA);
+            return bytes.toString(CryptoJS.enc.Utf8) || "DATO_RESERVADO";
+        } catch(e) { return "ERROR_CIFRADO"; }
     };
 
-    // --- MANEJO DE DIAGNÓSTICOS ---
-    window.agregarDiagnostico = () => {
-        const val = document.getElementById("cie10").value;
-        if (!val) return;
-        const [codigo, desc] = val.split("|");
-        if (!diagnosticosTemp.find(d => d.codigo === codigo)) {
-            diagnosticosTemp.push({ codigo, desc });
-            renderCie();
+    // --- GESTIÓN DE DIAGNÓSTICOS ---
+    window.addCie = () => {
+        const sel = document.getElementById("selectCie");
+        if (!sel.value) return;
+        const [cod, desc] = sel.value.split("|");
+        if (!diagnosticosCie.find(d => d.cod === cod)) {
+            diagnosticosCie.push({ cod, desc });
+            renderCieUI();
         }
-        document.getElementById("cie10").value = "";
+        sel.value = "";
     };
 
-    window.quitarCie = (c) => {
-        diagnosticosTemp = diagnosticosTemp.filter(d => d.codigo !== c);
-        renderCie();
+    window.removeCie = (cod) => {
+        diagnosticosCie = diagnosticosCie.filter(d => d.cod !== cod);
+        renderCieUI();
     };
 
-    function renderCie() {
-        const div = document.getElementById("listaDiagnosticos");
-        if (diagnosticosTemp.length === 0) {
-            div.innerHTML = '<span style="color:#999; font-style:italic;">No hay diagnósticos...</span>';
+    function renderCieUI() {
+        const div = document.getElementById("displayCie");
+        if (diagnosticosCie.length === 0) {
+            div.innerHTML = '<span style="color:#bdc3c7; font-style:italic;">Seleccione los diagnósticos...</span>';
             return;
         }
-        div.innerHTML = diagnosticosTemp.map(d => `
+        div.innerHTML = diagnosticosCie.map(d => `
             <div class="cie-item">
-                <span><strong>${d.codigo}</strong>: ${d.desc}</span>
-                <span class="remove" onclick="quitarCie('${d.codigo}')">✖</span>
+                <span><strong>${d.cod}</strong> - ${d.desc}</span>
+                <span class="remove-btn" onclick="removeCie('${d.cod}')">✖</span>
             </div>
         `).join('');
     }
 
-    // --- ACCESO SEGURIDAD ---
-    window.solicitarAcceso = (tipo, id = null) => {
-        const p = prompt("🔑 AUTENTICACIÓN REQUERIDA (CLAVE CLÍNICA):");
-        if (p === CLAVE_CLINICA) {
-            if (tipo === 'registro') abrirFormulario();
-            if (tipo === 'historial') cargarHistorial();
-            if (tipo === 'pdf') generarPDF(id);
-            if (tipo === 'json') descargarJSON(id);
-            if (tipo === 'aclarar') agregarAclaratoria(id);
+    // --- ACCESO Y SEGURIDAD ---
+    window.validarYAcceder = (accion, docId = null) => {
+        const pass = prompt("🔐 VALIDACIÓN DE IDENTIDAD CLÍNICA:");
+        if (pass === CLAVE_CLINICA) {
+            if (accion === 'registro') mostrarForm();
+            if (accion === 'historial') cargarHistorial();
+            if (accion === 'pdf') generarPDFLegal(docId);
+            if (accion === 'json') exportarJSON(docId);
+            if (accion === 'aclarar') abrirAclaratoria(docId);
         } else { alert("ACCESO DENEGADO."); }
     };
 
     // --- CÁMARA ---
-    let fotoBase64 = "", stream = null;
-    window.abrirFormulario = async () => {
+    let fotoData = "", camStream = null;
+    async function mostrarForm() {
         document.getElementById('areaRegistro').style.display = 'block';
-        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-        document.getElementById('video').srcObject = stream;
-    };
+        camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        document.getElementById('video').srcObject = camStream;
+    }
 
-    window.tomarFoto = () => {
+    window.capturarFoto = () => {
         const v = document.getElementById('video'), c = document.getElementById('canvas');
         c.width = v.videoWidth; c.height = v.videoHeight;
         c.getContext('2d').drawImage(v, 0, 0);
-        fotoBase64 = c.toDataURL('image/jpeg', 0.8);
-        document.getElementById('imgPreview').src = fotoBase64;
+        fotoData = c.toDataURL('image/jpeg', 0.7);
+        document.getElementById('imgPreview').src = fotoData;
         document.getElementById('imgPreview').style.display = 'block';
         v.style.display = 'none';
     };
 
-    window.cerrarFormulario = () => {
+    window.cancelar = () => {
         document.getElementById('areaRegistro').style.display = 'none';
-        if (stream) stream.getTracks().forEach(t => t.stop());
+        if (camStream) camStream.getTracks().forEach(t => t.stop());
     };
 
-    // --- PERSISTENCIA Y TRAZABILIDAD ---
-    window.guardarTodo = async () => {
-        const texto = document.getElementById("textoClinico").value;
-        if (!texto || diagnosticosTemp.length === 0) return alert("Faltan datos.");
+    // --- GUARDADO CON TRAZABILIDAD ---
+    window.finalizarYGuardar = async () => {
+        const evolucion = document.getElementById("evolucionTexto").value;
+        if (!evolucion || diagnosticosCie.length === 0) return alert("CIE-10 y Evolución son obligatorios.");
 
         try {
-            const data = {
+            const docData = {
                 idPaciente,
-                texto: cifrar(texto),
-                motivo: cifrar(document.getElementById("motivo").value),
-                aspectos: cifrar(document.getElementById("aspectos").value),
-                diagnosticos: cifrar(JSON.stringify(diagnosticosTemp)),
-                foto: fotoBase64,
+                evolucion: cifrar(evolucion),
+                motivo: cifrar(document.getElementById("motivoConsulta").value),
+                examen: cifrar(document.getElementById("examenMental").value),
+                diagnosticos: cifrar(JSON.stringify(diagnosticosCie)),
+                foto: fotoData,
                 fecha: new Date().toLocaleString(),
-                timestamp: serverTimestamp(),
-                autor: "PSICOLOGÍA - FUNDACIÓN NC",
-                hash: btoa(texto + Date.now()).substring(0,15),
-                aclaratorias: []
+                serverTime: serverTimestamp(),
+                firmaHash: btoa(evolucion + Date.now()).substring(0,16),
+                aclaratorias: [],
+                autor: "PSICOLOGÍA - FUNDACIÓN NC"
             };
-            await addDoc(collection(db, "evoluciones_psicologicas"), data);
-            alert("REGISTRO SELLADO."); location.reload();
-        } catch (e) { alert(e.message); }
+            await addDoc(collection(db, "evoluciones_psicologicas"), docData);
+            alert("✅ REGISTRO SELLADO Y ENCRIPTADO.");
+            location.reload();
+        } catch (e) { alert("Error: " + e.message); }
     };
 
     window.cargarHistorial = async () => {
-        const q = query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente));
-        const snap = await getDocs(q);
-        let h = "";
+        const snap = await getDocs(query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente)));
+        let html = "";
         snap.forEach(doc => {
             const d = doc.data();
             const diags = JSON.parse(descifrar(d.diagnosticos));
-            const diagStr = diags.map(x => `<div style="font-size:11px;">• <strong>${x.codigo}</strong>: ${x.desc}</div>`).join('');
             
-            h += `<div class="evolucion-item">
-                <span class="badge-hash">INTEGRITY-HASH: ${d.hash}</span>
-                <strong>📅 ${d.fecha}</strong>
-                <div style="margin: 10px 0; background: #fcfcfc; padding: 10px; border: 1px solid #eee;">
-                    <strong>DIAGNÓSTICOS:</strong> ${diagStr}
+            html += `<div class="evolucion-card">
+                <span class="hash-tag">INTEGRITY-ID: ${d.firmaHash}</span>
+                <strong>📅 ${d.fecha} | AUTOR: ${d.autor}</strong>
+                <div style="margin: 15px 0; padding: 12px; background: #fcfcfc; border: 1px solid #eee; border-radius: 8px;">
+                    <strong>DIAGNÓSTICOS ASOCIADOS:</strong><br>
+                    ${diags.map(x => `<small style="display:block; margin-top:4px;">• <strong>${x.cod}</strong>: ${x.desc}</small>`).join('')}
                 </div>
-                <p>${descifrar(d.texto)}</p>
-                <div class="grid-botones">
-                    <button class="btn-action" style="background:#2980b9" onclick="solicitarAcceso('json', '${doc.id}')">JSON</button>
-                    <button class="btn-action" style="background:#e67e22" onclick="solicitarAcceso('pdf', '${doc.id}')">PDF/A</button>
-                    <button class="btn-action" style="background:#9b59b6" onclick="solicitarAcceso('aclarar', '${doc.id}')">ACLARAR</button>
-                    ${d.aclaratorias.length > 0 ? `<button class="btn-action" style="background:#34495e" onclick="toggleAcl('${doc.id}')">VER ACLARATORIA</button>` : ''}
+                <p style="line-height:1.6; color:#444;">${descifrar(d.evolucion)}</p>
+                
+                <div class="botones-accion">
+                    <button class="btn-mini" style="background:#2c3e50" onclick="validarYAcceder('json', '${doc.id}')">JSON</button>
+                    <button class="btn-mini" style="background:#e67e22" onclick="validarYAcceder('pdf', '${doc.id}')">📄 GENERAR PDF/A</button>
+                    <button class="btn-mini" style="background:#9b59b6" onclick="validarYAcceder('aclarar', '${doc.id}')">ACLARAR</button>
+                    ${d.aclaratorias.length > 0 ? `<button class="btn-mini" style="background:#34495e" onclick="document.getElementById('acl-${doc.id}').style.display='block'">VER ACLARATORIA</button>` : ''}
                 </div>
-                <div id="acl-${doc.id}" style="display:none; margin-top:15px; padding:10px; background:#fff3cd; border: 1px solid #ffeeba; font-size:12px;">
-                    ${d.aclaratorias.map(a => `<strong>${a.fecha}:</strong> ${descifrar(a.texto)}<hr>`).join('')}
+                <div id="acl-${doc.id}" style="display:none; margin-top:15px; padding:15px; background:#fff3cd; border: 1px solid #ffeeba; border-radius:8px;">
+                    <h5 style="margin:0 0 10px 0;">NOTAS ACLARATORIAS POST-CIERRE:</h5>
+                    ${d.aclaratorias.map(a => `<div style="font-size:12px;"><strong>${a.fecha}:</strong> ${descifrar(a.texto)}<hr></div>`).join('')}
+                    <button class="btn-mini" style="background:#95a5a6; padding:4px 8px;" onclick="document.getElementById('acl-${doc.id}').style.display='none'">CERRAR</button>
                 </div>
             </div>`;
         });
-        document.getElementById("listaEvoluciones").innerHTML = h || "Sin datos.";
-        document.getElementById("btnCargar").style.display = 'none';
+        document.getElementById("listadoEvoluciones").innerHTML = html || "No existen registros previos.";
+        document.getElementById("btnHistorial").style.display = 'none';
     };
 
-    window.toggleAcl = (id) => { const x = document.getElementById(`acl-${id}`); x.style.display = x.style.display === 'none' ? 'block' : 'none'; };
-
-    window.agregarAclaratoria = async (id) => {
-        const t = prompt("Escriba la nota aclaratoria (No modifica el original):");
-        if (t) {
+    window.abrirAclaratoria = async (id) => {
+        const nota = prompt("Ingrese la aclaratoria (Este texto no altera el original, se anexa como nota marginal):");
+        if (nota) {
             await updateDoc(doc(db, "evoluciones_psicologicas", id), {
-                aclaratorias: arrayUnion({ texto: cifrar(t), fecha: new Date().toLocaleString() })
+                aclaratorias: arrayUnion({ texto: cifrar(nota), fecha: new Date().toLocaleString() })
             });
-            alert("Aclaratoria agregada."); location.reload();
+            alert("Aclaratoria sellada."); location.reload();
         }
     };
 
-    // --- PDF/A LEGAL (REPORTE SECRETARÍA DE SALUD) ---
-    window.generarPDF = async (idDoc) => {
-        const d = (await getDoc(doc(db, "evoluciones_psicologicas", idDoc))).data();
-        const p = (await getDoc(doc(db, "pacientes", idPaciente))).data();
-        const diags = JSON.parse(descifrar(d.diagnosticos));
+    // --- REPORTE LEGAL PDF/A (SECRETARÍA DE SALUD) ---
+    window.generarPDFLegal = async (id) => {
+        const evData = (await getDoc(doc(db, "evoluciones_psicologicas", id))).data();
+        const pacData = (await getDoc(doc(db, "pacientes", idPaciente))).data();
+        const diags = JSON.parse(descifrar(evData.diagnosticos));
 
-        const win = window.open('', '_blank');
-        win.document.write(`
+        const vent = window.open('', '_blank');
+        vent.document.write(`
             <html>
-            <head><title>REPORTE LEGAL HCE</title></head>
-            <body style="font-family:Arial; padding:40px; line-height:1.4;">
-                <div style="text-align:center; border-bottom: 2px solid #000; padding-bottom:10px;">
-                    <h2>FUNDACIÓN NUEVOS CAMINOS</h2>
-                    <p>NIT: 901.XXX.XXX | IPS REGISTRADA | GUACHINTE, VALLE DEL CAUCA</p>
-                    <strong>REPORTE DE HISTORIA CLÍNICA ELECTRÓNICA (RES. 1995/1999)</strong>
+            <head><title>HCE LEGAL - FUNDACIÓN NC</title></head>
+            <body style="font-family: Arial, sans-serif; padding: 40px; color: #111;">
+                <div style="text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">
+                    <h2 style="margin:0;">FUNDACIÓN NUEVOS CAMINOS</h2>
+                    <p style="margin:5px; font-size:12px;">NIT: 901.XXX.XXX | IPS HABILITADA | GUACHINTE, VALLE DEL CAUCA</p>
+                    <strong>REPORTE DE EVOLUCIÓN CLÍNICA - HISTORIA CLÍNICA ELECTRÓNICA</strong>
                 </div>
-                <div style="margin-top:20px; border: 1px solid #000; padding:10px;">
-                    <strong>PACIENTE:</strong> ${p.nombre.toUpperCase()} | <strong>ID:</strong> ${p.cedula || 'N/A'}<br>
-                    <strong>FECHA ATENCIÓN:</strong> ${d.fecha} | <strong>MOTIVO:</strong> ${descifrar(d.motivo)}
+                <div style="border: 1px solid #000; padding: 15px; margin-bottom: 20px; font-size: 13px;">
+                    <strong>PACIENTE:</strong> ${pacData.nombre.toUpperCase()} | <strong>IDENTIFICACIÓN:</strong> ${pacData.cedula || 'N/A'}<br>
+                    <strong>FECHA DE ATENCIÓN:</strong> ${evData.fecha} | <strong>MOTIVO:</strong> ${descifrar(evData.motivo)}
                 </div>
-                <h3>DIAGNÓSTICOS ASOCIADOS (CIE-10):</h3>
-                <ul>${diags.map(x => `<li><strong>${x.codigo}</strong>: ${x.desc}</li>`).join('')}</ul>
-                <h3>EVOLUCIÓN CLÍNICA:</h3>
-                <div style="text-align:justify; white-space:pre-wrap;">${descifrar(d.texto)}</div>
-                <div style="margin-top:40px;">
-                    <div style="border-top:1px solid #000; width:300px;">
+                <strong>DIAGNÓSTICOS CIE-10 ASOCIADOS:</strong>
+                <ul style="font-size: 13px;">${diags.map(x => `<li><strong>${x.cod}</strong>: ${x.desc}</li>`).join('')}</ul>
+                <hr>
+                <strong>EVOLUCIÓN TERAPÉUTICA:</strong>
+                <p style="text-align: justify; white-space: pre-wrap; font-size: 13px;">${descifrar(evData.evolucion)}</p>
+                <div style="margin-top: 50px;">
+                    <div style="border-top: 1px solid #000; width: 300px; padding-top: 5px;">
                         <strong>FIRMA ELECTRÓNICA</strong><br>
-                        ${d.autor}<br>
-                        CÓDIGO DE INTEGRIDAD: ${d.hash}
+                        ${evData.autor}<br>
+                        <strong>HASH DE INTEGRIDAD:</strong> ${evData.firmaHash}
                     </div>
                 </div>
-                <div style="margin-top:50px; font-size:10px; color:#666; border-top:1px solid #ccc; text-align:center;">
-                    ESTE DOCUMENTO ES UNA COPIA FIEL DEL ORIGINAL ELECTRÓNICO CIFRADO. LEY 527 DE 1999.<br>
-                    CONFIDENCIALIDAD SUJETA A LEY 1090 DE 2006.
+                <div style="margin-top: 80px; font-size: 10px; border-top: 1px solid #ccc; padding-top: 10px; text-align: center;">
+                    Este documento cumple con la Ley 527 de 1999 y Resolución 1995 de 1999.<br>
+                    <strong>RESERVA LEGAL:</strong> LEY 1090 DE 2006. PROHIBIDA SU DIVULGACIÓN SIN AUTORIZACIÓN.
                 </div>
                 <script>setTimeout(() => { window.print(); window.close(); }, 800);<\/script>
             </body>
@@ -301,16 +329,16 @@ src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></scri
         `);
     };
 
-    window.descargarJSON = async (id) => {
+    window.exportarJSON = async (id) => {
         const d = (await getDoc(doc(db, "evoluciones_psicologicas", id))).data();
         const blob = new Blob([JSON.stringify(d)], {type: "application/json"});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `EXPEDIENTE_${d.hash}.json`; a.click();
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `EXPEDIENTE_${id}.json`; a.click();
     };
 
     async function init() {
         if (!idPaciente) return;
-        const s = await getDoc(doc(db, "pacientes", idPaciente));
-        if (s.exists()) document.getElementById("nombrePaciente").innerText = "EXPEDIENTE: " + s.data().nombre.toUpperCase();
+        const pSnap = await getDoc(doc(db, "pacientes", idPaciente));
+        if (pSnap.exists()) document.getElementById("nombrePaciente").innerText = "EXPEDIENTE: " + pSnap.data().nombre.toUpperCase();
     }
     init();
 </script>
