@@ -9,46 +9,64 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-      <style>
-        :root { --primary: #0f3460; --accent: #27ae60; --danger: #e74c3c; --bg: #1a1a2e; }
+     <style>
+        :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #1a1a2e; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: #333; margin: 0; padding: 20px; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 40px; border-radius: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
         .header-status { background: #d1e7dd; color: #0f5132; padding: 15px; border-radius: 12px; font-size: 13px; margin-bottom: 25px; font-weight: bold; border: 1px solid #badbcc; text-align: center; }
         .btn-principal { background: var(--primary); color: white; padding: 18px; width: 100%; border: none; border-radius: 15px; font-size: 17px; font-weight: bold; cursor: pointer; margin-bottom: 20px; transition: 0.3s; }
-        #areaRegistro { display: none; background: #f8f9fa; padding: 30px; border-radius: 20px; border: 1.5px solid #dee2e6; margin-bottom: 40px; }
-        textarea, input, select { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #ced4da; margin-bottom: 12px; font-size: 14px; box-sizing: border-box; }
+        
+        /* ESTRUCTURA DE EVOLUCIÓN EXACTA A TU IMAGEN */
         .evolucion-card { text-align: left; background: #fff; border-radius: 15px; padding: 25px; margin-bottom: 25px; position: relative; box-shadow: 0 8px 25px rgba(0,0,0,0.1); border: 1px solid #eee; }
         .hash-tag { position: absolute; top: 12px; right: 20px; font-size: 10px; color: var(--accent); font-family: 'Courier New', monospace; font-weight: bold; }
         .cie-box { background: #f9f9f9; border-radius: 10px; padding: 15px; margin: 15px 0; border: 1px solid #eee; font-size: 13px; }
-        .bloque-aclaratoria { background: #fff9e6; padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px solid #ffeeba; font-size: 12px; }
-        .btn-mini { padding: 12px 18px; border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-right: 8px; }
+        
+        /* FORMATO LEGAL DE ACLARATORIA */
+        .bloque-aclaratoria { background: #fff9e6; padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px solid #ffeeba; font-size: 12px; border-left: 5px solid #f1c40f; }
+        
+        /* BOTONES DE ACCIÓN */
+        .botones-accion { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+        .btn-mini { padding: 12px 18px; border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+        
+        /* MODALES EMERGENTES */
         .modal-legal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
-        .modal-content { background: white; margin: 10% auto; padding: 35px; border-radius: 25px; width: 85%; max-width: 500px; border: 3px solid var(--primary); }
+        .modal-content { background: white; margin: 10% auto; padding: 35px; border-radius: 25px; width: 85%; max-width: 550px; border: 3px solid var(--primary); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 id="nombrePaciente">CARGANDO EXPEDIENTE MAESTRO...</h2>
-    <div class="header-status">🔒 PROTECCIÓN USC | AES-256 | AUDITORÍA LEY 1995 ACTIVA</div>
+    <h2 id="nombrePaciente">EXPEDIENTE MAESTRO INALTERABLE</h2>
+    <div class="header-status">🔒 PROTECCIÓN USC | AES-256 BIT | ESTÁNDAR LEGAL RES. 1995/99</div>
 
-    <button class="btn-principal" onclick="validarYAcceder('registro')">📂 NUEVA EVOLUCIÓN CLÍNICA</button>
+    <button class="btn-principal" onclick="validarYAcceder('registro')">📂 INICIAR NUEVA EVOLUCIÓN CLÍNICA</button>
 
-    <div id="areaRegistro">
+    <div id="areaRegistro" style="display:none; background:#f8f9fa; padding:30px; border-radius:20px; border:1.5px solid #dee2e6; margin-bottom:40px;">
         <video id="video" style="width:100%; border-radius:15px; background:#000;" autoplay playsinline></video>
         <canvas id="canvas" style="display:none;"></canvas>
         <img id="imgPreview" style="display:none; width:100%; border-radius:15px; border: 4px solid #fff; margin-bottom:20px;">
-        <button class="btn-principal" style="background:#34495e" onclick="capturarFoto()">📸 CAPTURAR ANEXO</button>
+        <button class="btn-principal" style="background:#34495e" onclick="capturarFoto()">📸 CAPTURAR ANEXO FOTOGRÁFICO</button>
 
-        <div id="displayCie" style="background:#fff; border:2px solid var(--primary); padding:15px; border-radius:12px; margin-bottom:15px; min-height:40px;"></div>
+        <div id="displayCie" class="cie-box">Seleccione diagnósticos...</div>
         <select id="selectCie" onchange="addCie()">
-            <option value="">-- SELECCIONAR CIE-10 (F00-F99) --</option>
-            <option value="F14.2|Dependencia a cocaína / Bazuco">F14.2 Cocaína/Bazuco</option>
-            <option value="F22.0|Trastorno delirante permanente">F22.0 Paranoia</option>
-            <option value="F25.0|Trastorno esquizoafectivo de tipo maníaco">F25.0 Esquizoafectivo</option>
+            <option value="">-- VADEMÉCUM CIE-10 (F00-F99) --</option>
+            <optgroup label="F10-F19: Sustancias">
+                <option value="F10.2|Dependencia al alcohol">F10.2 Alcohol</option>
+                <option value="F11.2|Dependencia a opioides (Heroína)">F11.2 Heroína</option>
+                <option value="F14.2|Dependencia a cocaína / Bazuco">F14.2 Cocaína/Bazuco</option>
+                <option value="F19.2|Policonsumo de múltiples drogas">F19.2 Policonsumo</option>
+            </optgroup>
+            <optgroup label="F30-F39: Afectivos">
+                <option value="F31.1|Trastorno Bipolar Maníaco">F31.1 Bipolar</option>
+                <option value="F32.2|Depresión Grave">F32.2 Depresión</option>
+            </optgroup>
+            <optgroup label="Otros">
+                <option value="F60.31|Personalidad Límite (Borderline)">F60.31 Borderline</option>
+                <option value="X70|Riesgo Suicida Activo">X70 Riesgo Suicida</option>
+            </optgroup>
         </select>
 
-        <input type="text" id="motivo" placeholder="Motivo de la consulta...">
+        <input type="text" id="motivo" placeholder="Motivo de la consulta (Cifrado)...">
         <textarea id="evolucionTexto" rows="6" placeholder="Evolución clínica detallada..."></textarea>
         <button class="btn-principal" style="background:var(--accent)" onclick="finalizarYGuardar()">💾 FIRMAR Y SELLAR EN BÓVEDA</button>
         <button class="btn-principal" style="background:#95a5a6" onclick="location.reload()">CANCELAR</button>
@@ -58,6 +76,7 @@
     <div id="listadoEvoluciones"></div>
 </div>
 
+<!-- MODAL MAESTRO -->
 <div id="modalMaestro" class="modal-legal">
     <div class="modal-content">
         <h3 id="modalTitulo" style="color:var(--primary); margin-top:0; border-bottom:3px solid var(--primary);"></h3>
@@ -138,9 +157,12 @@
 
     window.addCie = () => {
         const s = document.getElementById("selectCie");
+        if (!s.value) return;
         const [cod, desc] = s.value.split("|");
-        diagnosticosCie.push({ cod, desc });
-        document.getElementById("displayCie").innerHTML = diagnosticosCie.map(x => `• <strong>${x.cod}</strong>: ${x.desc}<br>`).join('');
+        if (!diagnosticosCie.find(x => x.cod === cod)) {
+            diagnosticosCie.push({ cod, desc });
+            document.getElementById("displayCie").innerHTML = diagnosticosCie.map(x => `• <strong>${x.cod}</strong>: ${x.desc}<br>`).join('');
+        }
         s.value = "";
     };
 
@@ -167,22 +189,26 @@
         let h = "";
         snap.forEach(docSnap => {
             const d = docSnap.data();
-            const diags = JSON.parse(descifrar(d.diagnosticos || d.cie10_array));
+            let diags = [];
+            try { diags = JSON.parse(descifrar(d.diagnosticos || d.cie10_array)); } catch(e) { diags = []; }
+            
             h += `<div class="evolucion-card">
                 <span class="hash-tag">HASH-ID: ${d.firmaHash || d.hash}</span>
-                <p>🗓️ <strong>${d.fecha || d.fechaHora}</strong></p>
+                <strong>📅 ${d.fecha || d.fechaHora}</strong>
                 <div class="cie-box"><strong>DIAGNÓSTICOS (CIE-10):</strong><br>${diags.map(x => `• ${x.cod}: ${x.desc}`).join('<br>')}</div>
                 <p>${descifrar(d.evolucion || d.texto)}</p>
-                <p style="font-size:10px; color:gray;">Firmado por: ${descifrar(d.autor || '')}</p>
+                <p style="font-size:10px; color:gray;">Firmado por: [${descifrar(d.autor || '')}]</p>
+                
                 <div class="botones-accion">
                     <button class="btn-mini" style="background:#2c3e50" onclick="validarYAcceder('json', '${docSnap.id}')">JSON</button>
                     <button class="btn-mini" style="background:#e67e22" onclick="validarYAcceder('pdf', '${docSnap.id}')">📄 PDF/A</button>
                     <button class="btn-mini" style="background:#9b59b6" onclick="validarYAcceder('aclarar', '${docSnap.id}')">ACLARAR</button>
                     ${(d.aclaratorias && d.aclaratorias.length > 0) ? `<button class="btn-mini" style="background:#34495e" onclick="document.getElementById('acl-${docSnap.id}').style.display='block'">VER ACLARATORIA</button>` : ''}
                 </div>
+                
                 <div id="acl-${docSnap.id}" class="bloque-aclaratoria" style="display:none;">
-                    <strong>NOTAS ACLARATORIAS (RES. 1995/99):</strong><hr>
-                    ${d.aclaratorias ? d.aclaratorias.map(a => `<div>[${a.fecha}] <strong>${descifrar(a.autor || '')}:</strong> ${descifrar(a.texto)}</div>`).join('<hr>') : ''}
+                    <strong>NOTAS ACLARATORIAS (RES. 1995/99):</strong><hr style="border:0.5px solid #ffeeba;">
+                    ${d.aclaratorias ? d.aclaratorias.map(a => `<div style="margin-bottom:8px;"><strong>[${a.fecha}]</strong> <strong>${descifrar(a.autor || '')}:</strong> ${descifrar(a.texto)}</div>`).join('') : ''}
                     <button class="btn-mini" style="background:#95a5a6; margin-top:10px;" onclick="document.getElementById('acl-${docSnap.id}').style.display='none'">CERRAR</button>
                 </div>
             </div>`;
@@ -192,7 +218,7 @@
     };
 
     window.prepararAclaratoria = (id) => {
-        const h = `<textarea id="tAcl" rows="4" placeholder="Nota aclaratoria..."></textarea><input type="text" id="autAcl" placeholder="Nombre profesional">`;
+        const h = `<textarea id="tAcl" rows="4" placeholder="Contenido legal..."></textarea><input type="text" id="autAcl" placeholder="Nombre profesional">`;
         abrirModal("🖋️ NUEVA NOTA ACLARATORIA", h, async () => {
             const nota = document.getElementById("tAcl").value;
             const aut = document.getElementById("autAcl").value;
@@ -208,14 +234,12 @@
     window.generarPDFLegal = async (id) => {
         const ev = (await getDoc(doc(db, "evoluciones_psicologicas", id))).data();
         const pac = (await getDoc(doc(db, "pacientes", idPaciente))).data();
-        const diags = JSON.parse(descifrar(ev.diagnosticos));
         const vent = window.open('', '_blank');
         vent.document.write(`<html><body style="font-family:'Times New Roman'; padding:40px;">
-            <h2 style="text-align:center;">FUNDACIÓN NUEVOS CAMINOS</h2>
+            <h2 style="text-align:center;">FUNDACIÓN NUEVOS CAMINOS - IPS</h2>
             <p><strong>PACIENTE:</strong> ${pac.nombre.toUpperCase()} | <strong>FECHA:</strong> ${ev.fecha}</p>
-            <p><strong>DIAGNÓSTICOS:</strong><br>${diags.map(x=>`• ${x.cod}: ${x.desc}`).join('<br>')}</p>
-            <p>${descifrar(ev.evolucion)}</p>
-            <p style="margin-top:40px; border-top:1px solid #000; width:300px;">Firmado por: ${descifrar(ev.autor)}<br>HASH: ${ev.firmaHash}</p>
+            <p style="white-space:pre-wrap;">${descifrar(ev.evolucion)}</p>
+            <p style="border-top:1px solid #000; padding-top:10px;">Firma: ${descifrar(ev.autor)} | HASH: ${ev.firmaHash}</p>
             <script>setTimeout(()=>window.print(), 1000);<\/script></body></html>`);
     };
 
