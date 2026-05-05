@@ -9,45 +9,51 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-     <style>
+  <style>
         :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #1a1a2e; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: #333; margin: 0; padding: 20px; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 40px; border-radius: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
         .header-status { background: #d1e7dd; color: #0f5132; padding: 15px; border-radius: 12px; font-size: 13px; margin-bottom: 25px; font-weight: bold; border: 1px solid #badbcc; text-align: center; }
         .btn-principal { background: var(--primary); color: white; padding: 18px; width: 100%; border: none; border-radius: 15px; font-size: 17px; font-weight: bold; cursor: pointer; margin-bottom: 20px; transition: 0.3s; }
+        #areaRegistro { display: none; background: #f8f9fa; padding: 30px; border-radius: 20px; border: 1.5px solid #dee2e6; margin-bottom: 40px; animation: slideDown 0.5s; }
+        textarea, input, select { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #ced4da; margin-bottom: 12px; font-size: 14px; box-sizing: border-box; }
         
-        /* ESTRUCTURA DE EVOLUCIÓN EXACTA A TU IMAGEN */
+        /* ESTILO EXACTO DE TU ESTRUCTURA VISUAL */
         .evolucion-card { text-align: left; background: #fff; border-radius: 15px; padding: 25px; margin-bottom: 25px; position: relative; box-shadow: 0 8px 25px rgba(0,0,0,0.1); border: 1px solid #eee; }
         .hash-tag { position: absolute; top: 12px; right: 20px; font-size: 10px; color: var(--accent); font-family: 'Courier New', monospace; font-weight: bold; }
         .cie-box { background: #f9f9f9; border-radius: 10px; padding: 15px; margin: 15px 0; border: 1px solid #eee; font-size: 13px; }
         
-        /* FORMATO LEGAL DE ACLARATORIA */
+        /* BLOQUE LEGAL AMARILLO DE ACLARATORIA */
         .bloque-aclaratoria { background: #fff9e6; padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px solid #ffeeba; font-size: 12px; border-left: 5px solid #f1c40f; }
         
-        /* BOTONES DE ACCIÓN */
         .botones-accion { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
-        .btn-mini { padding: 12px 18px; border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; }
-        
-        /* MODALES EMERGENTES */
+        .btn-mini { padding: 12px 18px; border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-right: 8px; }
+
+        /* VENTANAS EMERGENTES (MODALES) PROFESIONALES */
         .modal-legal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
-        .modal-content { background: white; margin: 10% auto; padding: 35px; border-radius: 25px; width: 85%; max-width: 550px; border: 3px solid var(--primary); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 8% auto; padding: 35px; border-radius: 25px; width: 85%; max-width: 550px; border: 3px solid var(--primary); box-shadow: 0 30px 70px rgba(0,0,0,0.6); }
+        .modal-header { color: var(--primary); border-bottom: 3px solid var(--primary); padding-bottom: 12px; margin-bottom: 20px; font-size: 18px; font-weight: bold; display: flex; align-items: center; }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 id="nombrePaciente">EXPEDIENTE MAESTRO INALTERABLE</h2>
-    <div class="header-status">🔒 PROTECCIÓN USC | AES-256 BIT | ESTÁNDAR LEGAL RES. 1995/99</div>
+    <h2 id="nombrePaciente">EXPEDIENTE MAESTRO</h2>
+    <div class="header-status">🔒 PROTECCIÓN USC | AES-256 | ESTÁNDAR LEGAL RES. 1995/99 EXHAUSTIVO</div>
 
     <button class="btn-principal" onclick="validarYAcceder('registro')">📂 INICIAR NUEVA EVOLUCIÓN CLÍNICA</button>
 
-    <div id="areaRegistro" style="display:none; background:#f8f9fa; padding:30px; border-radius:20px; border:1.5px solid #dee2e6; margin-bottom:40px;">
+    <div id="areaRegistro">
         <video id="video" style="width:100%; border-radius:15px; background:#000;" autoplay playsinline></video>
         <canvas id="canvas" style="display:none;"></canvas>
         <img id="imgPreview" style="display:none; width:100%; border-radius:15px; border: 4px solid #fff; margin-bottom:20px;">
         <button class="btn-principal" style="background:#34495e" onclick="capturarFoto()">📸 CAPTURAR ANEXO FOTOGRÁFICO</button>
 
-        <div id="displayCie" class="cie-box">Seleccione diagnósticos...</div>
+        <label style="font-weight:bold; font-size:14px; display:block; margin:10px 0;">DIAGNÓSTICOS (CIE-10):</label>
+        <div id="displayCie" class="cie-box">Seleccione diagnósticos del menú...</div>
+        
         <select id="selectCie" onchange="addCie()">
             <option value="">-- VADEMÉCUM CIE-10 (F00-F99) --</option>
             <optgroup label="F10-F19: Sustancias">
@@ -56,9 +62,14 @@
                 <option value="F14.2|Dependencia a cocaína / Bazuco">F14.2 Cocaína/Bazuco</option>
                 <option value="F19.2|Policonsumo de múltiples drogas">F19.2 Policonsumo</option>
             </optgroup>
+            <optgroup label="F20-F29: Esquizofrenia">
+                <option value="F20.0|Esquizofrenia paranoide">F20.0 Esq. Paranoide</option>
+                <option value="F22.0|Trastorno delirante permanente">F22.0 Paranoia</option>
+                <option value="F25.0|Trastorno esquizoafectivo de tipo maníaco">F25.0 Esquizoafectivo</option>
+            </optgroup>
             <optgroup label="F30-F39: Afectivos">
                 <option value="F31.1|Trastorno Bipolar Maníaco">F31.1 Bipolar</option>
-                <option value="F32.2|Depresión Grave">F32.2 Depresión</option>
+                <option value="F32.2|Episodio depresivo grave sin síntomas psicóticos">F32.2 Depresión Grave</option>
             </optgroup>
             <optgroup label="Otros">
                 <option value="F60.31|Personalidad Límite (Borderline)">F60.31 Borderline</option>
@@ -66,8 +77,8 @@
             </optgroup>
         </select>
 
-        <input type="text" id="motivo" placeholder="Motivo de la consulta (Cifrado)...">
-        <textarea id="evolucionTexto" rows="6" placeholder="Evolución clínica detallada..."></textarea>
+        <input type="text" id="motivoConsulta" placeholder="Motivo de la consulta (Cifrado)...">
+        <textarea id="evolucionTexto" rows="6" placeholder="Descripción detallada de la intervención..."></textarea>
         <button class="btn-principal" style="background:var(--accent)" onclick="finalizarYGuardar()">💾 FIRMAR Y SELLAR EN BÓVEDA</button>
         <button class="btn-principal" style="background:#95a5a6" onclick="location.reload()">CANCELAR</button>
     </div>
@@ -76,10 +87,12 @@
     <div id="listadoEvoluciones"></div>
 </div>
 
-<!-- MODAL MAESTRO -->
+<!-- MODAL MAESTRO INTEGRAL -->
 <div id="modalMaestro" class="modal-legal">
     <div class="modal-content">
-        <h3 id="modalTitulo" style="color:var(--primary); margin-top:0; border-bottom:3px solid var(--primary);"></h3>
+        <div class="modal-header">
+            <span id="modalIcono"></span>&nbsp;<span id="modalTitulo"></span>
+        </div>
         <div id="modalCuerpo"></div>
         <div style="margin-top:25px; display:flex; gap:12px;">
             <button id="btnModalAccion" class="btn-mini" style="background:var(--accent); flex:1; padding:15px;">AUTORIZAR</button>
@@ -90,7 +103,7 @@
 
 <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, collection, addDoc, query, where, getDocs, serverTimestamp, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import {  getFirestore, doc, getDoc, collection, addDoc, query, where, getDocs, serverTimestamp, updateDoc, arrayUnion  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
             authDomain: "caminosnuevosdatabase.firebaseapp.com",
@@ -109,6 +122,7 @@
     let diagnosticosCie = [];
     let fotoData = "", camStream = null;
 
+    // MOTOR DE CIFRADO E2EE
     const cifrar = (t) => CryptoJS.AES.encrypt(t, LLAVE_MAESTRA).toString();
     const descifrar = (h) => {
         try { 
@@ -117,7 +131,8 @@
         } catch(e) { return "[]"; }
     };
 
-    window.abrirModal = (tit, html, func) => {
+    window.abrirModal = (icon, tit, html, func) => {
+        document.getElementById("modalIcono").innerText = icon;
         document.getElementById("modalTitulo").innerText = tit;
         document.getElementById("modalCuerpo").innerHTML = html;
         document.getElementById("btnModalAccion").onclick = func;
@@ -127,7 +142,7 @@
 
     window.validarYAcceder = (tipo, docId = null) => {
         const h = `<p>Ingrese su clave de firma digital autorizada:</p><input type="password" id="passM" style="width:100%; padding:12px; border:2px solid #ccc; border-radius:10px;">`;
-        abrirModal("🔒 AUTENTICACIÓN DIGITAL", h, async () => {
+        abrirModal("🔒", "AUTENTICACIÓN DIGITAL", h, async () => {
             if (document.getElementById("passM").value === CLAVE_CLINICA) {
                 cerrarModal();
                 if (tipo === 'registro') activarCamara();
@@ -173,7 +188,7 @@
         await addDoc(collection(db, "evoluciones_psicologicas"), {
             idPaciente,
             evolucion: cifrar(ev),
-            motivo: cifrar(document.getElementById("motivo").value || "N/A"),
+            motivo: cifrar(document.getElementById("motivoConsulta").value),
             diagnosticos: cifrar(JSON.stringify(diagnosticosCie)),
             foto: fotoData,
             fecha: new Date().toLocaleString(),
@@ -186,15 +201,13 @@
 
     window.cargarHistorial = async () => {
         const snap = await getDocs(query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente)));
-        let h = "";
+        let html = "";
         snap.forEach(docSnap => {
             const d = docSnap.data();
-            let diags = [];
-            try { diags = JSON.parse(descifrar(d.diagnosticos || d.cie10_array)); } catch(e) { diags = []; }
-            
-            h += `<div class="evolucion-card">
+            let diags = JSON.parse(descifrar(d.diagnosticos || d.cie10_array));
+            html += `<div class="evolucion-card">
                 <span class="hash-tag">HASH-ID: ${d.firmaHash || d.hash}</span>
-                <strong>📅 ${d.fecha || d.fechaHora}</strong>
+                <p>🗓️ <strong>${d.fecha || d.fechaHora}</strong></p>
                 <div class="cie-box"><strong>DIAGNÓSTICOS (CIE-10):</strong><br>${diags.map(x => `• ${x.cod}: ${x.desc}`).join('<br>')}</div>
                 <p>${descifrar(d.evolucion || d.texto)}</p>
                 <p style="font-size:10px; color:gray;">Firmado por: [${descifrar(d.autor || '')}]</p>
@@ -208,23 +221,33 @@
                 
                 <div id="acl-${docSnap.id}" class="bloque-aclaratoria" style="display:none;">
                     <strong>NOTAS ACLARATORIAS (RES. 1995/99):</strong><hr style="border:0.5px solid #ffeeba;">
-                    ${d.aclaratorias ? d.aclaratorias.map(a => `<div style="margin-bottom:8px;"><strong>[${a.fecha}]</strong> <strong>${descifrar(a.autor || '')}:</strong> ${descifrar(a.texto)}</div>`).join('') : ''}
+                    ${d.aclaratorias ? d.aclaratorias.map(a => `<div style="margin-bottom:8px;"><strong>[${a.fecha}]</strong> <strong>Motivo: ${descifrar(a.motivo || '')}:</strong> ${descifrar(a.texto)}<br><small>Por: ${descifrar(a.autor || '')}</small></div>`).join('') : ''}
                     <button class="btn-mini" style="background:#95a5a6; margin-top:10px;" onclick="document.getElementById('acl-${docSnap.id}').style.display='none'">CERRAR</button>
                 </div>
             </div>`;
         });
-        document.getElementById("listadoEvoluciones").innerHTML = h || "Sin registros.";
+        document.getElementById("listadoEvoluciones").innerHTML = html || "Sin registros.";
         document.getElementById("btnHistorial").style.display = 'none';
     };
 
     window.prepararAclaratoria = (id) => {
-        const h = `<textarea id="tAcl" rows="4" placeholder="Contenido legal..."></textarea><input type="text" id="autAcl" placeholder="Nombre profesional">`;
-        abrirModal("🖋️ NUEVA NOTA ACLARATORIA", h, async () => {
+        const h = `
+            <select id="motivoAcl" style="margin-bottom:12px;">
+                <option value="Error de digitación o transcripción">Error de digitación</option>
+                <option value="Omisión involuntaria de hallazgo clínico">Omisión de hallazgo</option>
+                <option value="Aclaración solicitada por Auditoría">Aclaración por Auditoría</option>
+                <option value="Adición de resultados paraclínicos">Adición de paraclínicos</option>
+            </select>
+            <textarea id="tAcl" rows="4" placeholder="Contenido legal de la aclaratoria..."></textarea>
+            <input type="text" id="autAcl" placeholder="Nombre completo del profesional">
+        `;
+        abrirModal("🖋️", "NUEVA NOTA ACLARATORIA", h, async () => {
             const nota = document.getElementById("tAcl").value;
+            const mot = document.getElementById("motivoAcl").value;
             const aut = document.getElementById("autAcl").value;
             if (nota && aut) {
                 await updateDoc(doc(db, "evoluciones_psicologicas", id), {
-                    aclaratorias: arrayUnion({ texto: cifrar(nota), autor: cifrar(aut), fecha: new Date().toLocaleString() })
+                    aclaratorias: arrayUnion({ texto: cifrar(nota), motivo: cifrar(mot), autor: cifrar(aut), fecha: new Date().toLocaleString() })
                 });
                 alert("Nota sellada."); location.reload();
             }
@@ -237,9 +260,11 @@
         const vent = window.open('', '_blank');
         vent.document.write(`<html><body style="font-family:'Times New Roman'; padding:40px;">
             <h2 style="text-align:center;">FUNDACIÓN NUEVOS CAMINOS - IPS</h2>
-            <p><strong>PACIENTE:</strong> ${pac.nombre.toUpperCase()} | <strong>FECHA:</strong> ${ev.fecha}</p>
-            <p style="white-space:pre-wrap;">${descifrar(ev.evolucion)}</p>
-            <p style="border-top:1px solid #000; padding-top:10px;">Firma: ${descifrar(ev.autor)} | HASH: ${ev.firmaHash}</p>
+            <div style="border:1px solid #000; padding:15px; margin:20px 0;">
+                <strong>PACIENTE:</strong> ${pac.nombre.toUpperCase()} | <strong>FECHA:</strong> ${ev.fecha}
+            </div>
+            <strong>EVOLUCIÓN:</strong><p style="text-align:justify;">${descifrar(ev.evolucion)}</p>
+            <div style="margin-top:50px; border-top:1px solid #000; width:300px;">Firmado por: ${descifrar(ev.autor)}<br>HASH: ${ev.firmaHash}</div>
             <script>setTimeout(()=>window.print(), 1000);<\/script></body></html>`);
     };
 
