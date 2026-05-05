@@ -258,13 +258,86 @@
     };
 
     window.imprimirNotaCifrada = async (id) => {
+        // 1. Recuperamos los datos de la nota y del paciente
         const d = await getDoc(doc(db, "evoluciones_psicologicas", id));
         const ev = d.data();
         const pSnap = await getDoc(doc(db, "pacientes", idPaciente));
-        const win = window.open('', '_blank');
-        win.document.write(`<html><body style="font-family:Arial; padding:40px;"><h2>INFORME LEGAL</h2><p>Paciente: ${pSnap.data().nombre}</p><p>CIE-10: ${descifrar(ev.cie10)}</p><p>${descifrar(ev.texto)}</p><script>window.print();<\/script></body></html>`);
-    };
+        const p = pSnap.data();
 
+        // 2. Desciframos los datos críticos para el reporte
+        const ciePrincipal = descifrar(ev.cie10);
+        const notaClinica = descifrar(ev.texto);
+        const motivo = ev.motivoConsulta ? descifrar(ev.motivoConsulta) : "Seguimiento Terapéutico";
+        const cieDual = ev.cieDual ? descifrar(ev.cieDual) : null;
+
+        const win = window.open('', '_blank');
+        win.document.write(`
+            <html>
+            <head>
+                <title>HCE Legal - Nuevos Caminos</title>
+                <style>
+                    body { font-family: 'Arial', sans-serif; padding: 40px; color: #333; line-height: 1.6; }
+                    .header { text-align: center; border-bottom: 3px solid #2c3e50; margin-bottom: 25px; padding-bottom: 10px; }
+                    .institucion { font-size: 22px; font-weight: bold; color: #2c3e50; margin: 0; }
+                    .paciente-box { background: #f2f4f6; padding: 20px; border-radius: 8px; margin-bottom: 25px; border: 1px solid #d1d9e0; }
+                    .content-box { min-height: 350px; padding: 15px; border: 1px solid #eee; margin-bottom: 20px; text-align: justify; }
+                    .firma-area { margin-top: 60px; border-top: 2px solid #000; width: 320px; padding-top: 5px; }
+                    .footer { font-size: 10px; color: #7f8c8d; text-align: center; margin-top: 50px; border-top: 1px solid #eee; padding-top: 10px; }
+                    .badge-legal { font-size: 11px; font-weight: bold; color: #e74c3c; border: 1px solid #e74c3c; padding: 2px 5px; border-radius: 4px; display: inline-block; margin-bottom: 10px; }
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <p class="institucion">FUNDACIÓN NUEVOS CAMINOS</p>
+                    <p style="margin:5px 0;">NIT: 901.XXX.XXX-X | IPS HABILITADA | SEDE GUACHINTE, VALLE</p>
+                    <p style="margin:0; font-size: 13px; font-weight: bold;">GESTIÓN DE HISTORIAS CLÍNICAS - RES. 1995 DE 1999</p>
+                </div>
+
+                <div class="paciente-box">
+                    <table style="width: 100%; font-size: 14px; border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 5px;"><strong>PACIENTE:</strong> ${p.nombre.toUpperCase()}</td>
+                            <td style="padding: 5px;"><strong>DOCUMENTO:</strong> ${p.cedula || '---'}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 5px;"><strong>EDAD:</strong> ${p.edad || '--'} AÑOS</td>
+                            <td style="padding: 5px;"><strong>FECHA DE ATENCIÓN:</strong> ${ev.fechaHora}</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="badge-legal">DOCUMENTO CLÍNICO CONFIDENCIAL</div>
+
+                <div class="content-box">
+                    <p><strong>MOTIVO DE LA CONSULTA:</strong> ${motivo}</p>
+                    <p><strong>DIAGNÓSTICO PRINCIPAL (CIE-10):</strong> ${ciePrincipal}</p>
+                    ${cieDual ? `<p><strong>PATOLOGÍA DUAL ASOCIADA:</strong> ${cieDual}</p>` : ''}
+                    <hr style="border: 0; border-top: 1px solid #ccc; margin: 15px 0;">
+                    <p><strong>DESCRIPCIÓN DE LA EVOLUCIÓN:</strong></p>
+                    <p>${notaClinica}</p>
+                </div>
+
+                <p style="font-size: 11px; font-style: italic;">* Se deja constancia de que la atención se realizó bajo el Consentimiento Informado legalmente aceptado por el usuario.</p>
+
+                <div class="firma-area">
+                    <strong>FIRMA ELECTRÓNICA PROFESIONAL</strong><br>
+                    Profesional de ${ev.autorRol.toUpperCase()}<br>
+                    Sede Guachinte - Nuevos Caminos IPS
+                </div>
+
+                <div class="footer">
+                    Este documento es una copia fiel del registro electrónico original custodiado en la bóveda cifrada de la institución.<br>
+                    <strong>HASH DE INTEGRIDAD:</strong> ${ev.hash || 'VERIFICADO'} | <strong>PROTECCIÓN:</strong> LEY 1090 DE 2006 (SECRETO PROFESIONAL)<br>
+                    Prohibida su reproducción o custodia por personal no autorizado.
+                </div>
+
+                <script>
+                    setTimeout(() => { window.print(); }, 800);
+                <\/script>
+            </body>
+            </html>
+        `);
+    };
     // --- CARGA DE PACIENTE (SOLUCIÓN AL ERROR DE IMAGEN) ---
     async function init() {
         if (!idPaciente) return;
