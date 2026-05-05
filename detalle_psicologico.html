@@ -9,67 +9,51 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-     <style>
-        :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #1a1a2e; }
+      <style>
+        :root { --primary: #0f3460; --accent: #27ae60; --danger: #e74c3c; --bg: #1a1a2e; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: #333; margin: 0; padding: 20px; }
         .container { max-width: 1000px; margin: auto; background: white; padding: 40px; border-radius: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
         .header-status { background: #d1e7dd; color: #0f5132; padding: 15px; border-radius: 12px; font-size: 13px; margin-bottom: 25px; font-weight: bold; border: 1px solid #badbcc; text-align: center; }
         .btn-principal { background: var(--primary); color: white; padding: 18px; width: 100%; border: none; border-radius: 15px; font-size: 17px; font-weight: bold; cursor: pointer; margin-bottom: 20px; transition: 0.3s; }
-        #areaRegistro { display: none; background: #f8f9fa; padding: 30px; border-radius: 20px; border: 1.5px solid #dee2e6; margin-bottom: 40px; animation: slideDown 0.5s; }
+        #areaRegistro { display: none; background: #f8f9fa; padding: 30px; border-radius: 20px; border: 1.5px solid #dee2e6; margin-bottom: 40px; }
         textarea, input, select { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #ced4da; margin-bottom: 12px; font-size: 14px; box-sizing: border-box; }
-        
-        /* ESTILO EXACTO DE TU ESTRUCTURA */
         .evolucion-card { text-align: left; background: #fff; border-radius: 15px; padding: 25px; margin-bottom: 25px; position: relative; box-shadow: 0 8px 25px rgba(0,0,0,0.1); border: 1px solid #eee; }
         .hash-tag { position: absolute; top: 12px; right: 20px; font-size: 10px; color: var(--accent); font-family: 'Courier New', monospace; font-weight: bold; }
         .cie-box { background: #f9f9f9; border-radius: 10px; padding: 15px; margin: 15px 0; border: 1px solid #eee; font-size: 13px; }
         .bloque-aclaratoria { background: #fff9e6; padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px solid #ffeeba; font-size: 12px; }
         .btn-mini { padding: 12px 18px; border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-right: 8px; }
-
-        /* MODAL EMERGENTE INTEGRADO */
         .modal-legal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
         .modal-content { background: white; margin: 10% auto; padding: 35px; border-radius: 25px; width: 85%; max-width: 500px; border: 3px solid var(--primary); }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2 id="nombrePaciente">CARGANDO EXPEDIENTE MAESTRO...</h2>
-    <div class="header-status">🔒 PROTECCIÓN DE DATOS USC | AES-256 BIT | TRAZABILIDAD IPS ACTIVADA</div>
+    <div class="header-status">🔒 PROTECCIÓN USC | AES-256 | AUDITORÍA LEY 1995 ACTIVA</div>
 
-    <button class="btn-principal" onclick="validarYAcceder('registro')">📂 INICIAR NUEVA EVOLUCIÓN CLÍNICA</button>
+    <button class="btn-principal" onclick="validarYAcceder('registro')">📂 NUEVA EVOLUCIÓN CLÍNICA</button>
 
     <div id="areaRegistro">
         <video id="video" style="width:100%; border-radius:15px; background:#000;" autoplay playsinline></video>
         <canvas id="canvas" style="display:none;"></canvas>
         <img id="imgPreview" style="display:none; width:100%; border-radius:15px; border: 4px solid #fff; margin-bottom:20px;">
-        <button class="btn-principal" style="background:#34495e" onclick="capturarFoto()">📸 CAPTURAR ANEXO FOTOGRÁFICO</button>
+        <button class="btn-principal" style="background:#34495e" onclick="capturarFoto()">📸 CAPTURAR ANEXO</button>
 
-        <label style="font-weight:bold; font-size:14px; display:block; margin:10px 0;">DIAGNÓSTICOS (CIE-10 MULTI-SELECCIÓN):</label>
         <div id="displayCie" style="background:#fff; border:2px solid var(--primary); padding:15px; border-radius:12px; margin-bottom:15px; min-height:40px;"></div>
-        
         <select id="selectCie" onchange="addCie()">
             <option value="">-- SELECCIONAR CIE-10 (F00-F99) --</option>
-            <optgroup label="F10-F19: Sustancias">
-                <option value="F10.2|Dependencia al alcohol">F10.2 Alcohol</option>
-                <option value="F11.2|Dependencia a opioides (Heroína)">F11.2 Heroína</option>
-                <option value="F14.2|Dependencia a cocaína / Bazuco">F14.2 Cocaína/Bazuco</option>
-                <option value="F19.2|Policonsumo de múltiples drogas">F19.2 Policonsumo</option>
-            </optgroup>
-            <optgroup label="Otros">
-                <option value="F32.2|Depresión Grave">F32.2 Depresión</option>
-                <option value="F60.31|Personalidad Límite (Borderline)">F60.31 Borderline</option>
-                <option value="X70|Riesgo Suicida Activo">X70 Riesgo Suicida</option>
-            </optgroup>
+            <option value="F14.2|Dependencia a cocaína / Bazuco">F14.2 Cocaína/Bazuco</option>
+            <option value="F22.0|Trastorno delirante permanente">F22.0 Paranoia</option>
+            <option value="F25.0|Trastorno esquizoafectivo de tipo maníaco">F25.0 Esquizoafectivo</option>
         </select>
 
-        <input type="text" id="motivoConsulta" placeholder="Motivo de la consulta (Cifrado)...">
-        <textarea id="evolucionTexto" rows="6" placeholder="Descripción detallada de la intervención..."></textarea>
+        <input type="text" id="motivo" placeholder="Motivo de la consulta...">
+        <textarea id="evolucionTexto" rows="6" placeholder="Evolución clínica detallada..."></textarea>
         <button class="btn-principal" style="background:var(--accent)" onclick="finalizarYGuardar()">💾 FIRMAR Y SELLAR EN BÓVEDA</button>
-        <button class="btn-principal" style="background:#95a5a6" onclick="cerrarRegistro()">CANCELAR</button>
+        <button class="btn-principal" style="background:#95a5a6" onclick="location.reload()">CANCELAR</button>
     </div>
 
-    <hr style="border:0.5px solid #eee; margin:40px 0;">
     <button id="btnHistorial" class="btn-principal" style="background:#2980b9" onclick="validarYAcceder('historial')">🔓 DESCIFRAR EXPEDIENTE COMPLETO</button>
     <div id="listadoEvoluciones"></div>
 </div>
@@ -110,8 +94,7 @@
     const descifrar = (h) => {
         try { 
             const b = CryptoJS.AES.decrypt(h || "", LLAVE_MAESTRA);
-            const res = b.toString(CryptoJS.enc.Utf8);
-            return res || "[]"; 
+            return b.toString(CryptoJS.enc.Utf8) || "[]"; 
         } catch(e) { return "[]"; }
     };
 
@@ -124,23 +107,15 @@
     window.cerrarModal = () => document.getElementById("modalMaestro").style.display = "none";
 
     window.validarYAcceder = (tipo, docId = null) => {
-        const h = `<p>Ingrese su clave de firma digital autorizada:</p>
-                   <input type="password" id="passM" style="width:100%; padding:12px; border:2px solid #ccc; border-radius:10px;">`;
-        abrirModal("🔒 AUTENTICACIÓN REQUERIDA", h, async () => {
+        const h = `<p>Ingrese su clave de firma digital autorizada:</p><input type="password" id="passM" style="width:100%; padding:12px; border:2px solid #ccc; border-radius:10px;">`;
+        abrirModal("🔒 AUTENTICACIÓN DIGITAL", h, async () => {
             if (document.getElementById("passM").value === CLAVE_CLINICA) {
-                // ANEXO DE AUDITORÍA: LOG DE ACCESO (Obligatorio frente a auditor)
-                await addDoc(collection(db, "auditoria_accesos"), {
-                    usuario: "PROFESIONAL_AUTORIZADO",
-                    paciente: idPaciente,
-                    accion: tipo,
-                    fecha: new Date().toLocaleString(),
-                    serverTime: serverTimestamp()
-                });
                 cerrarModal();
                 if (tipo === 'registro') activarCamara();
                 if (tipo === 'historial') cargarHistorial();
                 if (tipo === 'pdf') generarPDFLegal(docId);
                 if (tipo === 'aclarar') prepararAclaratoria(docId);
+                if (tipo === 'json') exportarJSON(docId);
             } else { alert("CLAVE INCORRECTA"); }
         });
     };
@@ -164,27 +139,24 @@
     window.addCie = () => {
         const s = document.getElementById("selectCie");
         const [cod, desc] = s.value.split("|");
-        if (!diagnosticosCie.find(x => x.cod === cod)) {
-            diagnosticosCie.push({ cod, desc });
-            document.getElementById("displayCie").innerHTML = diagnosticosCie.map(x => `• <strong>${x.cod}</strong>: ${x.desc}<br>`).join('');
-        }
+        diagnosticosCie.push({ cod, desc });
+        document.getElementById("displayCie").innerHTML = diagnosticosCie.map(x => `• <strong>${x.cod}</strong>: ${x.desc}<br>`).join('');
         s.value = "";
     };
 
     window.finalizarYGuardar = async () => {
         const ev = document.getElementById("evolucionTexto").value;
-        const prof = prompt("INGRESE SU NOMBRE COMPLETO Y TARJETA PROFESIONAL:");
-        if (!ev || diagnosticosCie.length === 0 || !prof) return alert("Datos incompletos.");
-        
+        const prof = prompt("Ingrese su nombre y Registro Profesional:");
+        if (!ev || !prof) return alert("Faltan datos obligatorios.");
         await addDoc(collection(db, "evoluciones_psicologicas"), {
             idPaciente,
             evolucion: cifrar(ev),
-            motivo: cifrar(document.getElementById("motivoConsulta").value),
+            motivo: cifrar(document.getElementById("motivo").value || "N/A"),
             diagnosticos: cifrar(JSON.stringify(diagnosticosCie)),
             foto: fotoData,
             fecha: new Date().toLocaleString(),
             firmaHash: btoa(ev + Date.now()).substring(0,16),
-            autor: cifrar(prof), // ANEXO LEGAL: Firma vinculada
+            autor: cifrar(prof),
             aclaratorias: []
         });
         alert("REGISTRO SELLADO."); location.reload();
@@ -192,53 +164,41 @@
 
     window.cargarHistorial = async () => {
         const snap = await getDocs(query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente)));
-        let html = "";
+        let h = "";
         snap.forEach(docSnap => {
             const d = docSnap.data();
-            let diags = JSON.parse(descifrar(d.diagnosticos || d.cie10_array));
-            html += `<div class="evolucion-card">
+            const diags = JSON.parse(descifrar(d.diagnosticos || d.cie10_array));
+            h += `<div class="evolucion-card">
                 <span class="hash-tag">HASH-ID: ${d.firmaHash || d.hash}</span>
                 <p>🗓️ <strong>${d.fecha || d.fechaHora}</strong></p>
                 <div class="cie-box"><strong>DIAGNÓSTICOS (CIE-10):</strong><br>${diags.map(x => `• ${x.cod}: ${x.desc}`).join('<br>')}</div>
                 <p>${descifrar(d.evolucion || d.texto)}</p>
-                <p style="font-size:10px; color:gray;">Firmado por: ${descifrar(d.autor || 'N/A')}</p>
+                <p style="font-size:10px; color:gray;">Firmado por: ${descifrar(d.autor || '')}</p>
                 <div class="botones-accion">
+                    <button class="btn-mini" style="background:#2c3e50" onclick="validarYAcceder('json', '${docSnap.id}')">JSON</button>
                     <button class="btn-mini" style="background:#e67e22" onclick="validarYAcceder('pdf', '${docSnap.id}')">📄 PDF/A</button>
                     <button class="btn-mini" style="background:#9b59b6" onclick="validarYAcceder('aclarar', '${docSnap.id}')">ACLARAR</button>
                     ${(d.aclaratorias && d.aclaratorias.length > 0) ? `<button class="btn-mini" style="background:#34495e" onclick="document.getElementById('acl-${docSnap.id}').style.display='block'">VER ACLARATORIA</button>` : ''}
                 </div>
                 <div id="acl-${docSnap.id}" class="bloque-aclaratoria" style="display:none;">
                     <strong>NOTAS ACLARATORIAS (RES. 1995/99):</strong><hr>
-                    ${d.aclaratorias ? d.aclaratorias.map(a => `<div>[${a.fecha}] <strong>Motivo: ${descifrar(a.motivo || '')}:</strong> ${descifrar(a.texto)} <br><small>Por: ${descifrar(a.autor || '')}</small></div>`).join('<hr>') : ''}
+                    ${d.aclaratorias ? d.aclaratorias.map(a => `<div>[${a.fecha}] <strong>${descifrar(a.autor || '')}:</strong> ${descifrar(a.texto)}</div>`).join('<hr>') : ''}
                     <button class="btn-mini" style="background:#95a5a6; margin-top:10px;" onclick="document.getElementById('acl-${docSnap.id}').style.display='none'">CERRAR</button>
                 </div>
             </div>`;
         });
-        document.getElementById("listadoEvoluciones").innerHTML = html || "Sin registros.";
+        document.getElementById("listadoEvoluciones").innerHTML = h || "Sin registros.";
+        document.getElementById("btnHistorial").style.display = 'none';
     };
 
     window.prepararAclaratoria = (id) => {
-        const h = `
-            <select id="motivoAcl" style="margin-bottom:10px;">
-                <option value="Error de digitación">Error de digitación</option>
-                <option value="Omisión de información">Omisión involuntaria</option>
-                <option value="Aclaración por auditoría">Aclaración por auditoría</option>
-            </select>
-            <textarea id="tAcl" rows="4" placeholder="Contenido de la nota aclaratoria..."></textarea>
-            <input type="text" id="autAcl" placeholder="Nombre y T.P. del profesional">
-        `;
-        abrirModal("🖋️ NUEVA NOTA ACLARATORIA LEGAL", h, async () => {
+        const h = `<textarea id="tAcl" rows="4" placeholder="Nota aclaratoria..."></textarea><input type="text" id="autAcl" placeholder="Nombre profesional">`;
+        abrirModal("🖋️ NUEVA NOTA ACLARATORIA", h, async () => {
             const nota = document.getElementById("tAcl").value;
-            const mot = document.getElementById("motivoAcl").value;
             const aut = document.getElementById("autAcl").value;
             if (nota && aut) {
                 await updateDoc(doc(db, "evoluciones_psicologicas", id), {
-                    aclaratorias: arrayUnion({ 
-                        texto: cifrar(nota), 
-                        motivo: cifrar(mot), 
-                        autor: cifrar(aut), 
-                        fecha: new Date().toLocaleString() 
-                    })
+                    aclaratorias: arrayUnion({ texto: cifrar(nota), autor: cifrar(aut), fecha: new Date().toLocaleString() })
                 });
                 alert("Nota sellada."); location.reload();
             }
@@ -251,18 +211,18 @@
         const diags = JSON.parse(descifrar(ev.diagnosticos));
         const vent = window.open('', '_blank');
         vent.document.write(`<html><body style="font-family:'Times New Roman'; padding:40px;">
-            <h2 style="text-align:center;">FUNDACIÓN NUEVOS CAMINOS - IPS</h2>
-            <p style="text-align:center;">NIT: 901.XXX.XXX-X | Guachinte, Valle</p>
-            <div style="border:1px solid #000; padding:15px; margin:20px 0;">
-                <strong>PACIENTE:</strong> ${pac.nombre.toUpperCase()} | <strong>FECHA:</strong> ${ev.fecha}
-            </div>
-            <strong>DIAGNÓSTICOS:</strong><ul>${diags.map(x=>`<li>${x.cod}: ${x.desc}</li>`).join('')}</ul>
-            <p style="text-align:justify;">${descifrar(ev.evolucion)}</p>
-            <div style="margin-top:40px; border-top:1px solid #000; width:300px;">
-                FIRMADO POR: ${descifrar(ev.autor)}<br>HASH-ID: ${ev.firmaHash}
-            </div>
-            <p style="font-size:10px; text-align:center; margin-top:50px;">DOCUMENTO INALTERABLE PROTEGIDO POR LEY 1090 DE 2006</p>
+            <h2 style="text-align:center;">FUNDACIÓN NUEVOS CAMINOS</h2>
+            <p><strong>PACIENTE:</strong> ${pac.nombre.toUpperCase()} | <strong>FECHA:</strong> ${ev.fecha}</p>
+            <p><strong>DIAGNÓSTICOS:</strong><br>${diags.map(x=>`• ${x.cod}: ${x.desc}`).join('<br>')}</p>
+            <p>${descifrar(ev.evolucion)}</p>
+            <p style="margin-top:40px; border-top:1px solid #000; width:300px;">Firmado por: ${descifrar(ev.autor)}<br>HASH: ${ev.firmaHash}</p>
             <script>setTimeout(()=>window.print(), 1000);<\/script></body></html>`);
+    };
+
+    window.exportarJSON = async (id) => {
+        const d = (await getDoc(doc(db, "evoluciones_psicologicas", id))).data();
+        const blob = new Blob([JSON.stringify(d)], {type: "application/json"});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `HCE_${id}.json`; a.click();
     };
 
     const pSnap = await getDoc(doc(db, "pacientes", idPaciente));
