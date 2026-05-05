@@ -8,8 +8,8 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; text-align: center; padding: 20px; margin: 0; color: #fff; }
-        .container { max-width: 750px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #333; }
+        body { font-family: 'Segoe UI', sans-serif; background: #1a1a2e; text-align: center; padding: 20px; margin: 0; color: #333; }
+        .container { max-width: 720px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         .btn-abrir { background: #0f3460; color: white; padding: 18px; width: 100%; border: none; border-radius: 12px; font-size: 18px; font-weight: bold; cursor: pointer; margin-bottom: 20px; transition: 0.3s; }
         #areaRegistro { display: none; background: #f4f7f6; padding: 25px; border-radius: 15px; border: 1px solid #ddd; margin-bottom: 30px; animation: fadeIn 0.4s; }
         textarea, input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ced4da; box-sizing: border-box; margin-bottom: 12px; font-family: inherit; font-size: 14px; }
@@ -18,16 +18,16 @@
         .btn-ley { font-size: 11px; padding: 8px 12px; border: none; border-radius: 5px; color: white; cursor: pointer; margin-right: 5px; font-weight: 600; }
         .modal-aclaracion { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); align-items: center; justify-content: center; }
         .modal-content { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 550px; text-align: left; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .badge-dual { background: #e74c3c; color: white; font-size: 10px; padding: 3px 8px; border-radius: 50px; margin-left: 5px; text-transform: uppercase; }
+        .badge-dual { background: #e74c3c; color: white; font-size: 10px; padding: 4px 8px; border-radius: 50px; margin-left: 8px; text-transform: uppercase; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body onmousemove="resetTimer()" onclick="resetTimer()" onkeypress="resetTimer()">
+<body>
 
 <div class="container">
-    <h2 id="nombrePaciente">Cargando Identidad Clínica...</h2>
+    <h2 id="nombrePaciente">Identificando Paciente...</h2>
     <div style="background:#d4edda; color:#155724; padding:10px; border-radius:10px; font-size:12px; margin-bottom:20px; font-weight:bold; border: 1px solid #c3e6cb;">
-        🔐 SISTEMA CIFRADO NIVEL 3 | VADEMÉCUM INTEGRAL F00-F99
+        🔐 CIFRADO NIVEL CLÍNICO | VADEMÉCUM INTEGRAL F00-F99 ACTIVADO
     </div>
 
     <button class="btn-abrir" onclick="solicitarClaveAcceso('registro')">➕ INICIAR NUEVA INTERVENCIÓN CLÍNICA</button>
@@ -38,22 +38,20 @@
         <img id="imgPreview" style="display:none; width:100%; border-radius:10px; margin-bottom:15px; border: 2px solid #ddd;">
         <button class="btn" style="background:#34495e" onclick="tomarFoto()">📸 CAPTURAR EVIDENCIA FOTOGRÁFICA</button>
 
-        <!-- SELECTOR 1: VADEMÉCUM TOTAL DE SUSTANCIAS Y ORGÁNICOS -->
-        <label style="font-size: 12px; font-weight: bold; display: block; text-align: left; margin-bottom: 5px;">🩺 DIAGNÓSTICO PRINCIPAL (CIE-10 ESPECIALIZADO):</label>
+        <label style="font-size: 12px; font-weight: bold; display: block; text-align: left; margin-bottom: 5px;">🩺 DIAGNÓSTICO CIE-10 (CATÁLOGO COMPLETO):</label>
         <select id="cie10">
-            <option value="">-- SELECCIONE DIAGNÓSTICO MÉDICO --</option>
+            <option value="">-- SELECCIONE EL DIAGNÓSTICO MÉDICO --</option>
             <optgroup label="F00-F09 Trastornos Orgánicos">
                 <option value="F00.1">F00.1 Demencia en Alzheimer</option>
                 <option value="F03">F03 Demencia no especificada</option>
                 <option value="F06.3">F06.3 Trastorno del humor orgánico</option>
-                <option value="F07.0">F07.0 Trastorno de personalidad orgánico</option>
             </optgroup>
             <optgroup label="F10-F19 Trastornos por Sustancias">
                 <option value="F10.2">F10.2 Dependencia al Alcohol</option>
-                <option value="F10.4">F10.4 Abstinencia c/Delirium</option>
-                <option value="F11.2">F11.2 Dependencia a Opioides</option>
-                <option value="F12.2">F12.2 Dependencia a Cannabis</option>
-                <option value="F14.2">F14.2 Dependencia a Cocaína</option>
+                <option value="F10.4">F10.4 Abstinencia c/Delirium (Tremens)</option>
+                <option value="F11.2">F11.2 Dependencia a Opioides (Heroína)</option>
+                <option value="F12.2">F12.2 Dependencia a Cannabis (Marihuana)</option>
+                <option value="F14.2">F14.2 Dependencia a Cocaína / Bazuco</option>
                 <option value="F15.2">F15.2 Dependencia a Estimulantes</option>
                 <option value="F19.2">F19.2 Policonsumo (Dependencia Múltiple)</option>
             </optgroup>
@@ -62,60 +60,54 @@
                 <option value="F23.1">F23.1 Psicosis Aguda Polimorfa</option>
                 <option value="F25.0">F25.0 Trastorno Esquizoafectivo</option>
             </optgroup>
+            <optgroup label="F30-F69 Otros Trastornos Mentales">
+                <option value="F31.1">F31.1 Bipolar: Maníaco</option>
+                <option value="F31.3">F31.3 Bipolar: Depresivo</option>
+                <option value="F32.2">F32.2 Depresión Grave s/Psicosis</option>
+                <option value="F41.1">F41.1 Ansiedad Generalizada</option>
+                <option value="F43.1">F43.1 Estrés Postraumático (TEPT)</option>
+                <option value="F60.31">F60.31 Personalidad Límite (Borderline)</option>
+                <option value="F63.0">F63.0 Ludopatía (Juego patológico)</option>
+            </optgroup>
+            <optgroup label="F70-F99 Desarrollo y Urgencias">
+                <option value="X70">X70 RIESGO DE AUTOLESIÓN / SUICIDIO</option>
+                <option value="F90.0">F90.0 TDAH</option>
+                <option value="F70">F70 Retraso Mental Leve</option>
+            </optgroup>
         </select>
 
-        <!-- SELECTOR 2: PATOLOGÍA DUAL Y SALUD MENTAL ALTA COMPLEJIDAD -->
-        <button type="button" onclick="toggleDual()" style="background:#3498db; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer; font-size:12px; margin-bottom:12px; width:100%; font-weight:bold;">🧠 AGREGAR COMPLICACIÓN O PATOLOGÍA DUAL</button>
-
+        <button type="button" onclick="toggleDual()" style="background:#3498db; color:white; border:none; padding:10px; border-radius:8px; cursor:pointer; font-size:12px; margin-bottom:12px; width:100%; font-weight:bold;">🧠 VINCULAR PATOLOGÍA DUAL ADICIONAL</button>
         <div id="contenedorDual" style="display:none; background:#e8f4fd; padding:15px; border-radius:12px; border:1px solid #3498db; margin-bottom:15px;">
-            <label style="font-size:11px; font-weight:bold; display:block; text-align:left; color:#2980b9;">🔍 CATÁLOGO DE ALTA PSIQUIATRÍA:</label>
             <select id="cie10Dual">
                 <option value="">-- SELECCIONE TRASTORNO ASOCIADO --</option>
-                <optgroup label="F30-F39 Trastornos del Afecto">
-                    <option value="F31.1">F31.1 Bipolar: Episodio Maníaco</option>
-                    <option value="F31.3">F31.3 Bipolar: Episodio Depresivo</option>
-                    <option value="F32.2">F32.2 Depresión Grave s/Psicosis</option>
-                    <option value="F32.3">F32.3 Depresión Grave c/Psicosis</option>
-                </optgroup>
-                <optgroup label="F40-F48 Ansiedad y Estrés">
-                    <option value="F41.1">F41.1 Ansiedad Generalizada</option>
-                    <option value="F42.0">F42.0 Trastorno Obsesivo-Compulsivo (TOC)</option>
-                    <option value="F43.1">F43.1 Estrés Postraumático (TEPT)</option>
-                </optgroup>
-                <optgroup label="F50-F69 Personalidad y Alimentación">
-                    <option value="F50.0">F50.0 Anorexia Nerviosa</option>
-                    <option value="F60.31">F60.31 Personalidad Límite (Borderline)</option>
-                    <option value="F60.2">F60.2 Personalidad Antisocial</option>
-                    <option value="F63.0">F63.0 Ludopatía (Juego Patológico)</option>
-                </optgroup>
-                <optgroup label="F70-F99 Desarrollo y Urgencias">
-                    <option value="F70">F70 Retraso Mental Leve</option>
-                    <option value="F90.0">F90.0 TDAH</option>
-                    <option value="X70">X70 RIESGO DE AUTOLESIÓN / SUICIDIO</option>
-                </optgroup>
+                <option value="F20.0">F20.0 Esquizofrenia</option>
+                <option value="F31.1">F31.1 Trastorno Bipolar</option>
+                <option value="F41.1">F41.1 Ansiedad</option>
+                <option value="F60.31">F60.31 Borderline</option>
+                <option value="X70">X70 Riesgo Suicida</option>
             </select>
         </div>
 
         <select id="tipoRegistro">
-            <option value="evolucion">Evolución Clínica Psicológica</option>
+            <option value="evolucion">Evolución Clínica Estándar</option>
             <option value="anexo">Anexo Externo (Laboratorios / Remisiones)</option>
         </select>
-        <textarea id="aspectos" rows="2" placeholder="Aspectos observados en la conducta (Cifrado AES-256)..."></textarea>
-        <textarea id="textoPsicologico" rows="4" placeholder="Nota de evolución detallada (Secreto Profesional Protegido)..."></textarea>
+        <textarea id="aspectos" rows="2" placeholder="Aspectos observados en la conducta (Serán cifrados)..."></textarea>
+        <textarea id="textoPsicologico" rows="4" placeholder="Evolución clínica detallada (Confidencial - AES 256)..."></textarea>
         
         <button class="btn" style="background:#27ae60" onclick="guardarRegistroCifrado()">💾 GUARDAR, FIRMAR Y CIFRAR REGISTRO</button>
         <button class="btn" style="background:#95a5a6" onclick="toggleFormulario()">❌ CANCELAR Y CERRAR</button>
     </div>
 
     <hr>
-    <h3>📋 HISTORIAL CLÍNICO DESBLOQUEABLE</h3>
+    <h3>📋 HISTORIAL CLÍNICO INALTERABLE</h3>
     <button id="btnVerHistorial" class="btn" style="background:#2980b9" onclick="solicitarClaveAcceso('historial')">🔓 DESCIFRAR HISTORIAL CON CLAVE CLÍNICA</button>
     <div id="listaEvoluciones"></div>
     
-    <button onclick="window.location.href='perfil_paciente.html?id=' + idPaciente" style="background:none; border:none; color:#3498db; cursor:pointer; font-weight:bold; margin-top:20px;">⬅ VOLVER AL PERFIL</button>
+    <button onclick="window.location.href='perfil_paciente.html?id=' + idPaciente" style="background:none; border:none; color:#3498db; cursor:pointer; font-weight:bold; margin-top:20px;">⬅ VOLVER AL PERFIL DEL PACIENTE</button>
 </div>
 
-<!-- MODAL ACLARATORIA -->
+<!-- MODAL DE ACLARATORIAS -->
 <div id="modalAclaracion" class="modal-aclaracion">
     <div class="modal-content">
         <h3>📝 NOTA ACLARATORIA LEGAL</h3>
@@ -128,7 +120,7 @@
 </div>
 
 <script type="module">
-         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+           import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, getDoc, collection, addDoc, query, where, getDocs, serverTimestamp, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
@@ -137,16 +129,21 @@
             storageBucket: "caminosnuevosdatabase.firebasestorage.app",
             appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
         };
+    const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const params = new URLSearchParams(window.location.search);
-    const idPaciente = params.get("id"), rolAutor = sessionStorage.getItem('rolActivo');
+    const idPaciente = params.get("id");
+    const rolAutor = sessionStorage.getItem('rolActivo');
 
-    const LLAVE_MAESTRA = "FundacionNuevosCaminos2024*USC", CLAVE_CLINICA = "1234"; 
+    const LLAVE_MAESTRA = "FundacionNuevosCaminos2024*USC"; 
+    const CLAVE_CLINICA = "1234"; 
 
-    const cifrar = (txt) => CryptoJS.AES.encrypt(txt, LLAVE_MAESTRA).toString();
-    const descifrar = (hash) => { try { return CryptoJS.AES.decrypt(hash, LLAVE_MAESTRA).toString(CryptoJS.enc.Utf8) || "N/A"; } catch(e) { return "Error"; }};
-
-    window.toggleDual = () => { const div = document.getElementById('contenedorDual'); div.style.display = div.style.display === 'none' ? 'block' : 'none'; };
+    // --- FUNCIONES DE SEGURIDAD (DISPONIBLES GLOBALMENTE) ---
+    window.cifrar = (txt) => CryptoJS.AES.encrypt(txt, LLAVE_MAESTRA).toString();
+    window.descifrar = (hash) => {
+        try { return CryptoJS.AES.decrypt(hash, LLAVE_MAESTRA).toString(CryptoJS.enc.Utf8) || "N/A"; }
+        catch(e) { return "Error"; }
+    };
 
     window.solicitarClaveAcceso = (tipo, idDoc = null) => {
         const pass = prompt("🔐 INGRESE CLAVE DE SEGURIDAD CLÍNICA:");
@@ -155,19 +152,31 @@
             if (tipo === 'historial') cargarHistorialCifrado();
             if (tipo === 'pdf') imprimirNotaCifrada(idDoc);
             if (tipo === 'json') descargarJSONCifrado(idDoc);
-        } else { alert("❌ CLAVE INCORRECTA"); }
+        } else { alert("❌ ACCESO DENEGADO"); }
     };
 
-    let fotoBase64 = "", streamActivo = null, idNotaActual = "";
+    // --- SEGURIDAD POR INACTIVIDAD (REDISEÑADO) ---
+    let timer;
+    const resetTimer = () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            sessionStorage.clear();
+            window.location.href = 'login.html';
+        }, 300000); 
+    };
+    document.addEventListener('mousemove', resetTimer);
+    document.addEventListener('keypress', resetTimer);
 
-    let timer; window.resetTimer = () => { clearTimeout(timer); timer = setTimeout(() => { sessionStorage.clear(); window.location.href = 'login.html'; }, 300000); };
+    let fotoBase64 = "", streamActivo = null, idNotaActual = "";
 
     window.toggleFormulario = async () => {
         const div = document.getElementById('areaRegistro'), video = document.getElementById('video');
         if (div.style.display === 'none' || div.style.display === '') {
             div.style.display = 'block';
-            streamActivo = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-            video.srcObject = streamActivo;
+            try {
+                streamActivo = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                video.srcObject = streamActivo;
+            } catch (e) { alert("Active permisos de cámara"); }
         } else {
             div.style.display = 'none';
             if (streamActivo) streamActivo.getTracks().forEach(t => t.stop());
@@ -185,68 +194,89 @@
     };
 
     window.guardarRegistroCifrado = async () => {
-        const texto = document.getElementById("textoPsicologico").value, cie = document.getElementById("cie10").value, dual = document.getElementById("cie10Dual").value, asp = document.getElementById("aspectos").value;
+        const texto = document.getElementById("textoPsicologico").value;
+        const cie = document.getElementById("cie10").value;
+        const dual = document.getElementById("cie10Dual").value;
+        const asp = document.getElementById("aspectos").value;
+
         if (!texto || !cie) return alert("❌ Faltan datos obligatorios.");
         const motivo = prompt("MOTIVO DE CONSULTA:"); if(!motivo) return;
 
-        await addDoc(collection(db, "evoluciones_psicologicas"), {
-            idPaciente, texto: cifrar(texto), cie10: cifrar(cie), cieDual: dual ? cifrar(dual) : "", motivo: cifrar(motivo), aspectos: cifrar(asp),
-            fotoBase64, autorRol: rolAutor, fechaHora: new Date().toLocaleString(), timestamp: serverTimestamp(), hash: btoa(texto + Date.now()).substring(0,12), aclaratorias: [], tipo: document.getElementById("tipoRegistro").value
-        });
-        alert("✅ REGISTRO CIFRADO EXITOSAMENTE."); location.reload();
+        try {
+            await addDoc(collection(db, "evoluciones_psicologicas"), {
+                idPaciente, texto: cifrar(texto), cie10: cifrar(cie),
+                cieDual: dual ? cifrar(dual) : "", 
+                motivo: cifrar(motivo), aspectos: cifrar(asp),
+                fotoBase64, autorRol: rolAutor, fechaHora: new Date().toLocaleString(),
+                timestamp: serverTimestamp(), hash: btoa(texto + Date.now()).substring(0,12),
+                aclaratorias: [], tipo: document.getElementById("tipoRegistro").value
+            });
+            alert("✅ REGISTRO CIFRADO."); location.reload();
+        } catch (e) { alert(e.message); }
     };
 
     window.cargarHistorialCifrado = async () => {
         const snap = await getDocs(query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente)));
         let html = "";
         snap.forEach(d => {
-            const ev = d.data(), dualCod = ev.cieDual ? descifrar(ev.cieDual) : null;
+            const ev = d.data();
+            const dualCod = ev.cieDual ? descifrar(ev.cieDual) : null;
+            const tieneAcl = ev.aclaratorias?.length > 0;
             html += `<div class="evolucion-item">
-                <span style="position:absolute; top:8px; right:12px; font-size:9px; color:#27ae60; font-weight:bold;">🔒 HASH: ${ev.hash || 'FIDEDIGNO'}</span>
+                <span style="position:absolute; top:8px; right:12px; font-size:9px; color:#27ae60; font-weight:bold;">🔒 HASH: ${ev.hash || 'ORIGINAL'}</span>
                 <strong>📅 ${ev.fechaHora} | CIE-10: ${descifrar(ev.cie10)} ${dualCod ? `<span class="badge-dual">DUAL: ${dualCod}</span>` : ''}</strong>
-                <p style="margin:12px 0; color:#444;">${descifrar(ev.texto)}</p>
-                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <p style="color:#444;">${descifrar(ev.texto)}</p>
+                <div style="display:flex; gap:6px;">
                     <button class="btn-ley" style="background:#2980b9" onclick="solicitarClaveAcceso('json', '${d.id}')">📤 JSON</button>
                     <button class="btn-ley" style="background:#e67e22" onclick="solicitarClaveAcceso('pdf', '${d.id}')">🖨️ PDF/A</button>
                     <button class="btn-ley" style="background:#95a5a6" onclick="abrirModalAclaracion('${d.id}')">📝 ACLARAR</button>
-                    ${ev.aclaratorias?.length ? `<button class="btn-ley" style="background:#34495e" onclick="toggleAcl('${d.id}')">🔔 VER ACLARACIONES</button>` : ''}
+                    ${tieneAcl ? `<button class="btn-ley" style="background:#34495e" onclick="toggleAcl('${d.id}')">🔔 VER</button>` : ''}
                 </div>
                 <div id="ac-${d.id}" style="display:none; background:#fffcf5; padding:12px; margin-top:10px; border-radius:8px;">
-                    ${ev.aclaratorias?.map(a => `<div style="margin-bottom:8px; border-left:2px solid #ff9800; padding-left:10px;"><small>${a.fecha}</small><br>${descifrar(a.texto)}</div>`).join('')}
+                    ${ev.aclaratorias?.map(a => `<small>${a.fecha}</small><br>${descifrar(a.texto)}<hr>`).join('')}
                 </div>
-                <div style="font-size:10px; color:gray; border-top:1px solid #eee; padding-top:8px; margin-top:10px;">Firmado electrónicamente: ${ev.autorRol.toUpperCase()}</div>
             </div>`;
         });
         document.getElementById("listaEvoluciones").innerHTML = html || "Sin registros.";
         document.getElementById("btnVerHistorial").style.display = 'none';
     };
 
+    window.toggleDual = () => { document.getElementById('contenedorDual').style.display = document.getElementById('contenedorDual').style.display === 'none' ? 'block' : 'none'; };
     window.toggleAcl = (id) => { const el = document.getElementById(`ac-${id}`); el.style.display = el.style.display === 'none' ? 'block' : 'none'; };
     window.abrirModalAclaracion = (id) => { idNotaActual = id; document.getElementById('modalAclaracion').style.display = 'flex'; };
     window.cerrarModal = () => { document.getElementById('modalAclaracion').style.display = 'none'; };
     window.confirmarAclaratoria = async () => {
         const nota = document.getElementById('textoAclaratoriaNueva').value;
-        if(!nota.trim()) return;
         await updateDoc(doc(db, "evoluciones_psicologicas", idNotaActual), { aclaratorias: arrayUnion({ texto: cifrar(nota), fecha: new Date().toLocaleString(), autor: rolAutor }) });
         location.reload();
     };
 
     window.descargarJSONCifrado = async (id) => {
         const d = await getDoc(doc(db, "evoluciones_psicologicas", id));
-        const blob = new Blob([JSON.stringify(d.data(), null, 2)], {type: "application/json"});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `HCE_INTEROP_${id}.json`; a.click();
+        const blob = new Blob([JSON.stringify(d.data())], {type: "application/json"});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `HCE_${id}.json`; a.click();
     };
 
     window.imprimirNotaCifrada = async (id) => {
         const d = await getDoc(doc(db, "evoluciones_psicologicas", id));
         const ev = d.data();
+        const pSnap = await getDoc(doc(db, "pacientes", idPaciente));
         const win = window.open('', '_blank');
-        win.document.write(`<html><body style="font-family:Arial; padding:40px;"><h2>INFORME CLÍNICO DESCIFRADO</h2><hr><p>CIE-10: ${descifrar(ev.cie10)}</p><p>${descifrar(ev.texto)}</p><br>Firma: ${ev.autorRol.toUpperCase()}<script>window.print();<\/script></body></html>`);
+        win.document.write(`<html><body style="font-family:Arial; padding:40px;"><h2>INFORME LEGAL</h2><p>Paciente: ${pSnap.data().nombre}</p><p>CIE-10: ${descifrar(ev.cie10)}</p><p>${descifrar(ev.texto)}</p><script>window.print();<\/script></body></html>`);
     };
 
-    const snapP = await getDoc(doc(db, "pacientes", idPaciente));
-    if (snapP.exists()) document.getElementById("nombrePaciente").innerText = snapP.data().nombre;
+    // --- CARGA DE PACIENTE (SOLUCIÓN AL ERROR DE IMAGEN) ---
+    async function init() {
+        if (!idPaciente) return;
+        const snap = await getDoc(doc(db, "pacientes", idPaciente));
+        if (snap.exists()) {
+            document.getElementById("nombrePaciente").innerText = snap.data().nombre.toUpperCase();
+        } else {
+            document.getElementById("nombrePaciente").innerText = "PACIENTE NO ENCONTRADO";
+        }
+    }
+    init();
     window.idPaciente = idPaciente;
 </script>
 </body>
-</html>
+</html>>
