@@ -10,33 +10,19 @@
     <script src="https://cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-        :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 20px; }
+        :root { --primary: #0f3460; --accent: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
         .container { max-width: 1200px; margin: auto; background: white; padding: 35px; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
-        
-        /* CABECERA */
         .header { border-bottom: 3px solid var(--primary); padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
         .btn-principal { background: var(--primary); color: white; padding: 12px 25px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-principal:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-
-        /* TABLA DE PROFESIONALES */
         table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; text-align: left; }
         th, td { padding: 18px; border-bottom: 1px solid #eee; }
-        th { background: #f8f9fa; color: var(--primary); text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
-        .badge-habilitado { background: var(--accent); color: white; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: bold; }
-
-        /* VENTANA EMERGENTE (MODAL) */
+        th { background: #f8f9fa; color: var(--primary); text-transform: uppercase; font-size: 11px; }
         .modal-legal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
-        .modal-content { background: white; margin: 3% auto; padding: 35px; border-radius: 25px; width: 85%; max-width: 900px; max-height: 90vh; overflow-y: auto; border: 3px solid var(--primary); box-shadow: 0 25px 60px rgba(0,0,0,0.5); }
-        
-        .grid-form { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; text-align: left; }
-        label { font-weight: bold; font-size: 13px; color: var(--primary); display: block; margin-bottom: 5px; }
+        .modal-content { background: white; margin: 3% auto; padding: 35px; border-radius: 25px; width: 85%; max-width: 850px; border: 3px solid var(--primary); }
         input, select { width: 100%; padding: 14px; margin-bottom: 15px; border-radius: 10px; border: 1px solid #ccc; box-sizing: border-box; }
-
-        /* ÁREA DE ARCHIVOS / SOPORTES */
-        .box-soportes { background: #f9f9f9; padding: 20px; border-radius: 15px; border: 2px dashed var(--primary); }
-        .soporte-tag { background: white; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
-        .btn-add-file { background: var(--secondary); color: white; width: 100%; padding: 12px; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; margin-bottom: 15px; }
+        .box-soportes { background: #f9f9f9; padding: 20px; border-radius: 15px; border: 2px dashed #0f3460; text-align: left; }
+        .soporte-tag { background: white; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #ddd; display: flex; justify-content: space-between; font-size: 12px; }
     </style>
 </head>
 <body>
@@ -52,77 +38,64 @@
             <button class="btn-principal" style="background:#6c757d" onclick="window.location.href='administracion.html'">⬅ VOLVER</button>
         </div>
     </div>
-
-    <table>
+    <table id="tablaPersonal">
         <thead>
             <tr>
-                <th>NOMBRE Y DOCUMENTO</th>
-                <th>TARJETA PROFESIONAL</th>
-                <th>CARGO / ESPECIALIDAD</th>
-                <th>FECHA VINCULACIÓN</th>
-                <th>ESTADO</th>
-                <th>EXPEDIENTE CV</th>
+                <th>PROFESIONAL</th>
+                <th>IDENTIFICACIÓN</th>
+                <th>TARJETA PROF.</th>
+                <th>CARGO</th>
+                <th>VINCULACIÓN</th>
+                <th>ACCIONES</th>
             </tr>
         </thead>
-        <tbody id="tablaPersonal">
-            <!-- Cargando datos cifrados... -->
-        </tbody>
+        <tbody id="cuerpoTabla"></tbody>
     </table>
 </div>
 
-<!-- MODAL DE REGISTRO INTEGRAL -->
 <div id="modalVinculacion" class="modal-legal">
     <div class="modal-content">
-        <h3 style="color: var(--primary); border-bottom: 3px solid var(--primary); padding-bottom: 10px; margin-top: 0;">📋 REGISTRO DE VINCULACIÓN Y HOJA DE VIDA</h3>
-        <div class="grid-form">
-            <!-- COLUMNA 1: IDENTIDAD -->
+        <h3 style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px;">📋 REGISTRO DE VINCULACIÓN PROFESIONAL</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left;">
             <div>
-                <label>Nombre Completo:</label>
-                <input type="text" id="pNombre" placeholder="Nombre completo">
-                <label>Documento de Identidad (CC):</label>
-                <input type="text" id="pCC" placeholder="Cédula">
-                <label>Tarjeta Profesional / Registro:</label>
-                <input type="text" id="pTP" placeholder="ReTHUS o TP">
-                <label>Cargo o Especialidad:</label>
+                <label>Nombre Completo:</label><input type="text" id="pNombre">
+                <label>Documento (CC):</label><input type="text" id="pCC">
+                <label>Tarjeta Profesional:</label><input type="text" id="pTP">
+                <label>Cargo / Especialidad:</label>
                 <select id="pCargo">
-                    <option value="Psicología Clínica">Psicología Clínica</option>
-                    <option value="Trabajo Social">Trabajo Social</option>
-                    <option value="Dirección General">Dirección General</option>
-                    <option value="Administración">Administración</option>
+                    <option value="Psicologia">Psicología</option>
+                    <option value="Terapeuta">Terapeuta</option>
+                    <option value="Director(a) Terapeutico">Director(a) Terapéutico</option>
+                    <option value="Psiquiatria">Psiquiatría</option>
+                    <option value="Medico">Médico</option>
+                    <option value="Director(a) General">Director(a) General</option>
+                    <option value="Administrador">Administrador</option>
                 </select>
-                <label>PIN de Firma Digital (4 Dígitos):</label>
-                <input type="password" id="pPIN" maxlength="4" style="text-align:center; letter-spacing:10px; font-size:22px;" placeholder="****">
+                <label>PIN de Firma (4 dígitos):</label><input type="password" id="pPIN" maxlength="4" style="text-align:center; letter-spacing:8px;">
             </div>
-
-            <!-- COLUMNA 2: SOPORTES DIGITALES -->
             <div class="box-soportes">
-                <label style="color: var(--primary);">📁 ADJUNTAR SOPORTES LEGALES (PDF/JPG):</label>
+                <label>ANEXAR SOPORTE LEGAL:</label>
                 <select id="tipoDoc">
-                    <option value="Diploma/Acta">Diploma o Acta de Grado</option>
-                    <option value="Tarjeta Física">Tarjeta Profesional (Copia)</option>
-                    <option value="Certificado ReTHUS">Inscripción ReTHUS</option>
-                    <option value="Antecedentes">Antecedentes Judiciales</option>
-                    <option value="Referencias">Referencias Laborales</option>
+                    <option value="Diploma">Diploma/Acta</option>
+                    <option value="Tarjeta">Tarjeta Prof.</option>
+                    <option value="Rethus">Inscripción ReTHUS</option>
+                    <option value="Antecedentes">Antecedentes</option>
                 </select>
-                <input type="file" id="archivoInput" style="font-size: 11px;">
-                <button class="btn-add-file" onclick="adicionarSoporteALista()">📂 ADICIONAR AL EXPEDIENTE</button>
-                
-                <div id="listaPreviaArchivos" style="max-height: 200px; overflow-y: auto; border-top: 1px solid #ddd; padding-top: 10px;">
-                    <!-- Los archivos listos para cifrar aparecen aquí -->
-                </div>
+                <input type="file" id="archivoInput">
+                <button class="btn-principal" style="width:100%; background:#34495e;" onclick="adicionarInfo()">📂 ADICIONAR AL EXPEDIENTE</button>
+                <div id="listaPrevia"></div>
             </div>
         </div>
-
-        <div style="margin-top:30px; display:flex; gap:15px;">
-            <button class="btn-principal" style="background: var(--accent); flex:1; padding:18px;" onclick="guardarVinculacionE2EE()">💾 FINALIZAR Y CIFRAR VINCULACIÓN</button>
-            <button class="btn-principal" style="background: var(--danger); flex:1; padding:18px;" onclick="cerrarModal()">CANCELAR</button>
+        <div style="margin-top:25px; display:flex; gap:15px;">
+            <button class="btn-principal" style="background:var(--accent); flex:1;" onclick="guardarE2EE()">💾 SELLAR Y CIFRAR</button>
+            <button class="btn-principal" style="background:var(--danger); flex:1;" onclick="cerrarModal()">CANCELAR</button>
         </div>
     </div>
 </div>
 
 <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import {  getFirestore, collection, addDoc, getDocs, serverTimestamp, query, orderBy  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import {  getFirestore, collection, addDoc, getDocs  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
             authDomain: "caminosnuevosdatabase.firebaseapp.com",
@@ -133,121 +106,65 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    
-    // LLAVE MAESTRA DE ADMINISTRACIÓN (Misma que administracion.html)
-    const LLAVE_MAESTRA_ADMIN = "ADMIN2024*"; 
+    const LLAVE_ADMIN = "ADMIN2024*"; 
+    let soporteTemp = [];
 
-    let archivosParaCifrar = [];
-
-    // MOTOR DE CIFRADO DE EXTREMO A EXTREMO (E2EE)
-    const cifrarDato = (t) => CryptoJS.AES.encrypt(t, LLAVE_MAESTRA_ADMIN).toString();
-    const descifrarDato = (h) => {
-        try { 
-            const bytes = CryptoJS.AES.decrypt(h, LLAVE_MAESTRA_ADMIN);
-            return bytes.toString(CryptoJS.enc.Utf8) || "DATO_PROTEGIDO"; 
-        } catch(e) { return "ERROR_KEY"; }
+    const cifrar = (t) => CryptoJS.AES.encrypt(t, LLAVE_ADMIN).toString();
+    const descifrar = (h) => {
+        try { return CryptoJS.AES.decrypt(h, LLAVE_ADMIN).toString(CryptoJS.enc.Utf8); }
+        catch(e) { return "PROTEGIDO"; }
     };
 
     window.abrirModal = () => document.getElementById('modalVinculacion').style.display = 'block';
-    window.cerrarModal = () => {
-        document.getElementById('modalVinculacion').style.display = 'none';
-        archivosParaCifrar = [];
-        document.getElementById('listaPreviaArchivos').innerHTML = "";
-    };
+    window.cerrarModal = () => { document.getElementById('modalVinculacion').style.display = 'none'; soporteTemp = []; document.getElementById('listaPrevia').innerHTML = ""; };
 
-    // ADICIONAR ARCHIVOS LAS VECES QUE QUIERAS
-    window.adicionarSoporteALista = () => {
+    window.adicionarInfo = () => {
         const fileInput = document.getElementById('archivoInput');
         const tipo = document.getElementById('tipoDoc').value;
-        
-        if (fileInput.files.length === 0) return alert("Por favor, seleccione un archivo.");
-
+        if (fileInput.files.length === 0) return alert("Seleccione archivo");
         const reader = new FileReader();
         reader.onload = (e) => {
-            archivosParaCifrar.push({
-                categoria: tipo,
-                nombre: fileInput.files[0].name,
-                base64: e.target.result
-            });
-            renderListaPrevia();
+            soporteTemp.push({ tipo, nombre: fileInput.files[0].name, data: e.target.result });
+            document.getElementById('listaPrevia').innerHTML += `<div class='soporte-tag'><span>✅ ${tipo}</span></div>`;
         };
         reader.readAsDataURL(fileInput.files[0]);
     };
 
-    function renderListaPrevia() {
-        const div = document.getElementById('listaPreviaArchivos');
-        div.innerHTML = archivosParaCifrar.map((a, i) => `
-            <div class="soporte-tag">
-                <span>📄 <strong>${a.categoria}</strong>: ${a.nombre.substring(0,20)}...</span>
-                <b onclick="archivosParaCifrar.splice(${i},1); renderListaPrevia()" style="color:red; cursor:pointer;">✖</b>
-            </div>
-        `).join('');
-    }
-
-    // GUARDADO FINAL CON CIFRADO TOTAL
-    window.guardarVinculacionE2EE = async () => {
-        const d = {
-            nom: document.getElementById('pNombre').value,
-            cc: document.getElementById('pCedula').value,
-            tp: document.getElementById('pTP').value,
-            car: document.getElementById('pCargo').value,
-            pin: document.getElementById('pPIN').value
-        };
-
-        if (!d.nom || !d.tp || !d.pin || archivosParaCifrar.length === 0) {
-            return alert("❌ ERROR: Para habilitación legal, debe completar todos los campos y adjuntar soportes.");
-        }
+    window.guardarE2EE = async () => {
+        const n = document.getElementById('pNombre').value;
+        const cc = document.getElementById('pCC').value;
+        const tp = document.getElementById('pTP').value;
+        const ca = document.getElementById('pCargo').value;
+        const pi = document.getElementById('pPIN').value;
+        if (!n || !cc || !pi) return alert("Faltan datos");
 
         try {
-            console.log("Iniciando trituración de datos y cifrado de archivos...");
-            
             await addDoc(collection(db, "talento_humano_cifrado"), {
-                // Datos Identitarios Cifrados
-                identidad: {
-                    nombre: cifrarDato(d.nom),
-                    cedula: cifrarDato(d.cc),
-                    tp: cifrarDato(d.tp),
-                    cargo: cifrarDato(d.car),
-                    pin_acceso: cifrarDato(d.pin)
-                },
-                // SOPORTES (PDF/JPG) CIFRADOS INDIVIDUALMENTE
-                expediente_digital: archivosParaCifrar.map(a => ({
-                    tipo: a.categoria,
-                    archivo_cifrado: cifrarDato(a.base64)
-                })),
-                fecha_vinculacion: new Date().toLocaleString(),
-                timestamp: serverTimestamp(),
-                estado: "HABILITADO",
-                audit_hash: btoa(d.cc + Date.now()).substring(0,15)
+                nombre: cifrar(n), cc: cifrar(cc), tp: cifrar(tp), cargo: cifrar(ca), pin: cifrar(pi),
+                expediente: soporteTemp.map(s => ({ tipo: s.tipo, archivo: cifrar(s.data) })),
+                fecha: new Date().toLocaleString()
             });
-
-            alert("✅ PROFESIONAL VINCULADO CORRECTAMENTE. Expediente cifrado de extremo a extremo.");
-            location.reload();
-        } catch (e) { alert("Error de Base de Datos: " + e.message); }
+            alert("🎯 PROFESIONAL VINCULADO"); location.reload();
+        } catch(e) { alert(e.message); }
     };
 
-    // CARGAR LISTA CON DESCIFRADO LOCAL
-    async function cargarListaProfesionales() {
-        const q = query(collection(db, "talento_humano_cifrado"), orderBy("timestamp", "desc"));
-        const snap = await getDocs(q);
-        let html = "";
-        
+    async function cargar() {
+        const snap = await getDocs(collection(db, "talento_humano_cifrado"));
+        let h = "";
         snap.forEach(doc => {
             const d = doc.data();
-            html += `<tr>
-                <td><strong>${descifrarDato(d.identidad.nombre)}</strong><br><small>CC: ${descifrarDato(d.identidad.cedula)}</small></td>
-                <td>${descifrarDato(d.identidad.tp)}</td>
-                <td>${descifrarDato(d.identidad.cargo)}</td>
-                <td>${d.fecha_vinculacion}</td>
-                <td><span class="badge-habilitado">${d.estado}</span></td>
-                <td><button class="btn-principal" style="padding:6px 12px; font-size:10px;" onclick="alert('Accediendo a Bóveda Personal...')">👁️ VER CV</button></td>
+            h += `<tr>
+                <td><strong>${descifrar(d.nombre)}</strong></td>
+                <td>${descifrar(d.cc)}</td>
+                <td>${descifrar(d.tp)}</td>
+                <td>${descifrar(d.cargo)}</td>
+                <td>${d.fecha}</td>
+                <td><button class='btn-principal' style='padding:5px; font-size:10px;'>👁️ VER CV</button></td>
             </tr>`;
         });
-        document.getElementById("tablaPersonal").innerHTML = html || "<tr><td colspan='6'>No hay profesionales vinculados.</td></tr>";
+        document.getElementById("cuerpoTabla").innerHTML = h;
     }
-    
-    cargarListaProfesionales();
+    cargar();
 </script>
-
 </body>
 </html>
