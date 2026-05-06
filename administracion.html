@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Administración - Fundación NC</title>
+    <!-- MOTOR DE SEGURIDAD PARA CIFRADO E2EE -->
+    <script src="https://cloudflare.com"></script>
+    <style>
+        :root { --primary: #0f3460; --bg: #1a1a2e; --white: #ffffff; --accent: #27ae60; --danger: #e74c3c; }
+        
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: var(--bg); 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            min-height: 100vh;
+        }
+
+        /* CONTENEDOR PRINCIPAL (DESENFOCADO HASTA VALIDAR) */
+        #panelMaestro { 
+            display: none; 
+            width: 90%; 
+            max-width: 1000px; 
+            background: var(--white); 
+            padding: 40px; 
+            border-radius: 30px; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5); 
+            text-align: center;
+            filter: blur(10px); /* Efecto de seguridad visual */
+            transition: filter 0.5s ease;
+        }
+
+        /* DISEÑO DE LA CUADRÍCULA DE 5 BOTONES */
+        .grid-admin { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
+            gap: 25px; 
+            margin-top: 30px; 
+        }
+
+        .btn-card { 
+            background: #fff; 
+            border: 2px solid #eee; 
+            padding: 40px 20px; 
+            border-radius: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            text-decoration: none; 
+            color: var(--primary); 
+            transition: 0.3s; 
+            cursor: pointer;
+        }
+
+        .btn-card:hover { 
+            transform: translateY(-10px); 
+            border-color: var(--primary); 
+            box-shadow: 0 15px 30px rgba(15,52,96,0.2); 
+        }
+
+        .btn-card i { font-size: 50px; margin-bottom: 15px; font-style: normal; }
+        .btn-card span { font-weight: bold; text-transform: uppercase; font-size: 13px; letter-spacing: 1px; }
+
+        /* VENTANA EMERGENTE DE SEGURIDAD (MODAL) */
+        .modal-seguridad { 
+            position: fixed; 
+            z-index: 10000; 
+            left: 0; top: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(26, 26, 46, 0.95); 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content { 
+            background: white; 
+            padding: 40px; 
+            border-radius: 25px; 
+            text-align: center; 
+            width: 90%; 
+            max-width: 400px; 
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            border: 3px solid var(--primary);
+        }
+
+        .input-clave { 
+            width: 100%; 
+            padding: 15px; 
+            margin: 20px 0; 
+            border-radius: 12px; 
+            border: 2px solid #ddd; 
+            font-size: 24px; 
+            text-align: center; 
+            letter-spacing: 8px; 
+            box-sizing: border-box;
+        }
+
+        .btn-acceder { 
+            background: var(--primary); 
+            color: white; 
+            padding: 15px; 
+            width: 100%; 
+            border: none; 
+            border-radius: 12px; 
+            font-weight: bold; 
+            cursor: pointer; 
+        }
+
+    </style>
+</head>
+<body>
+
+<!-- VENTANA EMERGENTE DE ACCESO (MODAL) -->
+<div id="modalClave" class="modal-seguridad">
+    <div class="modal-content">
+        <i style="font-size: 50px; font-style: normal;">🔐</i>
+        <h2 style="color: var(--primary); margin-top: 15px;">ALTA DIRECCIÓN</h2>
+        <p style="color: #666; font-size: 14px;">Ingrese la Llave Maestra para descifrar el Panel Administrativo</p>
+        
+        <input type="password" id="passMaster" class="input-clave" placeholder="****" autofocus>
+        
+        <button class="btn-acceder" onclick="verificarLlave()">DESCIFRAR Y ENTRAR</button>
+        <button onclick="window.location.href='index.html'" style="background:none; border:none; color:var(--danger); margin-top:15px; cursor:pointer; font-weight:bold;">✖ CANCELAR</button>
+    </div>
+</div>
+
+<!-- PANEL ADMINISTRATIVO (OCULTO HASTA VALIDAR) -->
+<div id="panelMaestro">
+    <div style="border-bottom: 3px solid var(--primary); margin-bottom: 30px; padding-bottom: 15px;">
+        <h1 style="color: var(--primary); margin: 0; letter-spacing: 1px;">⚙️ BÓVEDA ADMINISTRATIVA E2EE</h1>
+        <small style="color: #666; font-weight: bold; text-transform: uppercase;">Control de Gestión Institucional - Nivel Maestro</small>
+    </div>
+
+    <div class="grid-admin">
+        <!-- 1. GESTIÓN DE TALENTO HUMANO -->
+        <a href="gestion_talento.html" class="btn-card">
+            <i>👥</i>
+            <span>Gestión de Talento Humano</span>
+        </a>
+
+        <!-- 2. DATOS DE LA IPS -->
+        <div class="btn-card" onclick="alert('Módulo encriptado')">
+            <i>🏥</i>
+            <span>Configuración IPS (NIT/Hab)</span>
+        </div>
+
+        <!-- 3. TRAZABILIDAD -->
+        <div class="btn-card" onclick="alert('Módulo encriptado')">
+            <i>📜</i>
+            <span>Trazabilidad de Accesos</span>
+        </div>
+
+        <!-- 4. SEGURIDAD -->
+        <div class="btn-card" onclick="alert('Módulo encriptado')">
+            <i>🔑</i>
+            <span>Gestión de Llaves Máximas</span>
+        </div>
+
+        <!-- 5. ESTADÍSTICAS -->
+        <div class="btn-card" onclick="alert('Módulo encriptado')">
+            <i>📊</i>
+            <span>Estadísticas de Gestión</span>
+        </div>
+    </div>
+
+    <div style="margin-top: 40px;">
+        <button onclick="window.location.href='index.html'" style="background:#f8f9fa; border:1px solid #ddd; padding:10px 20px; border-radius:10px; color:var(--primary); font-weight:bold; cursor:pointer;">
+            ⬅ CERRAR SESIÓN ADMINISTRATIVA
+        </button>
+    </div>
+</div>
+
+<script>
+    // LLAVE MAESTRA DE DIRECCIÓN
+    const LLAVE_AUTORIZADA = "ADMIN2024*"; 
+    // LLAVE DE CIFRADO E2EE PARA DATOS INSTITUCIONALES
+    const LLAVE_CIFRADO_ADMIN = "USC_E2EE_ADMIN_SECURE";
+
+    function verificarLlave() {
+        const pass = document.getElementById("passMaster").value;
+        
+        if (pass === LLAVE_AUTORIZADA) {
+            // Animación de acceso
+            document.getElementById("modalClave").style.display = "none";
+            const panel = document.getElementById("panelMaestro");
+            panel.style.display = "block";
+            
+            // Quitamos el blur progresivamente
+            setTimeout(() => {
+                panel.style.filter = "blur(0px)";
+            }, 10);
+            
+            console.log("Acceso autorizado E2EE a Dirección.");
+        } else {
+            alert("❌ LLAVE INCORRECTA. Acceso Denegado.");
+            document.getElementById("passMaster").value = "";
+        }
+    }
+
+    // Permitir "Enter" para entrar
+    document.getElementById("passMaster").addEventListener("keyup", function(event) {
+        if (event.key === "Enter") {
+            verificarLlave();
+        }
+    });
+
+    // MOTOR DE CIFRADO PARA USO EN PÁGINAS ADMINISTRATIVAS
+    const cifrarE2EE = (texto) => CryptoJS.AES.encrypt(texto, LLAVE_CIFRADO_ADMIN).toString();
+</script>
+
+</body>
+</html>
