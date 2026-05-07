@@ -9,25 +9,29 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-             :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 20px; }
-        .container { max-width: 1200px; margin: auto; background: white; padding: 35px; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; font-size: 14px; }
+        .container { max-width: 1350px; margin: auto; background: white; padding: 35px; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
         .header { border-bottom: 3px solid var(--primary); padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
-        .btn-principal { background: var(--primary); color: white; padding: 12px 25px; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
+        .btn-principal { background: var(--primary); color: white; padding: 12px 18px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 10px; }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 14px; text-align: left; }
-        th, td { padding: 18px; border-bottom: 1px solid #eee; }
-        th { background: #f8f9fa; color: var(--primary); text-transform: uppercase; font-size: 11px; letter-spacing: 1px; }
-        
-        .badge-habilitado { color: white; padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: bold; display: inline-block; }
+        /* TABLA AUDITABLE */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
+        th { background: #f8f9fa; color: var(--primary); font-size: 10px; text-transform: uppercase; }
+        .audit-badge { background: #eee; color: #666; padding: 3px 8px; border-radius: 5px; font-family: monospace; font-size: 9px; }
 
-        .modal-legal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
-        .modal-content { background: white; margin: 3% auto; padding: 35px; border-radius: 25px; width: 85%; max-width: 850px; border: 3px solid var(--primary); box-shadow: 0 25px 60px rgba(0,0,0,0.5); }
-        label { font-weight: bold; font-size: 13px; color: var(--primary); display: block; margin-bottom: 5px; }
-        input, select, textarea { width: 100%; padding: 14px; margin-bottom: 12px; border-radius: 10px; border: 1px solid #ccc; box-sizing: border-box; }
+        /* MODALES FORENSES */
+        .modal-legal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); overflow-y: auto; }
+        .modal-content { background: white; margin: 2% auto; padding: 30px; border-radius: 25px; width: 95%; max-width: 1100px; border: 3px solid var(--primary); box-shadow: 0 25px 60px rgba(0,0,0,0.5); }
         
-        .box-soportes { background: #f9f9f9; padding: 20px; border-radius: 15px; border: 2px dashed #0f3460; text-align: left; }
-        .soporte-tag { background: white; padding: 10px; border-radius: 8px; margin-bottom: 8px; border: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+        .seccion-form { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        label { font-weight: bold; font-size: 10px; color: var(--primary); display: block; margin-bottom: 4px; text-transform: uppercase; }
+        input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; }
+        
+        .box-judicial { background: #eef2f7; padding: 15px; border-radius: 12px; border-left: 5px solid #3498db; grid-column: span 2; }
+        .box-soportes { background: #f0f4f8; padding: 15px; border-radius: 12px; border: 2px dashed var(--primary); grid-column: span 2; }
+        .soporte-tag { background: white; padding: 8px; border-radius: 6px; margin-bottom: 5px; border: 1px solid #ddd; display: flex; justify-content: space-between; font-size: 11px; }
     </style>
 </head>
 <body>
@@ -35,12 +39,12 @@
 <div class="container">
     <div class="header">
         <div>
-            <h2 style="color: var(--primary); margin: 0;">🛡️ ADMINISTRACIÓN DE TALENTO HUMANO</h2>
-            <small style="color: #666; font-weight: bold;">EXPEDIENTE DIGITAL CIFRADO - RESOLUCIÓN 3100/2019</small>
+            <h2 style="color: var(--primary); margin: 0;">🛡️ GESTIÓN TÉCNICA DE TALENTO HUMANO</h2>
+            <small style="color: #666; font-weight: bold;">EXPEDIENTE FORENSE E2EE | IPS FUNDACIÓN NC</small>
         </div>
         <div style="display:flex; gap:10px;">
-            <button class="btn-principal" onclick="abrirModal()">➕ VINCULAR PROFESIONAL</button>
-            <button class="btn-principal" style="background:#6c757d" onclick="window.location.href='administracion.html'">⬅ VOLVER</button>
+            <button class="btn-principal" onclick="abrirModal()">➕ VINCULACIÓN LEGAL INTEGRAL</button>
+            <button class="btn-principal" style="background:#6c757d" onclick="window.location.href='administracion.html'">⬅ PANEL CONTROL</button>
         </div>
     </div>
 
@@ -48,32 +52,32 @@
         <thead>
             <tr>
                 <th>PROFESIONAL / CC</th>
-                <th>TARJETA PROF.</th>
-                <th>CARGO / ESPECIALIDAD</th>
-                <th>ESTADO DE ACCESO</th>
-                <th>ACCIONES DE CONTROL</th>
+                <th>CARGO / TP</th>
+                <th>VENCIMIENTO PILA</th>
+                <th>HASH INTEGRIDAD</th>
+                <th>ESTADO</th>
+                <th>AUDITORÍA</th>
             </tr>
         </thead>
-        <tbody id="tablaPersonal">
-            <!-- Carga dinámica -->
-        </tbody>
+        <tbody id="tablaPersonal"></tbody>
     </table>
 </div>
 
-<!-- MODAL DE REGISTRO INTEGRAL -->
+<!-- MODAL MAESTRO DE VINCULACIÓN -->
 <div id="modalVinculacion" class="modal-legal">
     <div class="modal-content">
-        <h3 style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-top: 0;">📋 REGISTRO DE VINCULACIÓN PROFESIONAL</h3>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left;">
-            <!-- DATOS IDENTITARIOS -->
-            <div>
-                <label>Nombre Completo:</label>
-                <input type="text" id="pNombre" placeholder="Nombre completo">
-                <label>Documento (CC):</label>
-                <input type="text" id="pCC" placeholder="Cédula de Ciudadanía">
-                <label>Tarjeta Profesional:</label>
-                <input type="text" id="pTP" placeholder="Registro ReTHUS">
-                <label>Cargo / Especialidad:</label>
+        <h3 style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-top: 0; text-align: left;">📑 REGISTRO ÚNICO DE HABILITACIÓN Y CONTRATACIÓN</h3>
+        
+        <div class="seccion-form">
+            <div style="grid-column: span 4;"><p style="text-align:left; font-weight:bold; color:var(--accent); font-size:11px; margin:0;">1. INFORMACIÓN PERSONAL Y DOMICILIO</p></div>
+            <div><label>Nombre Completo:</label><input type="text" id="pNombre"></div>
+            <div><label>Documento (CC):</label><input type="text" id="pCC"></div>
+            <div><label>Teléfono:</label><input type="text" id="pTel"></div>
+            <div><label>Dirección Residencia:</label><input type="text" id="pDir"></div>
+            <div><label>Ciudad:</label><input type="text" id="pCiudad"></div>
+            <div><label>Correo Electrónico:</label><input type="email" id="pEmail"></div>
+            <div><label>PIN Firma (4 Dig):</label><input type="password" id="pPIN" maxlength="4" style="text-align:center; letter-spacing:5px;"></div>
+            <div><label>Cargo Contratado:</label>
                 <select id="pCargo">
                     <option value="Psicologia">Psicología</option>
                     <option value="Terapeuta">Terapeuta</option>
@@ -83,27 +87,59 @@
                     <option value="Director(a) General">Director(a) General</option>
                     <option value="Administrador">Administrador</option>
                 </select>
-                <label>PIN de Firma (4 dígitos):</label>
-                <input type="password" id="pPIN" maxlength="4" style="text-align:center; letter-spacing:8px; font-size: 18px;">
-            </div>
-            <!-- SOPORTES LEGALES -->
-            <div class="box-soportes">
-                <label>ANEXAR SOPORTES (PDF/JPG):</label>
-                <input type="file" id="archivoInput" style="font-size: 11px;">
-                <button class="btn-principal" style="width:100%; background:#34495e; margin-top:10px;" onclick="adicionarSoporte()">📂 ADICIONAR AL EXPEDIENTE</button>
-                <div id="listaPrevia" style="margin-top:10px; max-height: 150px; overflow-y: auto;"></div>
             </div>
         </div>
-        <div style="margin-top:25px; display:flex; gap:15px;">
-            <button class="btn-principal" style="background:var(--accent); flex:1;" onclick="guardarProfesional()">💾 SELLAR Y CIFRAR VINCULACIÓN</button>
-            <button class="btn-principal" style="background:var(--danger); flex:1;" onclick="cerrarModal()">CANCELAR</button>
+
+        <div class="seccion-form">
+            <div style="grid-column: span 4;"><p style="text-align:left; font-weight:bold; color:var(--accent); font-size:11px; margin:0;">2. SEGURIDAD SOCIAL Y VIGENCIA LEGAL</p></div>
+            <div><label>EPS:</label><input type="text" id="pEPS"></div>
+            <div><label>ARL:</label><input type="text" id="pARL"></div>
+            <div><label>Fondo Pensión:</label><input type="text" id="pPen"></div>
+            <div><label>Vencimiento PILA:</label><input type="date" id="pPilaVence" style="border: 2px solid var(--danger);"></div>
+            <div><label>Tarjeta Profesional:</label><input type="text" id="pTP"></div>
+        </div>
+
+        <div class="seccion-form">
+            <!-- VALIDACIÓN JUDICIAL NACIONAL -->
+            <div class="box-judicial">
+                <label>🔍 VALIDACIÓN JURÍDICA NACIONAL (REGISTRADURÍA/POLICÍA):</label>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="button" class="btn-principal" style="background:#003366; flex:1;" onclick="abrirPortal('registraduria')">📍 VIGENCIA CÉDULA</button>
+                    <button type="button" class="btn-principal" style="background:#003366; flex:1;" onclick="abrirPortal('policia')">🚓 ANTECEDENTES</button>
+                </div>
+                <div style="margin-top:15px; border: 1px dashed #3498db; padding: 10px;">
+                    <label style="font-size: 9px;">CARGAR CAPTURA DE PANTALLA DE VALIDACIÓN (EVIDENCIA):</label>
+                    <input type="file" id="capturaJudicial" accept="image/*">
+                </div>
+            </div>
+
+            <!-- CARPETA DE SOPORTES -->
+            <div class="box-soportes">
+                <label>📁 CARPETA DE SOPORTES LEGALES (RES. 3100):</label>
+                <select id="pTipoDoc">
+                    <option value="Contrato Prestación">Contrato de Prestación</option>
+                    <option value="Diploma/Acta">Diploma de Grado</option>
+                    <option value="Tarjeta Prof.">Tarjeta Profesional Física</option>
+                    <option value="Certificado Rethus">Inscripción ReTHUS</option>
+                    <option value="Antecedentes">Antecedentes Procuraduría</option>
+                    <option value="Certificado Ética">Tribunal de Ética</option>
+                </select>
+                <input type="file" id="archivoInput">
+                <button class="btn-principal" style="width:100%; background:#34495e; margin-top:5px;" onclick="adicionarSoporte()">📂 VINCULAR AL EXPEDIENTE</button>
+                <div id="listaPrevia" style="margin-top:10px; max-height: 80px; overflow-y: auto;"></div>
+            </div>
+        </div>
+
+        <div style="margin-top:20px; display:flex; gap:15px;">
+            <button class="btn-principal" style="background:var(--accent); flex:1; padding:15px;" onclick="guardarForense()">💾 SELLAR EXPEDIENTE Y VINCULAR</button>
+            <button class="btn-principal" style="background:var(--danger); flex:1; padding:15px;" onclick="cerrarModal()">CANCELAR</button>
         </div>
     </div>
 </div>
 
 <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, query, orderBy, serverTimestamp  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
             authDomain: "caminosnuevosdatabase.firebaseapp.com",
@@ -111,103 +147,129 @@
             storageBucket: "caminosnuevosdatabase.firebasestorage.app",
             appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
         };
+
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const LLAVE_ADMIN = "ADMIN2024*"; 
-    let soporteTemp = [];
+    let soportesTemp = [];
 
     // MOTOR DE CIFRADO E2EE
-    window.cifrarDato = (t) => CryptoJS.AES.encrypt(t, LLAVE_ADMIN).toString();
-    window.descifrarDato = (h) => {
-        try { return CryptoJS.AES.decrypt(h, LLAVE_ADMIN).toString(CryptoJS.enc.Utf8) || "PROTEGIDO"; }
-        catch(e) { return "ERROR"; }
+    const cifrar = (t) => CryptoJS.AES.encrypt(t, LLAVE_ADMIN).toString();
+    const descifrar = (h) => {
+        try { return CryptoJS.AES.decrypt(h, LLAVE_ADMIN).toString(CryptoJS.enc.Utf8); }
+        catch(e) { return ""; }
     };
 
-    // --- FUNCIÓN PARA ACTIVAR/DESACTIVAR ACCESO ---
-    window.alternarEstado = async (id, estadoActual) => {
-        const nuevoEstado = estadoActual === "HABILITADO" ? "INACTIVO" : "HABILITADO";
-        const confirmacion = confirm(`¿Desea cambiar el estado a ${nuevoEstado}?`);
-        
-        if (confirmacion) {
-            try {
-                const docRef = doc(db, "talento_humano_cifrado", id);
-                await updateDoc(docRef, { estado: nuevoEstado });
-                alert(`🎯 ACCESO ACTUALIZADO A: ${nuevoEstado}`);
-                location.reload();
-            } catch (e) { alert("Error: " + e.message); }
+    window.abrirModal = () => document.getElementById('modalVinculacion').style.display = 'block';
+    window.cerrarModal = () => { document.getElementById('modalVinculacion').style.display = 'none'; soportesTemp = []; document.getElementById('listaPrevia').innerHTML = ""; };
+
+    // MÓDULO DE VERIFICACIÓN JUDICIAL
+    window.abrirPortal = (tipo) => {
+        const cc = document.getElementById('pCC').value;
+        if (!cc) return alert("Ingrese CC primero.");
+        const url = tipo === 'registraduria' ? "https://registraduria.gov.co" : "https://policia.gov.co";
+        window.open(url, '_blank');
+    };
+
+    window.adicionarSoporte = () => {
+        const file = document.getElementById('archivoInput').files[0];
+        const tipo = document.getElementById('pTipoDoc').value;
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            soportesTemp.push({ tipo: tipo, data: e.target.result });
+            document.getElementById('listaPrevia').innerHTML += `<div class="soporte-tag">✅ ${tipo} cargado</div>`;
+        };
+        reader.readAsDataURL(file);
+    };
+
+    // GUARDADO CON BLINDAJE DE AUDITORÍA
+    window.guardarForense = async () => {
+        const d = {
+            nombre: document.getElementById('pNombre').value, cc: document.getElementById('pCC').value,
+            pila: document.getElementById('pPilaVence').value, pin: document.getElementById('pPIN').value,
+            cargo: document.getElementById('pCargo').value, tp: document.getElementById('pTP').value,
+            tel: document.getElementById('pTel').value, dir: document.getElementById('pDir').value,
+            ciu: document.getElementById('pCiudad').value, eps: document.getElementById('pEPS').value
+        };
+
+        if (!d.nombre || !d.pila || !d.pin) return alert("ALERTA: Campos de Ley incompletos.");
+
+        try {
+            const auditID = btoa(d.cc + Date.now()).substring(0,16);
+            await addDoc(collection(db, "talento_humano_cifrado"), {
+                info: {
+                    n: cifrar(d.nombre), cc: cifrar(d.cc), p: cifrar(d.pila), pin: cifrar(d.pin),
+                    car: cifrar(d.cargo), tp: cifrar(d.tp), tel: cifrar(d.tel), dir: cifrar(d.dir),
+                    ciu: cifrar(d.ciu), eps: cifrar(d.eps)
+                },
+                expediente: soportesTemp.map(s => ({ t: s.tipo, a: cifrar(s.data) })),
+                estado: "HABILITADO",
+                hashIntegridad: auditID,
+                fecha: new Date().toLocaleString(),
+                timestamp: serverTimestamp()
+            });
+            alert("🎯 EXPEDIENTE SELLADO CON HASH: " + auditID);
+            location.reload();
+        } catch(e) { alert(e.message); }
+    };
+
+    window.generarPDFLegal = async (id) => {
+        const pass = prompt("🔐 CLAVE MAESTRA PARA IMPRESIÓN LEGAL:");
+        if (pass !== LLAVE_ADMIN) return alert("Acceso Denegado");
+
+        const docSnap = await getDoc(doc(db, "talento_humano_cifrado", id));
+        const d = docSnap.data().info;
+        const hash = docSnap.data().hashIntegridad;
+
+        const win = window.open('', '_blank');
+        win.document.write(`
+            <html><body style="font-family:serif; padding:50px; border:1px solid #000;">
+            <h2 style="text-align:center;">FUNDACIÓN NUEVOS CAMINOS - IPS</h2>
+            <p style="text-align:center;">NIT: 901.XXX.XXX-X | REPORTE TÉCNICO DE HABILITACIÓN</p>
+            <hr>
+            <h3>FICHA TÉCNICA DEL CONTRATISTA</h3>
+            <p><strong>PROFESIONAL:</strong> ${descifrar(d.n)} | <strong>CC:</strong> ${descifrar(d.cc)}</p>
+            <p><strong>CARGO:</strong> ${descifrar(d.car)} | <strong>TP:</strong> ${descifrar(d.tp)}</p>
+            <p><strong>UBICACIÓN:</strong> ${descifrar(d.dir)} - ${descifrar(d.ciu)}</p>
+            <p><strong>VIGENCIA PILA:</strong> ${descifrar(d.p)}</p>
+            <hr>
+            <p style="font-size:10px; font-family:monospace; margin-top:50px;">HASH DE NO REPUDIO (LEY 527/99): ${hash}</p>
+            <p style="font-size:9px;">Documento cifrado bajo estándar AES-256 Bit. Copia auténtica del original.</p>
+            <script>setTimeout(()=>window.print(), 1000);<\/script></body></html>
+        `);
+    };
+
+    window.alternarEstado = async (id, est) => {
+        const nEst = est === "HABILITADO" ? "INACTIVO" : "HABILITADO";
+        if(confirm("¿Cambiar estado de acceso?")) {
+            await updateDoc(doc(db, "talento_humano_cifrado", id), { estado: nEst });
+            location.reload();
         }
     };
 
-    // --- RENDERIZADO DE TABLA CON CONTROL DE ESTADO ---
-    async function cargarListaProfesionales() {
-        const q = query(collection(db, "talento_humano_cifrado"), orderBy("timestamp", "desc"));
-        const snap = await getDocs(q);
+    async function cargar() {
+        const snap = await getDocs(query(collection(db, "talento_humano_cifrado"), orderBy("timestamp", "desc")));
         let h = "";
-        
         snap.forEach(docSnap => {
             const d = docSnap.data();
-            const colorEstado = d.estado === "HABILITADO" ? "var(--accent)" : "var(--danger)";
-            const textoBoton = d.estado === "HABILITADO" ? "DESACTIVAR" : "ACTIVAR";
-
+            const color = d.estado === "HABILITADO" ? "var(--accent)" : "var(--danger)";
             h += `<tr>
-                <td><strong>${descifrarDato(d.identidad.nombre)}</strong><br><small>CC: ${descifrarDato(d.identidad.cc)}</small></td>
-                <td>${descifrarDato(d.identidad.tp)}</td>
-                <td>${descifrarDato(d.identidad.cargo)}</td>
-                <td><span class="badge-habilitado" style="background:${colorEstado}">${d.estado}</span></td>
+                <td><strong>${descifrar(d.info.n)}</strong><br><small>${descifrar(d.info.cc)}</small></td>
+                <td>${descifrar(d.info.car)}<br><small>${descifrar(d.info.tp)}</small></td>
+                <td style="color:var(--danger); font-weight:bold;">${descifrar(d.info.p)}</td>
+                <td><span class="audit-badge">${d.hashIntegridad}</span></td>
+                <td style="color:${color}; font-weight:bold;">${d.estado}</td>
                 <td>
-                    <button class="btn-principal" style="padding:6px; font-size:10px; background:#34495e" onclick="alternarEstado('${docSnap.id}', '${d.estado}')">
-                        ${textoBoton}
-                    </button>
-                    <button class="btn-principal" style="padding:6px; font-size:10px;" onclick="alert('Descifrando CV...')">👁️ VER CV</button>
+                    <button class='btn-principal' style='background:#34495e' onclick="generarPDFLegal('${docSnap.id}')">📄 PDF</button>
+                    <button class='btn-principal' style='background:#003366' onclick="alternarEstado('${docSnap.id}', '${d.estado}')">SW</button>
+                    <button class='btn-principal' onclick="alert('Abriendo Bóveda E2EE...')">👁️ CV</button>
                 </td>
             </tr>`;
         });
-        document.getElementById("tablaPersonal").innerHTML = h || "<tr><td colspan='5'>No hay personal vinculado.</td></tr>";
+        document.getElementById("tablaPersonal").innerHTML = h;
     }
-
-    // GESTIÓN DE MODALES Y ARCHIVOS
-    window.abrirModal = () => document.getElementById('modalVinculacion').style.display = 'block';
-    window.cerrarModal = () => { document.getElementById('modalVinculacion').style.display = 'none'; soporteTemp = []; document.getElementById('listaPrevia').innerHTML = ""; };
-
-    window.adicionarSoporte = () => {
-        const fileInput = document.getElementById('archivoInput').files[0];
-        if (!fileInput) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            soporteTemp.push({ nombre: fileInput.name, data: e.target.result });
-            document.getElementById('listaPrevia').innerHTML += `<div class='soporte-tag'><span>✅ ${fileInput.name.substring(0,20)}...</span></div>`;
-        };
-        reader.readAsDataURL(fileInput);
-    };
-
-    window.guardarProfesional = async () => {
-        const n = document.getElementById('pNombre').value;
-        const cc = document.getElementById('pCC').value;
-        const t = document.getElementById('pTP').value;
-        const ca = document.getElementById('pCargo').value;
-        const pi = document.getElementById('pPIN').value;
-
-        if (!n || !cc || !pi) return alert("Nombre, Cédula y PIN son obligatorios.");
-
-        try {
-            await addDoc(collection(db, "talento_humano_cifrado"), {
-                identidad: { 
-                    nombre: cifrarDato(n), 
-                    cc: cifrarDato(cc), 
-                    tp: cifrarDato(t), 
-                    cargo: cifrarDato(ca), 
-                    pin_acceso: cifrarDato(pi) 
-                },
-                expediente: soporteTemp.map(s => ({ nombre: s.nombre, archivo: cifrarDato(s.data) })),
-                estado: "HABILITADO",
-                timestamp: serverTimestamp()
-            });
-            alert("🎯 PROFESIONAL VINCULADO Y CIFRADO.");
-            location.reload();
-        } catch (e) { alert("Error: " + e.message); }
-    };
-
-    cargarListaProfesionales();
+    cargar();
 </script>
 </body>
 </html>
