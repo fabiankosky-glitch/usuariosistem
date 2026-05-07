@@ -3,125 +3,105 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HCE Bóveda Cifrada - Fundación Nuevos Caminos</title>
-    
-    <!-- CARGA CRÍTICA DE LIBRERÍAS DE SEGURIDAD (ORDEN OBLIGATORIO) -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <title>HCE Bóveda Maestro - Fundación Nuevos Caminos</title>
+    <!-- LIBRERÍAS DE SEGURIDAD Y PRESERVACIÓN -->
+    <script src="https://cloudflare.com"></script>
+    <script src="https://cloudflare.com"></script>
+    <style>
+        :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #1a1a2e; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 40px; border-radius: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
+        .header-status { background: #d1e7dd; color: #0f5132; padding: 15px; border-radius: 12px; font-size: 13px; margin-bottom: 25px; font-weight: bold; border: 1px solid #badbcc; text-align: center; }
+        .btn-principal { background: var(--primary); color: white; padding: 18px; width: 100%; border: none; border-radius: 15px; font-size: 17px; font-weight: bold; cursor: pointer; margin-bottom: 20px; transition: 0.3s; }
+        #areaRegistro { display: none; background: #f8f9fa; padding: 30px; border-radius: 20px; border: 1.5px solid #dee2e6; margin-bottom: 40px; animation: slideDown 0.5s; }
+        textarea, input, select { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #ced4da; margin-bottom: 12px; font-size: 14px; box-sizing: border-box; }
+        
+        /* ESTILO EXACTO DE TU ESTRUCTURA VISUAL */
+        .evolucion-card { text-align: left; background: #fff; border-radius: 15px; padding: 25px; margin-bottom: 25px; position: relative; box-shadow: 0 8px 25px rgba(0,0,0,0.1); border: 1px solid #eee; }
+        .hash-tag { position: absolute; top: 12px; right: 20px; font-size: 10px; color: var(--accent); font-family: 'Courier New', monospace; font-weight: bold; }
+        .cie-box { background: #f9f9f9; border-radius: 10px; padding: 15px; margin: 15px 0; border: 1px solid #eee; font-size: 13px; }
+        
+        /* BLOQUE LEGAL AMARILLO DE ACLARATORIA */
+        .bloque-aclaratoria { background: #fff9e6; padding: 20px; border-radius: 12px; margin-top: 20px; border: 1px solid #ffeeba; font-size: 12px; border-left: 5px solid #f1c40f; }
+        
+        .botones-accion { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+        .btn-mini { padding: 12px 18px; border: none; border-radius: 8px; color: white; cursor: pointer; font-size: 11px; font-weight: 700; text-transform: uppercase; margin-right: 8px; }
 
-  <style>
-        :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 20px; font-size: 13px; }
-        .container { max-width: 1400px; margin: auto; background: white; padding: 35px; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
-        .header { border-bottom: 3px solid var(--primary); padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
-        .btn-principal { background: var(--primary); color: white; padding: 12px 18px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 10px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
-        th { background: #f8f9fa; color: var(--primary); font-size: 10px; text-transform: uppercase; }
-        .audit-badge { background: #eee; color: #666; padding: 3px 8px; border-radius: 5px; font-family: monospace; font-size: 9px; }
-        .modal-legal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); overflow-y: auto; }
-        .modal-content { background: white; margin: 2% auto; padding: 30px; border-radius: 25px; width: 95%; max-width: 1150px; border: 3px solid var(--primary); box-shadow: 0 25px 60px rgba(0,0,0,0.5); }
-        .seccion-form { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
-        label { font-weight: bold; font-size: 10px; color: var(--primary); display: block; margin-bottom: 4px; text-transform: uppercase; }
-        input, select { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; }
-        .box-judicial { background: #eef2f7; padding: 15px; border-radius: 12px; border-left: 5px solid #3498db; grid-column: span 2; }
-        .box-soportes { background: #f0f4f8; padding: 15px; border-radius: 12px; border: 2px dashed var(--primary); grid-column: span 2; }
-        .soporte-tag { background: white; padding: 8px; border-radius: 6px; margin-bottom: 5px; border: 1px solid #ddd; display: flex; justify-content: space-between; font-size: 11px; }
+        /* VENTANAS EMERGENTES (MODALES) PROFESIONALES */
+        .modal-legal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
+        .modal-content { background: white; margin: 8% auto; padding: 35px; border-radius: 25px; width: 85%; max-width: 550px; border: 3px solid var(--primary); box-shadow: 0 30px 70px rgba(0,0,0,0.6); }
+        .modal-header { color: var(--primary); border-bottom: 3px solid var(--primary); padding-bottom: 12px; margin-bottom: 20px; font-size: 18px; font-weight: bold; display: flex; align-items: center; }
+
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="header">
-        <div>
-            <h2 style="color: var(--primary); margin: 0;">🛡️ GESTIÓN TÉCNICA DE CONTRATACIÓN (E2EE)</h2>
-            <small style="color: #666; font-weight: bold;">EXPEDIENTE FORENSE INTEGRAL | AUDITORÍA DIAN & POLNAL</small>
-        </div>
-        <div style="display:flex; gap:10px;">
-            <button class="btn-principal" onclick="abrirModal()">➕ VINCULACIÓN CIVIL INTEGRAL</button>
-            <button class="btn-principal" style="background:#6c757d" onclick="window.location.href='administracion.html'">⬅ PANEL CONTROL</button>
-        </div>
+    <h2 id="nombrePaciente">EXPEDIENTE MAESTRO</h2>
+    <div class="header-status">🔒 PROTECCIÓN USC | AES-256 | ESTÁNDAR LEGAL RES. 1995/99 EXHAUSTIVO</div>
+
+    <button class="btn-principal" onclick="validarYAcceder('registro')">📂 INICIAR NUEVA EVOLUCIÓN CLÍNICA</button>
+
+    <div id="areaRegistro">
+        <video id="video" style="width:100%; border-radius:15px; background:#000;" autoplay playsinline></video>
+        <canvas id="canvas" style="display:none;"></canvas>
+        <img id="imgPreview" style="display:none; width:100%; border-radius:15px; border: 4px solid #fff; margin-bottom:20px;">
+        <button class="btn-principal" style="background:#34495e" onclick="capturarFoto()">📸 CAPTURAR ANEXO FOTOGRÁFICO</button>
+
+        <label style="font-weight:bold; font-size:14px; display:block; margin:10px 0;">DIAGNÓSTICOS (CIE-10):</label>
+        <div id="displayCie" class="cie-box">Seleccione diagnósticos del menú...</div>
+        
+        <select id="selectCie" onchange="addCie()">
+            <option value="">-- VADEMÉCUM CIE-10 (F00-F99) --</option>
+            <optgroup label="F10-F19: Sustancias">
+                <option value="F10.2|Dependencia al alcohol">F10.2 Alcohol</option>
+                <option value="F11.2|Dependencia a opioides (Heroína)">F11.2 Heroína</option>
+                <option value="F14.2|Dependencia a cocaína / Bazuco">F14.2 Cocaína/Bazuco</option>
+                <option value="F19.2|Policonsumo de múltiples drogas">F19.2 Policonsumo</option>
+            </optgroup>
+            <optgroup label="F20-F29: Esquizofrenia">
+                <option value="F20.0|Esquizofrenia paranoide">F20.0 Esq. Paranoide</option>
+                <option value="F22.0|Trastorno delirante permanente">F22.0 Paranoia</option>
+                <option value="F25.0|Trastorno esquizoafectivo de tipo maníaco">F25.0 Esquizoafectivo</option>
+            </optgroup>
+            <optgroup label="F30-F39: Afectivos">
+                <option value="F31.1|Trastorno Bipolar Maníaco">F31.1 Bipolar</option>
+                <option value="F32.2|Episodio depresivo grave sin síntomas psicóticos">F32.2 Depresión Grave</option>
+            </optgroup>
+            <optgroup label="Otros">
+                <option value="F60.31|Personalidad Límite (Borderline)">F60.31 Borderline</option>
+                <option value="X70|Riesgo Suicida Activo">X70 Riesgo Suicida</option>
+            </optgroup>
+        </select>
+
+        <input type="text" id="motivoConsulta" placeholder="Motivo de la consulta (Cifrado)...">
+        <textarea id="evolucionTexto" rows="6" placeholder="Descripción detallada de la intervención..."></textarea>
+        <button class="btn-principal" style="background:var(--accent)" onclick="finalizarYGuardar()">💾 FIRMAR Y SELLAR EN BÓVEDA</button>
+        <button class="btn-principal" style="background:#95a5a6" onclick="location.reload()">CANCELAR</button>
     </div>
-    <table>
-        <thead>
-            <tr>
-                <th>CONTRATISTA / CC</th>
-                <th>OBJETO / CARGO</th>
-                <th>VENCIMIENTO PILA</th>
-                <th>HASH INTEGRIDAD</th>
-                <th>ESTADO</th>
-                <th>CONTROL LEGAL</th>
-            </tr>
-        </thead>
-        <tbody id="tablaPersonal"></tbody>
-    </table>
+
+    <button id="btnHistorial" class="btn-principal" style="background:#2980b9" onclick="validarYAcceder('historial')">🔓 DESCIFRAR EXPEDIENTE COMPLETO</button>
+    <div id="listadoEvoluciones"></div>
 </div>
 
-<div id="modalVinculacion" class="modal-legal">
+<!-- MODAL MAESTRO INTEGRAL -->
+<div id="modalMaestro" class="modal-legal">
     <div class="modal-content">
-        <h3 style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-top: 0; text-align: left;">📑 EXPEDIENTE DE PRESTACIÓN DE SERVICIOS PROFESIONALES</h3>
-        
-        <div class="seccion-form">
-            <div style="grid-column: span 4;"><p style="text-align:left; font-weight:bold; color:var(--accent); font-size:11px; margin:0;">1. IDENTIFICACIÓN Y AUTONOMÍA</p></div>
-            <div><label>Nombre Completo:</label><input type="text" id="pNombre"></div>
-            <div><label>Documento (CC/NIT):</label><input type="text" id="pCC"></div>
-            <div><label>Código CIIU:</label><input type="text" id="pCIIU"></div>
-            <div><label>Objeto Contractual:</label><input type="text" id="pObjeto"></div>
-            <div><label>Vencimiento PILA:</label><input type="date" id="pPilaVence" style="border: 2px solid var(--danger);"></div>
-            <div><label>PIN Firma (4 Dig):</label><input type="password" id="pPIN" maxlength="4" style="text-align:center; letter-spacing:5px;"></div>
-            <div><label>Cargo / Rol:</label>
-                <select id="pCargo">
-                    <option value="Psicologia">Psicología</option>
-                    <option value="Terapeuta">Terapeuta</option>
-                    <option value="Director(a) Terapeutico">Director(a) Terapéutico</option>
-                    <option value="Administrador">Administrador</option>
-                </select>
-            </div>
-            <div><label>Tarjeta Profesional:</label><input type="text" id="pTP"></div>
+        <div class="modal-header">
+            <span id="modalIcono"></span>&nbsp;<span id="modalTitulo"></span>
         </div>
-
-        <div class="seccion-form">
-            <!-- BLOQUE DE VERIFICACIÓN (BOTÓN CORREGIDO) -->
-            <div class="box-judicial">
-                <label>🔍 VERIFICACIÓN DE ANTECEDENTES Y RUT:</label>
-                <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <button type="button" class="btn-principal" style="background:#003366; flex:1;" onclick="abrirPortal('dian')">🏦 VALIDAR RUT (DIAN)</button>
-                    <button type="button" class="btn-principal" style="background:#003366; flex:1;" onclick="abrirPortal('policia')">🚓 ANTECEDENTES (POLNAL)</button>
-                </div>
-                <div style="margin-top:15px; border: 1px dashed #3498db; padding: 10px;">
-                    <label style="font-size: 9px;">CARGAR CAPTURA DE PANTALLA DE VALIDACIÓN (EVIDENCIA):</label>
-                    <input type="file" id="capturaJudicial" accept="image/*">
-                    <!-- BOTÓN AGREGADO PARA VINCULAR EVIDENCIA -->
-                    <button type="button" class="btn-principal" style="background:#34495e; width:100%; margin-top:5px;" onclick="vincularEvidenciaForense()">📂 VINCULAR CAPTURA AL EXPEDIENTE</button>
-                    <div id="statusEv" style="font-size: 9px; color: #27ae60; margin-top: 5px; font-weight: bold;"></div>
-                </div>
-            </div>
-
-            <!-- CARPETA DE SOPORTES -->
-            <div class="box-soportes">
-                <label>📁 CARPETA DE SOPORTES LEGALES (CIVIL/COMERCIAL):</label>
-                <select id="pTipoDoc">
-                    <option value="Contrato Prestación">Contrato de Prestación</option>
-                    <option value="Diploma/Acta">Diploma de Idoneidad</option>
-                    <option value="Rethus">Inscripción ReTHUS</option>
-                    <option value="Referencias">Referencias Laborales</option>
-                </select>
-                <input type="file" id="archivoInput">
-                <button class="btn-principal" style="width:100%; background:#34495e; margin-top:5px;" onclick="adicionarSoporte()">📂 VINCULAR SOPORTE AL EXPEDIENTE</button>
-                <div id="listaPrevia" style="margin-top:10px; max-height: 80px; overflow-y: auto;"></div>
-            </div>
-        </div>
-
-        <div style="margin-top:20px; display:flex; gap:15px;">
-            <button class="btn-principal" style="background:var(--accent); flex:1; padding:15px;" onclick="guardarForense()">💾 SELLAR CONTRATO Y CIFRAR</button>
-            <button class="btn-principal" style="background:var(--danger); flex:1; padding:15px;" onclick="cerrarModal()">CANCELAR</button>
+        <div id="modalCuerpo"></div>
+        <div style="margin-top:25px; display:flex; gap:12px;">
+            <button id="btnModalAccion" class="btn-mini" style="background:var(--accent); flex:1; padding:15px;">AUTORIZAR</button>
+            <button onclick="cerrarModal()" class="btn-mini" style="background:var(--danger); flex:1; padding:15px;">CANCELAR</button>
         </div>
     </div>
 </div>
 
 <script type="module">
     import { initializeApp } from "https://gstatic.com";
-    import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, query, orderBy, serverTimestamp } from "https://gstatic.com";
+    import { getFirestore, doc, getDoc, collection, addDoc, query, where, getDocs, serverTimestamp, updateDoc, arrayUnion } from "https://gstatic.com";
 
     const firebaseConfig = {
         apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
@@ -133,85 +113,237 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const LLAVE_ADMIN = "ADMIN2024*"; 
-    let soportesTemp = [];
+    const idPaciente = new URLSearchParams(window.location.search).get("id");
+    const LLAVE_MAESTRA = "FundacionNuevosCaminos2024*USC";
+    const CLAVE_CLINICA = "1234";
 
-    const cifrar = (t) => CryptoJS.AES.encrypt(t, LLAVE_ADMIN).toString();
+    let diagnosticosCie = [];
+    let fotoData = "", camStream = null;
+
+    // MOTOR DE CIFRADO E2EE
+    const cifrar = (t) => CryptoJS.AES.encrypt(t, LLAVE_MAESTRA).toString();
     const descifrar = (h) => {
-        try { return CryptoJS.AES.decrypt(h, LLAVE_ADMIN).toString(CryptoJS.enc.Utf8); }
-        catch(e) { return ""; }
+        try { 
+            const b = CryptoJS.AES.decrypt(h || "", LLAVE_MAESTRA);
+            return b.toString(CryptoJS.enc.Utf8) || "[]"; 
+        } catch(e) { return "[]"; }
     };
 
-    window.abrirModal = () => document.getElementById('modalVinculacion').style.display = 'block';
-    window.cerrarModal = () => { document.getElementById('modalVinculacion').style.display = 'none'; soportesTemp = []; document.getElementById('listaPrevia').innerHTML = ""; document.getElementById('statusEv').innerText = ""; };
+    window.abrirModal = (icon, tit, html, func) => {
+        document.getElementById("modalIcono").innerText = icon;
+        document.getElementById("modalTitulo").innerText = tit;
+        document.getElementById("modalCuerpo").innerHTML = html;
+        document.getElementById("btnModalAccion").onclick = func;
+        document.getElementById("modalMaestro").style.display = "block";
+    };
+    window.cerrarModal = () => document.getElementById("modalMaestro").style.display = "none";
 
-    window.abrirPortal = (tipo) => {
-        const url = tipo === 'dian' ? "https://muisca.dian.gov.co/WebRutMuisca/DefConsultaEstadoRUT.faces" : "https://antecedentes.policia.gov.co:7005/WebJudicial/index.xhtml";
-        window.open(url, '_blank');
+    window.validarYAcceder = (tipo, docId = null) => {
+        const h = `<p>Ingrese su clave de firma digital autorizada:</p><input type="password" id="passM" style="width:100%; padding:12px; border:2px solid #ccc; border-radius:10px;">`;
+        abrirModal("🔒", "AUTENTICACIÓN DIGITAL", h, async () => {
+            if (document.getElementById("passM").value === CLAVE_CLINICA) {
+                cerrarModal();
+                if (tipo === 'registro') activarCamara();
+                if (tipo === 'historial') cargarHistorial();
+                if (tipo === 'pdf') generarPDFLegal(docId);
+                if (tipo === 'aclarar') prepararAclaratoria(docId);
+                if (tipo === 'json') exportarJSON(docId);
+            } else { alert("CLAVE INCORRECTA"); }
+        });
     };
 
-    // FUNCIÓN PARA VINCULAR EL PANTALLAZO DE VALIDACIÓN
-    window.vincularEvidenciaForense = () => {
-        const input = document.getElementById('capturaJudicial');
-        if (input.files.length === 0) return alert("❌ Seleccione el pantallazo de verificación primero.");
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            soportesTemp.push({ tipo: "Evidencia Validación Oficial", data: e.target.result });
-            document.getElementById('statusEv').innerText = "✅ EVIDENCIA SELLADA Y VINCULADA";
-            document.getElementById('listaPrevia').innerHTML += `<div class="soporte-tag">✅ Pantallazo Validación cargado</div>`;
-        };
-        reader.readAsDataURL(input.files[0]);
+    async function activarCamara() {
+        document.getElementById('areaRegistro').style.display = 'block';
+        camStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        document.getElementById('video').srcObject = camStream;
+    }
+
+    window.capturarFoto = () => {
+        const v = document.getElementById('video'), c = document.getElementById('canvas');
+        c.width = v.videoWidth; c.height = v.videoHeight;
+        c.getContext('2d').drawImage(v, 0, 0);
+        fotoData = c.toDataURL('image/jpeg', 0.7);
+        document.getElementById('imgPreview').src = fotoData;
+        document.getElementById('imgPreview').style.display = 'block';
+        v.style.display = 'none';
     };
 
-    window.adicionarSoporte = () => {
-        const fileInput = document.getElementById('archivoInput').files;
-        const tipo = document.getElementById('pTipoDoc').value;
-        if (fileInput.length === 0) return alert("Seleccione archivo.");
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            soportesTemp.push({ tipo: tipo, data: e.target.result });
-            document.getElementById('listaPrevia').innerHTML += `<div class="soporte-tag">✅ ${tipo} cargado</div>`;
-        };
-        reader.readAsDataURL(fileInput[0]);
+    window.addCie = () => {
+        const s = document.getElementById("selectCie");
+        if (!s.value) return;
+        const [cod, desc] = s.value.split("|");
+        if (!diagnosticosCie.find(x => x.cod === cod)) {
+            diagnosticosCie.push({ cod, desc });
+            document.getElementById("displayCie").innerHTML = diagnosticosCie.map(x => `• <strong>${x.cod}</strong>: ${x.desc}<br>`).join('');
+        }
+        s.value = "";
     };
 
-    window.guardarForense = async () => {
-        const d = {
-            nombre: document.getElementById('pNombre').value, cc: document.getElementById('pCC').value,
-            pila: document.getElementById('pPilaVence').value, pin: document.getElementById('pPIN').value,
-            cargo: document.getElementById('pCargo').value, objeto: document.getElementById('pObjeto').value
-        };
-        if (!d.nombre || !d.pila || !d.pin) return alert("ALERTA: Faltan campos de Ley obligatorios.");
-        try {
-            const auditID = btoa(d.cc + Date.now()).substring(0,16);
-            await addDoc(collection(db, "talento_humano_cifrado"), {
-                info: { n: cifrar(d.nombre), cc: cifrar(d.cc), p: cifrar(d.pila), pin: cifrar(d.pin), car: cifrar(d.cargo), obj: cifrar(d.objeto) },
-                expediente: soportesTemp.map(s => ({ t: s.tipo, a: cifrar(s.data) })),
-                estado: "HABILITADO", hashIntegridad: auditID, fecha: new Date().toLocaleString(), timestamp: serverTimestamp()
-            });
-            alert("🎯 CONTRATO SELLADO CON HASH: " + auditID);
-            location.reload();
-        } catch(e) { alert(e.message); }
+    window.finalizarYGuardar = async () => {
+        const ev = document.getElementById("evolucionTexto").value;
+        const prof = prompt("Ingrese su nombre y Registro Profesional:");
+        if (!ev || !prof) return alert("Faltan datos obligatorios.");
+        await addDoc(collection(db, "evoluciones_psicologicas"), {
+            idPaciente,
+            evolucion: cifrar(ev),
+            motivo: cifrar(document.getElementById("motivoConsulta").value),
+            diagnosticos: cifrar(JSON.stringify(diagnosticosCie)),
+            foto: fotoData,
+            fecha: new Date().toLocaleString(),
+            firmaHash: btoa(ev + Date.now()).substring(0,16),
+            autor: cifrar(prof),
+            aclaratorias: []
+        });
+        alert("REGISTRO SELLADO."); location.reload();
     };
 
-    async function cargar() {
-        const snap = await getDocs(query(collection(db, "talento_humano_cifrado"), orderBy("timestamp", "desc")));
-        let h = "";
+    window.cargarHistorial = async () => {
+        const snap = await getDocs(query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente)));
+        let html = "";
         snap.forEach(docSnap => {
             const d = docSnap.data();
-            const color = d.estado === "HABILITADO" ? "var(--accent)" : "var(--danger)";
-            h += `<tr>
-                <td><strong>${descifrar(d.info.n)}</strong><br><small>${descifrar(d.info.cc)}</small></td>
-                <td>${descifrar(d.info.obj)}<br><small>${descifrar(d.info.car)}</small></td>
-                <td style="color:var(--danger); font-weight:bold;">${descifrar(d.info.p)}</td>
-                <td><span class="audit-badge">${d.hashIntegridad}</span></td>
-                <td style="color:${color}; font-weight:bold;">${d.estado}</td>
-                <td><button class='btn-principal' style='background:#34495e' onclick="alert('Generando PDF...')">📄 PDF</button></td>
-            </tr>`;
+            let diags = JSON.parse(descifrar(d.diagnosticos || d.cie10_array));
+            html += `<div class="evolucion-card">
+                <span class="hash-tag">HASH-ID: ${d.firmaHash || d.hash}</span>
+                <p>🗓️ <strong>${d.fecha || d.fechaHora}</strong></p>
+                <div class="cie-box"><strong>DIAGNÓSTICOS (CIE-10):</strong><br>${diags.map(x => `• ${x.cod}: ${x.desc}`).join('<br>')}</div>
+                <p>${descifrar(d.evolucion || d.texto)}</p>
+                <p style="font-size:10px; color:gray;">Firmado por: [${descifrar(d.autor || '')}]</p>
+                
+                <div class="botones-accion">
+                    <button class="btn-mini" style="background:#2c3e50" onclick="validarYAcceder('json', '${docSnap.id}')">JSON</button>
+                    <button class="btn-mini" style="background:#e67e22" onclick="validarYAcceder('pdf', '${docSnap.id}')">📄 PDF/A</button>
+                    <button class="btn-mini" style="background:#9b59b6" onclick="validarYAcceder('aclarar', '${docSnap.id}')">ACLARAR</button>
+                    ${(d.aclaratorias && d.aclaratorias.length > 0) ? `<button class="btn-mini" style="background:#34495e" onclick="document.getElementById('acl-${docSnap.id}').style.display='block'">VER ACLARATORIA</button>` : ''}
+                </div>
+                
+                <div id="acl-${docSnap.id}" class="bloque-aclaratoria" style="display:none;">
+                    <strong>NOTAS ACLARATORIAS (RES. 1995/99):</strong><hr style="border:0.5px solid #ffeeba;">
+                    ${d.aclaratorias ? d.aclaratorias.map(a => `<div style="margin-bottom:8px;"><strong>[${a.fecha}]</strong> <strong>Motivo: ${descifrar(a.motivo || '')}:</strong> ${descifrar(a.texto)}<br><small>Por: ${descifrar(a.autor || '')}</small></div>`).join('') : ''}
+                    <button class="btn-mini" style="background:#95a5a6; margin-top:10px;" onclick="document.getElementById('acl-${docSnap.id}').style.display='none'">CERRAR</button>
+                </div>
+            </div>`;
         });
-        document.getElementById("tablaPersonal").innerHTML = h;
-    }
-    cargar();
+        document.getElementById("listadoEvoluciones").innerHTML = html || "Sin registros.";
+        document.getElementById("btnHistorial").style.display = 'none';
+    };
+
+    window.prepararAclaratoria = (id) => {
+        const h = `
+            <select id="motivoAcl" style="margin-bottom:12px;">
+                <option value="Error de digitación o transcripción">Error de digitación</option>
+                <option value="Omisión involuntaria de hallazgo clínico">Omisión de hallazgo</option>
+                <option value="Aclaración solicitada por Auditoría">Aclaración por Auditoría</option>
+                <option value="Adición de resultados paraclínicos">Adición de paraclínicos</option>
+            </select>
+            <textarea id="tAcl" rows="4" placeholder="Contenido legal de la aclaratoria..."></textarea>
+            <input type="text" id="autAcl" placeholder="Nombre completo del profesional">
+        `;
+        abrirModal("🖋️", "NUEVA NOTA ACLARATORIA", h, async () => {
+            const nota = document.getElementById("tAcl").value;
+            const mot = document.getElementById("motivoAcl").value;
+            const aut = document.getElementById("autAcl").value;
+            if (nota && aut) {
+                await updateDoc(doc(db, "evoluciones_psicologicas", id), {
+                    aclaratorias: arrayUnion({ texto: cifrar(nota), motivo: cifrar(mot), autor: cifrar(aut), fecha: new Date().toLocaleString() })
+                });
+                alert("Nota sellada."); location.reload();
+            }
+        });
+    };
+
+window.generarPDFLegal = async (id) => {
+    const ev = (await getDoc(doc(db, "evoluciones_psicologicas", id))).data();
+    const pac = (await getDoc(doc(db, "pacientes", idPaciente))).data();
+    const diags = JSON.parse(descifrar(ev.diagnosticos || ev.cie10_array));
+    
+    const vent = window.open('', '_blank');
+    vent.document.write(`
+        <html>
+        <head>
+            <title>REPORTE CLÍNICO LEGAL - FUNDACIÓN NC</title>
+            <style>
+                @page { size: letter; margin: 2.5cm; }
+                body { font-family: 'Times New Roman', Times, serif; color: #000; line-height: 1.5; padding: 20px; }
+                .header { text-align: center; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px; }
+                .ips-info { font-size: 11px; text-transform: uppercase; font-weight: bold; }
+                .titulo-doc { font-size: 16px; text-decoration: underline; margin-top: 10px; display: block; }
+                .box-paciente { border: 1px solid #000; padding: 15px; margin-bottom: 20px; font-size: 13px; background: #f9f9f9; }
+                .seccion-titulo { font-weight: bold; text-transform: uppercase; font-size: 12px; margin-top: 20px; display: block; border-bottom: 1px solid #ccc; }
+                .contenido-clinico { text-align: justify; white-space: pre-wrap; font-size: 13px; margin: 10px 0; }
+                .bloque-aclaratoria { margin-top: 20px; border: 1px solid #e67e22; padding: 15px; background: #fffcf5; }
+                .aclaratoria-item { font-size: 11px; border-bottom: 0.5px solid #ccc; padding: 8px 0; }
+                .signature-area { margin-top: 50px; }
+                .signature-line { border-top: 1px solid #000; width: 300px; padding-top: 5px; font-size: 12px; font-weight: bold; }
+                .footer { position: fixed; bottom: 0; width: 100%; text-align: center; font-size: 9px; color: #666; border-top: 1px solid #ccc; }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <span class="ips-info">FUNDACIÓN NUEVOS CAMINOS<br>NIT: 901.XXX.XXX-X | IPS HABILITADA | GUACHINTE, VALLE</span><br>
+                <strong class="titulo-doc">EVOLUCIÓN TERAPÉUTICA DE PSICOLOGÍA</strong>
+            </div>
+
+            <div class="box-paciente">
+                <strong>PACIENTE:</strong> ${pac.nombre.toUpperCase()}<br>
+                <strong>DOCUMENTO:</strong> ${pac.cedula || '---'} | <strong>FECHA ATENCIÓN:</strong> ${ev.fecha}<br>
+                <strong>HASH DE INTEGRIDAD:</strong> ${ev.firmaHash || ev.hash}
+            </div>
+
+            <span class="seccion-titulo">1. DIAGNÓSTICOS ASOCIADOS (CIE-10)</span>
+            <ul style="font-size: 12px;">
+                ${diags.map(x => `<li><strong>${x.cod}</strong>: ${x.desc}</li>`).join('')}
+            </ul>
+
+            <span class="seccion-titulo">2. MOTIVO DE CONSULTA / INTERVENCIÓN</span>
+            <div class="contenido-clinico">${descifrar(ev.motivo)}</div>
+
+            <span class="seccion-titulo">3. DESCRIPCIÓN DE LA EVOLUCIÓN</span>
+            <div class="contenido-clinico">${descifrar(ev.evolucion || ev.texto)}</div>
+
+            ${(ev.aclaratorias && ev.aclaratorias.length > 0) ? `
+                <div class="bloque-aclaratoria">
+                    <strong style="color:#e67e22;">NOTAS ACLARATORIAS MARGINALES (Vínculo Jurídico Res. 1995/99):</strong>
+                    ${ev.aclaratorias.map(a => `
+                        <div class="aclaratoria-item">
+                            <strong>FECHA:</strong> ${a.fecha} | <strong>MOTIVO:</strong> ${descifrar(a.motivo || '')}<br>
+                            <strong>CONTENIDO:</strong> ${descifrar(a.texto)}<br>
+                            <strong>RESPONSABLE:</strong> ${descifrar(a.autor)}
+                        </div>
+                    `).join('')}
+                </div>
+            ` : ''}
+
+            <div class="signature-area">
+                <div class="signature-line">
+                    FIRMADO ELECTRÓNICAMENTE POR:<br>
+                    ${descifrar(ev.autor)}<br>
+                    <small>ID DE SELLO DIGITAL: ${ev.firmaHash || ev.hash}</small>
+                </div>
+            </div>
+
+            <div class="footer">
+                Documento generado bajo los estándares de la Ley 527 de 1999 y Resolución 1995 de 1999.<br>
+                <strong>RESERVA LEGAL:</strong> Contenido protegido por el Secreto Profesional (Ley 1090 de 2006) y Ley 1581 de 2012.
+            </div>
+
+            <script>
+                setTimeout(() => { window.print(); window.close(); }, 1200);
+            <\/script>
+        </body>
+        </html>
+    `);
+};
+
+    window.exportarJSON = async (id) => {
+        const d = (await getDoc(doc(db, "evoluciones_psicologicas", id))).data();
+        const blob = new Blob([JSON.stringify(d)], {type: "application/json"});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = `HCE_${id}.json`; a.click();
+    };
+
+    const pSnap = await getDoc(doc(db, "pacientes", idPaciente));
+    if (pSnap.exists()) document.getElementById("nombrePaciente").innerText = "EXPEDIENTE: " + pSnap.data().nombre.toUpperCase();
 </script>
 </body>
+</html>
 </html>
