@@ -10,24 +10,22 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; font-size: 14px; }
-        .container { max-width: 1350px; margin: auto; background: white; padding: 35px; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 20px; font-size: 13px; }
+        .container { max-width: 1400px; margin: auto; background: white; padding: 35px; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
         .header { border-bottom: 3px solid var(--primary); padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
         .btn-principal { background: var(--primary); color: white; padding: 12px 18px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 10px; }
         
-        /* TABLA AUDITABLE */
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
         th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
         th { background: #f8f9fa; color: var(--primary); font-size: 10px; text-transform: uppercase; }
         .audit-badge { background: #eee; color: #666; padding: 3px 8px; border-radius: 5px; font-family: monospace; font-size: 9px; }
 
-        /* MODALES FORENSES */
         .modal-legal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); overflow-y: auto; }
-        .modal-content { background: white; margin: 2% auto; padding: 30px; border-radius: 25px; width: 95%; max-width: 1100px; border: 3px solid var(--primary); box-shadow: 0 25px 60px rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 2% auto; padding: 30px; border-radius: 25px; width: 95%; max-width: 1150px; border: 3px solid var(--primary); box-shadow: 0 25px 60px rgba(0,0,0,0.5); }
         
         .seccion-form { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
         label { font-weight: bold; font-size: 10px; color: var(--primary); display: block; margin-bottom: 4px; text-transform: uppercase; }
-        input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; }
+        input, select { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; }
         
         .box-judicial { background: #eef2f7; padding: 15px; border-radius: 12px; border-left: 5px solid #3498db; grid-column: span 2; }
         .box-soportes { background: #f0f4f8; padding: 15px; border-radius: 12px; border: 2px dashed var(--primary); grid-column: span 2; }
@@ -39,11 +37,11 @@
 <div class="container">
     <div class="header">
         <div>
-            <h2 style="color: var(--primary); margin: 0;">🛡️ GESTIÓN TÉCNICA DE TALENTO HUMANO</h2>
-            <small style="color: #666; font-weight: bold;">EXPEDIENTE FORENSE E2EE | IPS FUNDACIÓN NC</small>
+            <h2 style="color: var(--primary); margin: 0;">🛡️ GESTIÓN TÉCNICA DE CONTRATACIÓN (CIVIL/COMERCIAL)</h2>
+            <small style="color: #666; font-weight: bold;">EXPEDIENTE INDEPENDIENTE E2EE | AUDITORÍA DIAN & POLICÍA NACIONAL</small>
         </div>
         <div style="display:flex; gap:10px;">
-            <button class="btn-principal" onclick="abrirModal()">➕ VINCULACIÓN LEGAL INTEGRAL</button>
+            <button class="btn-principal" onclick="abrirModal()">➕ VINCULACIÓN CIVIL INTEGRAL</button>
             <button class="btn-principal" style="background:#6c757d" onclick="window.location.href='administracion.html'">⬅ PANEL CONTROL</button>
         </div>
     </div>
@@ -51,87 +49,85 @@
     <table>
         <thead>
             <tr>
-                <th>PROFESIONAL / CC</th>
-                <th>CARGO / TP</th>
+                <th>CONTRATISTA / CC</th>
+                <th>OBJETO / CARGO</th>
                 <th>VENCIMIENTO PILA</th>
                 <th>HASH INTEGRIDAD</th>
                 <th>ESTADO</th>
-                <th>AUDITORÍA</th>
+                <th>CONTROL LEGAL</th>
             </tr>
         </thead>
         <tbody id="tablaPersonal"></tbody>
     </table>
 </div>
 
-<!-- MODAL MAESTRO DE VINCULACIÓN -->
 <div id="modalVinculacion" class="modal-legal">
     <div class="modal-content">
-        <h3 style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-top: 0; text-align: left;">📑 REGISTRO ÚNICO DE HABILITACIÓN Y CONTRATACIÓN</h3>
+        <h3 style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-top: 0; text-align: left;">📑 EXPEDIENTE DE PRESTACIÓN DE SERVICIOS PROFESIONALES</h3>
         
         <div class="seccion-form">
-            <div style="grid-column: span 4;"><p style="text-align:left; font-weight:bold; color:var(--accent); font-size:11px; margin:0;">1. INFORMACIÓN PERSONAL Y DOMICILIO</p></div>
+            <div style="grid-column: span 4;"><p style="text-align:left; font-weight:bold; color:var(--accent); font-size:11px; margin:0;">1. IDENTIFICACIÓN Y AUTONOMÍA DEL CONTRATISTA</p></div>
             <div><label>Nombre Completo:</label><input type="text" id="pNombre"></div>
-            <div><label>Documento (CC):</label><input type="text" id="pCC"></div>
-            <div><label>Teléfono:</label><input type="text" id="pTel"></div>
-            <div><label>Dirección Residencia:</label><input type="text" id="pDir"></div>
+            <div><label>Documento (CC/NIT):</label><input type="text" id="pCC"></div>
+            <div><label>Código CIIU (RUT):</label><input type="text" id="pCIIU" placeholder="Ej: 8691"></div>
+            <div><label>Objeto Contractual:</label><input type="text" id="pObjeto" placeholder="Actividad autónoma"></div>
+            <div><label>Duración Contrato:</label><input type="text" id="pDuracion" placeholder="Ej: 6 meses"></div>
             <div><label>Ciudad:</label><input type="text" id="pCiudad"></div>
-            <div><label>Correo Electrónico:</label><input type="email" id="pEmail"></div>
             <div><label>PIN Firma (4 Dig):</label><input type="password" id="pPIN" maxlength="4" style="text-align:center; letter-spacing:5px;"></div>
-            <div><label>Cargo Contratado:</label>
+            <div><label>Cargo / Rol:</label>
                 <select id="pCargo">
                     <option value="Psicologia">Psicología</option>
                     <option value="Terapeuta">Terapeuta</option>
                     <option value="Director(a) Terapeutico">Director(a) Terapéutico</option>
                     <option value="Psiquiatria">Psiquiatría</option>
                     <option value="Medico">Médico</option>
-                    <option value="Director(a) General">Director(a) General</option>
                     <option value="Administrador">Administrador</option>
                 </select>
             </div>
         </div>
 
         <div class="seccion-form">
-            <div style="grid-column: span 4;"><p style="text-align:left; font-weight:bold; color:var(--accent); font-size:11px; margin:0;">2. SEGURIDAD SOCIAL Y VIGENCIA LEGAL</p></div>
+            <div style="grid-column: span 4;"><p style="text-align:left; font-weight:bold; color:var(--accent); font-size:11px; margin:0;">2. SEGURIDAD SOCIAL (APORTES COMO INDEPENDIENTE)</p></div>
             <div><label>EPS:</label><input type="text" id="pEPS"></div>
-            <div><label>ARL:</label><input type="text" id="pARL"></div>
+            <div><label>ARL (Riesgo I-V):</label><input type="text" id="pARL"></div>
             <div><label>Fondo Pensión:</label><input type="text" id="pPen"></div>
             <div><label>Vencimiento PILA:</label><input type="date" id="pPilaVence" style="border: 2px solid var(--danger);"></div>
             <div><label>Tarjeta Profesional:</label><input type="text" id="pTP"></div>
+            <div><label>Teléfono:</label><input type="text" id="pTel"></div>
         </div>
 
         <div class="seccion-form">
-            <!-- VALIDACIÓN JUDICIAL NACIONAL -->
+            <!-- VALIDACIÓN JUDICIAL Y TRIBUTARIA (DIAN Y POLICÍA ACTUALIZADOS) -->
             <div class="box-judicial">
-                <label>🔍 VALIDACIÓN JURÍDICA NACIONAL (REGISTRADURÍA/POLICÍA):</label>
+                <label>🔍 VERIFICACIÓN DE ANTECEDENTES Y RUT:</label>
                 <div style="display: flex; gap: 10px; margin-top: 10px;">
-                    <button type="button" class="btn-principal" style="background:#003366; flex:1;" onclick="abrirPortal('registraduria')">📍 VIGENCIA CÉDULA</button>
-                    <button type="button" class="btn-principal" style="background:#003366; flex:1;" onclick="abrirPortal('policia')">🚓 ANTECEDENTES</button>
+                    <button type="button" class="btn-principal" style="background:#003366; flex:1;" onclick="abrirPortal('dian')">🏦 VALIDAR RUT (DIAN)</button>
+                    <button type="button" class="btn-principal" style="background:#003366; flex:1;" onclick="abrirPortal('policia')">🚓 ANTECEDENTES (POLNAL)</button>
                 </div>
                 <div style="margin-top:15px; border: 1px dashed #3498db; padding: 10px;">
-                    <label style="font-size: 9px;">CARGAR CAPTURA DE PANTALLA DE VALIDACIÓN (EVIDENCIA):</label>
+                    <label style="font-size: 9px;">CARGAR EVIDENCIA DE VALIDACIÓN (PANTALLAZO OFICIAL):</label>
                     <input type="file" id="capturaJudicial" accept="image/*">
                 </div>
             </div>
 
             <!-- CARPETA DE SOPORTES -->
             <div class="box-soportes">
-                <label>📁 CARPETA DE SOPORTES LEGALES (RES. 3100):</label>
+                <label>📁 CARPETA DE SOPORTES LEGALES (CIVIL/COMERCIAL):</label>
                 <select id="pTipoDoc">
-                    <option value="Contrato Prestación">Contrato de Prestación</option>
-                    <option value="Diploma/Acta">Diploma de Grado</option>
-                    <option value="Tarjeta Prof.">Tarjeta Profesional Física</option>
-                    <option value="Certificado Rethus">Inscripción ReTHUS</option>
-                    <option value="Antecedentes">Antecedentes Procuraduría</option>
-                    <option value="Certificado Ética">Tribunal de Ética</option>
+                    <option value="Contrato Prestación">Contrato de Prestación Firmado</option>
+                    <option value="RUT Actualizado">RUT con CIIU Salud</option>
+                    <option value="Diploma/Acta">Diploma de Idoneidad</option>
+                    <option value="Rethus">Inscripción ReTHUS</option>
+                    <option value="Antecedentes">Antecedentes Judiciales</option>
                 </select>
                 <input type="file" id="archivoInput">
-                <button class="btn-principal" style="width:100%; background:#34495e; margin-top:5px;" onclick="adicionarSoporte()">📂 VINCULAR AL EXPEDIENTE</button>
+                <button class="btn-principal" style="width:100%; background:#34495e; margin-top:5px;" onclick="adicionarSoporte()">📂 VINCULAR SOPORTE AL EXPEDIENTE</button>
                 <div id="listaPrevia" style="margin-top:10px; max-height: 80px; overflow-y: auto;"></div>
             </div>
         </div>
 
         <div style="margin-top:20px; display:flex; gap:15px;">
-            <button class="btn-principal" style="background:var(--accent); flex:1; padding:15px;" onclick="guardarForense()">💾 SELLAR EXPEDIENTE Y VINCULAR</button>
+            <button class="btn-principal" style="background:var(--accent); flex:1; padding:15px;" onclick="guardarForense()">💾 SELLAR CONTRATO Y CIFRAR</button>
             <button class="btn-principal" style="background:var(--danger); flex:1; padding:15px;" onclick="cerrarModal()">CANCELAR</button>
         </div>
     </div>
@@ -139,7 +135,7 @@
 
 <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, query, orderBy, serverTimestamp  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import {   getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, query, orderBy, serverTimestamp  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
             authDomain: "caminosnuevosdatabase.firebaseapp.com",
@@ -153,7 +149,6 @@
     const LLAVE_ADMIN = "ADMIN2024*"; 
     let soportesTemp = [];
 
-    // MOTOR DE CIFRADO E2EE
     const cifrar = (t) => CryptoJS.AES.encrypt(t, LLAVE_ADMIN).toString();
     const descifrar = (h) => {
         try { return CryptoJS.AES.decrypt(h, LLAVE_ADMIN).toString(CryptoJS.enc.Utf8); }
@@ -163,45 +158,43 @@
     window.abrirModal = () => document.getElementById('modalVinculacion').style.display = 'block';
     window.cerrarModal = () => { document.getElementById('modalVinculacion').style.display = 'none'; soportesTemp = []; document.getElementById('listaPrevia').innerHTML = ""; };
 
-    // MÓDULO DE VERIFICACIÓN JUDICIAL
     window.abrirPortal = (tipo) => {
-        const cc = document.getElementById('pCC').value;
-        if (!cc) return alert("Ingrese CC primero.");
-        const url = tipo === 'registraduria' ? "https://registraduria.gov.co" : "https://policia.gov.co";
+        const url = tipo === 'dian' ? 
+            "https://dian.gov.co" : 
+            "https://policia.gov.co";
         window.open(url, '_blank');
     };
 
     window.adicionarSoporte = () => {
-        const file = document.getElementById('archivoInput').files[0];
+        const fileInput = document.getElementById('archivoInput').files;
         const tipo = document.getElementById('pTipoDoc').value;
-        if (!file) return;
+        if (fileInput.length === 0) return alert("Seleccione archivo.");
         const reader = new FileReader();
         reader.onload = (e) => {
             soportesTemp.push({ tipo: tipo, data: e.target.result });
             document.getElementById('listaPrevia').innerHTML += `<div class="soporte-tag">✅ ${tipo} cargado</div>`;
         };
-        reader.readAsDataURL(file);
+        reader.readAsDataURL(fileInput);
     };
 
-    // GUARDADO CON BLINDAJE DE AUDITORÍA
     window.guardarForense = async () => {
         const d = {
             nombre: document.getElementById('pNombre').value, cc: document.getElementById('pCC').value,
+            objeto: document.getElementById('pObjeto').value, dura: document.getElementById('pDuracion').value,
             pila: document.getElementById('pPilaVence').value, pin: document.getElementById('pPIN').value,
-            cargo: document.getElementById('pCargo').value, tp: document.getElementById('pTP').value,
-            tel: document.getElementById('pTel').value, dir: document.getElementById('pDir').value,
-            ciu: document.getElementById('pCiudad').value, eps: document.getElementById('pEPS').value
+            ciiu: document.getElementById('pCIIU').value, tp: document.getElementById('pTP').value,
+            cargo: document.getElementById('pCargo').value
         };
 
-        if (!d.nombre || !d.pila || !d.pin) return alert("ALERTA: Campos de Ley incompletos.");
+        if (!d.nombre || !d.objeto || !d.pin) return alert("ALERTA: El Objeto Contractual y el PIN son obligatorios.");
 
         try {
             const auditID = btoa(d.cc + Date.now()).substring(0,16);
             await addDoc(collection(db, "talento_humano_cifrado"), {
                 info: {
-                    n: cifrar(d.nombre), cc: cifrar(d.cc), p: cifrar(d.pila), pin: cifrar(d.pin),
-                    car: cifrar(d.cargo), tp: cifrar(d.tp), tel: cifrar(d.tel), dir: cifrar(d.dir),
-                    ciu: cifrar(d.ciu), eps: cifrar(d.eps)
+                    n: cifrar(d.nombre), cc: cifrar(d.cc), obj: cifrar(d.objeto), dur: cifrar(d.dura),
+                    pila: cifrar(d.pila), pin: cifrar(d.pin), ciiu: cifrar(d.ciiu), tp: cifrar(d.tp),
+                    car: cifrar(d.cargo)
                 },
                 expediente: soportesTemp.map(s => ({ t: s.tipo, a: cifrar(s.data) })),
                 estado: "HABILITADO",
@@ -209,15 +202,14 @@
                 fecha: new Date().toLocaleString(),
                 timestamp: serverTimestamp()
             });
-            alert("🎯 EXPEDIENTE SELLADO CON HASH: " + auditID);
+            alert("🎯 CONTRATO SELLADO CON HASH: " + auditID);
             location.reload();
         } catch(e) { alert(e.message); }
     };
 
     window.generarPDFLegal = async (id) => {
-        const pass = prompt("🔐 CLAVE MAESTRA PARA IMPRESIÓN LEGAL:");
+        const pass = prompt("🔐 CLAVE MAESTRA PARA IMPRESIÓN:");
         if (pass !== LLAVE_ADMIN) return alert("Acceso Denegado");
-
         const docSnap = await getDoc(doc(db, "talento_humano_cifrado", id));
         const d = docSnap.data().info;
         const hash = docSnap.data().hashIntegridad;
@@ -226,23 +218,22 @@
         win.document.write(`
             <html><body style="font-family:serif; padding:50px; border:1px solid #000;">
             <h2 style="text-align:center;">FUNDACIÓN NUEVOS CAMINOS - IPS</h2>
-            <p style="text-align:center;">NIT: 901.XXX.XXX-X | REPORTE TÉCNICO DE HABILITACIÓN</p>
             <hr>
-            <h3>FICHA TÉCNICA DEL CONTRATISTA</h3>
-            <p><strong>PROFESIONAL:</strong> ${descifrar(d.n)} | <strong>CC:</strong> ${descifrar(d.cc)}</p>
-            <p><strong>CARGO:</strong> ${descifrar(d.car)} | <strong>TP:</strong> ${descifrar(d.tp)}</p>
-            <p><strong>UBICACIÓN:</strong> ${descifrar(d.dir)} - ${descifrar(d.ciu)}</p>
-            <p><strong>VIGENCIA PILA:</strong> ${descifrar(d.p)}</p>
+            <h3>FICHA TÉCNICA CONTRATISTA INDEPENDIENTE</h3>
+            <p><strong>NOMBRE:</strong> ${descifrar(d.n)} | <strong>CC/NIT:</strong> ${descifrar(d.cc)}</p>
+            <p><strong>OBJETO:</strong> ${descifrar(d.obj)}</p>
+            <p><strong>ACTIVIDAD CIIU:</strong> ${descifrar(d.ciiu)} | <strong>DURACIÓN:</strong> ${descifrar(d.dur)}</p>
+            <p><strong>ESTADO SEGURIDAD SOCIAL:</strong> Verificado (Vence: ${descifrar(d.pila)})</p>
             <hr>
-            <p style="font-size:10px; font-family:monospace; margin-top:50px;">HASH DE NO REPUDIO (LEY 527/99): ${hash}</p>
-            <p style="font-size:9px;">Documento cifrado bajo estándar AES-256 Bit. Copia auténtica del original.</p>
+            <p style="font-size:11px; text-align:justify;">Este contratista actúa con plena autonomía técnica y administrativa, sin subordinación horaria, utilizando sus propios medios de conformidad con el Código Civil Colombiano.</p>
+            <p style="font-size:10px; font-family:monospace; margin-top:40px;">SELLO DE NO REPUDIO: ${hash}</p>
             <script>setTimeout(()=>window.print(), 1000);<\/script></body></html>
         `);
     };
 
     window.alternarEstado = async (id, est) => {
         const nEst = est === "HABILITADO" ? "INACTIVO" : "HABILITADO";
-        if(confirm("¿Cambiar estado de acceso?")) {
+        if(confirm("¿Cambiar estado de acceso profesional?")) {
             await updateDoc(doc(db, "talento_humano_cifrado", id), { estado: nEst });
             location.reload();
         }
@@ -256,14 +247,13 @@
             const color = d.estado === "HABILITADO" ? "var(--accent)" : "var(--danger)";
             h += `<tr>
                 <td><strong>${descifrar(d.info.n)}</strong><br><small>${descifrar(d.info.cc)}</small></td>
-                <td>${descifrar(d.info.car)}<br><small>${descifrar(d.info.tp)}</small></td>
-                <td style="color:var(--danger); font-weight:bold;">${descifrar(d.info.p)}</td>
+                <td>${descifrar(d.info.obj)}<br><small>${descifrar(d.info.car)}</small></td>
+                <td style="color:var(--danger); font-weight:bold;">${descifrar(d.info.pila)}</td>
                 <td><span class="audit-badge">${d.hashIntegridad}</span></td>
                 <td style="color:${color}; font-weight:bold;">${d.estado}</td>
                 <td>
                     <button class='btn-principal' style='background:#34495e' onclick="generarPDFLegal('${docSnap.id}')">📄 PDF</button>
                     <button class='btn-principal' style='background:#003366' onclick="alternarEstado('${docSnap.id}', '${d.estado}')">SW</button>
-                    <button class='btn-principal' onclick="alert('Abriendo Bóveda E2EE...')">👁️ CV</button>
                 </td>
             </tr>`;
         });
