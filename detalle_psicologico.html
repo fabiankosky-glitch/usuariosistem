@@ -187,29 +187,73 @@
         location.reload();
     };
 
-    window.cargarHist = async () => {
+window.cargarHist = async () => {
+    console.log("Iniciando descifrado de historial...");
+    const contenedor = document.getElementById('contenedorHistorial');
+    contenedor.innerHTML = "<p style='color:blue;'>🔓 Descifrando archivos de la bóveda...</p>";
+
+    try {
+        // 1. Consulta simple (Evita el error de índice de Firebase)
         const q = query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente));
         const snap = await getDocs(q);
-        let evs = [];
-        snap.forEach(d => { const data = d.data(); const raw = descCl(data.dataHCE); if(raw) evs.push({...data, c: JSON.parse(raw), id: d.id }); });
-        evs.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+        
+        if (snap.empty) {
+            contenedor.innerHTML = "<p style='color:gray;'>📭 No hay registros en el archivo para este paciente.</p>";
+            return;
+        }
 
-        let h = "";
-        evs.forEach(ev => {
-            h += `<div class="evolucion-card">
-                <span style="float:right; font-size:9px; color:green;">HASH ID: ${ev.hash}</span>
-                <strong>📅 ${ev.fecha}</strong>
-                <p><strong>MOTIVO:</strong> ${ev.c.a.mot}</p>
-                <div style="margin-top:10px;">
-                    <button class="btn-mini" style="background:#2c3e50" onclick="validarAcceso('json', '${ev.id}')">JSON</button>
+        let listaEvoluciones = [];
+
+        // 2. Procesamiento con Escudo Anti-Errores
+        snap.forEach(docSnap => {
+            const d = docSnap.data();
+            try {
+                const textoPlano = descCl(d.dataHCE); // Intentamos abrir el candado
+                if (textoPlano) {
+                    const datos = JSON.parse(textoPlano);
+                    listaEvoluciones.push({ ...d, datos, id: docSnap.id });
+                }
+            } catch (e) {
+                console.warn("Registro omitido: No se pudo descifrar o formato antiguo.");
+            }
+        });
+
+        // 3. Ordenar por fecha (El más reciente primero)
+        listaEvoluciones.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+        // 4. Dibujar en pantalla con todos los botones
+        let htmlFinal = "";
+        listaEvoluciones.forEach(ev => {
+            htmlFinal += `
+            <div class="evolucion-card">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                    <strong>📅 ${ev.fecha}</strong>
+                    <span style="font-size:9px; color:green; font-family:monospace;">HASH: ${ev.hash || 'PROTEGIDO'}</span>
+                </div>
+                <p><strong>MOTIVO:</strong> ${ev.datos.a ? ev.datos.a.mot : (ev.datos.mot || "Ver en PDF")}</p>
+                
+                <div style="margin-top:15px; border-top:1px solid #eee; padding-top:10px;">
+                    <button class="btn-mini" style="background:#2c3e50" onclick="exportarJSON('${ev.id}')">JSON</button>
                     <button class="btn-mini" style="background:#e67e22" onclick="validarAcceso('pdf', '${ev.id}')">📄 PDF FULL</button>
                     <button class="btn-mini" style="background:#9b59b6" onclick="validarAcceso('aclarar', '${ev.id}')">🖋️ ACLARAR</button>
                 </div>
-                ${ev.aclaratorias.length > 0 ? `<div class="bloque-aclaratoria">${ev.aclaratorias.map(a=>`• [${a.fecha}] ${descCl(a.texto)}`).join('<br>')}</div>` : ''}
+
+                ${ev.aclaratorias && ev.aclaratorias.length > 0 ? `
+                    <div class="bloque-aclaratoria">
+                        <strong>NOTAS MARGINALES:</strong><br>
+                        ${ev.aclaratorias.map(a => `• [${a.fecha}] ${descCl(a.texto)}`).join('<br>')}
+                    </div>
+                ` : ''}
             </div>`;
         });
-        document.getElementById('contenedorHistorial').innerHTML = h || "<p>Sin registros.</p>";
-    };
+
+        contenedor.innerHTML = htmlFinal;
+
+    } catch (error) {
+        console.error("Fallo total en historial:", error);
+        contenedor.innerHTML = "<p style='color:red;'>❌ Error crítico al conectar con la bóveda.</p>";
+    }
+};
 
     window.generarReporte = async (id) => {
         const d = (await getDoc(doc(db, "evoluciones_psicologicas", id))).data(), pac = (await getDoc(doc(db, "pacientes", idPaciente))).data(), c = JSON.parse(descCl(d.dataHCE));
