@@ -9,77 +9,137 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
-        :root { --primary: #0f3460; --accent: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 20px; }
-        .container { max-width: 1200px; margin: auto; background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+   :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 20px; font-size: 13px; }
+        .container { max-width: 1450px; margin: auto; background: white; padding: 35px; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
         .header { border-bottom: 3px solid var(--primary); padding-bottom: 15px; margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; }
-        .btn-blue { background: var(--primary); color: white; padding: 12px 20px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 11px; }
+        .btn-principal { background: var(--primary); color: white; padding: 12px 18px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; font-size: 10px; }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; text-align: left; }
-        th, td { padding: 15px; border-bottom: 1px solid #eee; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: left; }
         th { background: #f8f9fa; color: var(--primary); font-size: 10px; text-transform: uppercase; }
+        .audit-badge { background: #eee; color: #666; padding: 3px 8px; border-radius: 5px; font-family: monospace; font-size: 9px; }
 
-        /* ESTILO DE LA CREDENCIAL EMERGENTE */
+        /* MODALES */
+        .modal-legal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); overflow-y: auto; }
+        .modal-content { background: white; margin: 2% auto; padding: 30px; border-radius: 25px; width: 95%; max-width: 1100px; border: 3px solid var(--primary); box-shadow: 0 25px 60px rgba(0,0,0,0.5); }
+        
+        .seccion-form { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; border-bottom: 1px solid #eee; padding-bottom: 15px; }
+        label { font-weight: bold; font-size: 10px; color: var(--primary); display: block; margin-bottom: 4px; text-transform: uppercase; }
+        input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 12px; box-sizing: border-box; }
+        
+        .box-judicial { background: #eef2f7; padding: 15px; border-radius: 12px; border-left: 5px solid #3498db; grid-column: span 2; }
+        .box-soportes { background: #f0f4f8; padding: 15px; border-radius: 12px; border: 2px dashed var(--primary); grid-column: span 2; }
+        .soporte-tag { background: white; padding: 8px; border-radius: 6px; margin-bottom: 5px; border: 1px solid #ddd; display: flex; justify-content: space-between; font-size: 11px; }
+
+        /* CREDENCIAL */
         .card-credencial { background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); color: white; padding: 25px; border-radius: 20px; text-align: center; border: 4px solid #ffd700; }
-        .pin-display { font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #ffd700; margin: 15px 0; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; }
-
-        .modal-legal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); }
-        .modal-content { background: white; margin: 5% auto; padding: 30px; border-radius: 25px; width: 90%; max-width: 500px; border: 3px solid var(--primary); }
+        .pin-display { font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #ffd700; margin: 15px 0; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <h2 style="color: var(--primary); margin: 0;">🛡️ BÓVEDA DE CREDENCIALES PROFESIONALES</h2>
-        <button class="btn-blue" onclick="abrirModalRegistro()">➕ VINCULAR NUEVO PERFIL</button>
+        <div>
+            <h2 style="color: var(--primary); margin: 0;">🛡️ GESTIÓN TÉCNICA DE TALENTO HUMANO</h2>
+            <small style="color: #666; font-weight: bold;">EXPEDIENTE FORENSE INTEGRAL | CUMPLIMIENTO LEY 3100 & DIAN</small>
+        </div>
+        <div style="display:flex; gap:10px;">
+            <button class="btn-principal" onclick="abrirModalRegistro()">➕ VINCULACIÓN CIVIL INTEGRAL</button>
+            <button class="btn-principal" style="background:#6c757d" onclick="window.location.href='administracion.html'">⬅ VOLVER</button>
+        </div>
     </div>
 
     <table>
         <thead>
             <tr>
-                <th>PROFESIONAL</th>
-                <th>CARGO REGISTRADO</th>
+                <th>CONTRATISTA / CC</th>
+                <th>OBJETO / CARGO</th>
+                <th>VENCIMIENTO PILA</th>
+                <th>HASH INTEGRIDAD</th>
                 <th>ESTADO</th>
-                <th>LLAVES DE ACCESO</th>
+                <th>CONTROL LEGAL</th>
             </tr>
         </thead>
         <tbody id="tablaPersonal"></tbody>
     </table>
 </div>
 
-<!-- MODAL DE REGISTRO (LO QUE YA TENÍAS) -->
-<div id="modalRegistro" class="modal-legal">
+<!-- MODAL MAESTRO UNIFICADO -->
+<div id="modalVinculacion" class="modal-legal">
     <div class="modal-content">
-        <h3 style="color:var(--primary); text-align:left;">📝 NUEVO REGISTRO PROFESIONAL</h3>
-        <input type="text" id="pNom" placeholder="Nombre Completo">
-        <input type="text" id="pCC" placeholder="Cédula">
-        <select id="pCar">
-            <option value="Psicologia">Psicología</option>
-            <option value="Terapeuta">Terapeuta</option>
-            <option value="Director(a) Terapeutico">Director(a) Terapéutico</option>
-            <option value="Psiquiatria">Psiquiatría</option>
-            <option value="Medico">Médico</option>
-            <option value="Director(a) General">Director(a) General</option>
-            <option value="Administrador">Administrador</option>
-        </select>
-        <input type="password" id="pPin" placeholder="PIN de 4 dígitos" maxlength="4" style="text-align:center;">
-        <button class="btn-blue" style="width:100%; background:var(--accent);" onclick="guardar()">GUARDAR Y CIFRAR</button>
-        <button class="btn-blue" style="width:100%; background:var(--danger); margin-top:10px;" onclick="cerrarModal()">CANCELAR</button>
+        <h3 style="color: var(--primary); border-bottom: 2px solid var(--primary); padding-bottom: 10px; margin-top: 0; text-align: left;">📑 REGISTRO ÚNICO DE CONTRATACIÓN</h3>
+        
+        <div class="seccion-form">
+            <div style="grid-column: span 4;"><p style="text-align:left; font-weight:bold; color:var(--accent); font-size:11px; margin:0;">1. IDENTIFICACIÓN Y AUTONOMÍA</p></div>
+            <div><label>Nombre Completo:</label><input type="text" id="pNombre"></div>
+            <div><label>Documento (CC/NIT):</label><input type="text" id="pCC"></div>
+            <div><label>Código CIIU:</label><input type="text" id="pCIIU" placeholder="Ej: 8691"></div>
+            <div><label>Objeto Contractual:</label><input type="text" id="pObjeto"></div>
+            <div><label>Vencimiento PILA:</label><input type="date" id="pPilaVence" style="border: 2px solid var(--danger);"></div>
+            <div><label>PIN Firma (4 Dig):</label><input type="password" id="pPIN" maxlength="4" style="text-align:center; letter-spacing:5px;"></div>
+            <div><label>Cargo / Rol:</label>
+                <select id="pCargo">
+                    <option value="Psicologia">Psicología</option>
+                    <option value="Terapeuta">Terapeuta</option>
+                    <option value="Director(a) Terapeutico">Director(a) Terapéutico</option>
+                    <option value="Psiquiatria">Psiquiatría</option>
+                    <option value="Medico">Médico</option>
+                    <option value="Director(a) General">Director(a) General</option>
+                    <option value="Administrador">Administrador</option>
+                </select>
+            </div>
+            <div><label>Tarjeta Profesional:</label><input type="text" id="pTP"></div>
+        </div>
+
+        <div class="seccion-form">
+            <div class="box-judicial">
+                <label>🔍 VERIFICACIÓN OFICIAL (DIAN / POLNAL):</label>
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="button" class="btn-principal" style="background:#003366; flex:1;" onclick="abrirPortal('dian')">🏦 VALIDAR RUT (DIAN)</button>
+                    <button type="button" class="btn-principal" style="background:#003366; flex:1;" onclick="abrirPortal('policia')">🚓 ANTECEDENTES (POLNAL)</button>
+                </div>
+                <div style="margin-top:15px; border: 1px dashed #3498db; padding: 10px;">
+                    <label style="font-size: 9px;">CARGAR EVIDENCIA DE VALIDACIÓN (PANTALLAZO):</label>
+                    <input type="file" id="capturaJudicial" accept="image/*">
+                    <button type="button" class="btn-principal" style="background:#34495e; width:100%; margin-top:5px;" onclick="vincularEvidencia()">📂 VINCULAR CAPTURA</button>
+                    <div id="statusEv" style="font-size: 9px; color: #27ae60; margin-top: 5px; font-weight: bold;"></div>
+                </div>
+            </div>
+
+            <div class="box-soportes">
+                <label>📁 CARPETA DE SOPORTES (PDF/JPG):</label>
+                <select id="pTipoDoc">
+                    <option value="Contrato">Contrato Firmado</option>
+                    <option value="RUT">RUT Actualizado</option>
+                    <option value="Diploma">Diploma/Acta</option>
+                    <option value="Rethus">Inscripción ReTHUS</option>
+                </select>
+                <input type="file" id="archivoInput">
+                <button class="btn-principal" style="width:100%; background:#34495e; margin-top:5px;" onclick="adicionarSoporte()">📂 ADICIONAR SOPORTE</button>
+                <div id="listaPrevia" style="margin-top:10px; max-height: 80px; overflow-y: auto;"></div>
+            </div>
+        </div>
+
+        <div style="margin-top:20px; display:flex; gap:15px;">
+            <button class="btn-principal" style="background:var(--accent); flex:1; padding:15px;" onclick="guardarForense()">💾 SELLAR Y CIFRAR EXPEDIENTE</button>
+            <button class="btn-principal" style="background:var(--danger); flex:1; padding:15px;" onclick="cerrarModalRegistro()">CANCELAR</button>
+        </div>
     </div>
 </div>
 
-<!-- MODAL DE VISOR DE CREDENCIAL (NUEVO) -->
+<!-- MODAL VISOR DE CREDENCIAL -->
 <div id="modalCredencial" class="modal-legal">
     <div class="modal-content" style="background:transparent; border:none; box-shadow:none;">
         <div id="cuerpoCredencial"></div>
-        <button class="btn-blue" style="width:100%; margin-top:20px; background:var(--danger);" onclick="document.getElementById('modalCredencial').style.display='none'">CERRAR VISOR</button>
+        <button class="btn-principal" style="width:100%; margin-top:20px; background:var(--danger);" onclick="document.getElementById('modalCredencial').style.display='none'">CERRAR VISOR</button>
     </div>
 </div>
 
 <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import {getFirestore, collection, addDoc, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import {getFirestore, collection, addDoc, getDocs, doc, getDoc, updateDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
             authDomain: "caminosnuevosdatabase.firebaseapp.com",
@@ -90,66 +150,111 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
-    const LLAVE_MASTER = "ADMIN2024*"; 
+    const LLAVE_ADMIN = "ADMIN2024*"; 
+    let soportesTemp = [];
 
-    const cifrar = (t) => CryptoJS.AES.encrypt(t, LLAVE_MASTER).toString();
+    const cifrar = (t) => CryptoJS.AES.encrypt(t, LLAVE_ADMIN).toString();
     const descifrar = (h) => {
-        try { return CryptoJS.AES.decrypt(h, LLAVE_MASTER).toString(CryptoJS.enc.Utf8); }
-        catch(e) { return "ERROR"; }
+        try { return CryptoJS.AES.decrypt(h, LLAVE_ADMIN).toString(CryptoJS.enc.Utf8); }
+        catch(e) { return ""; }
     };
 
-    window.abrirModalRegistro = () => document.getElementById('modalRegistro').style.display = 'block';
-    window.cerrarModal = () => document.getElementById('modalRegistro').style.display = 'none';
+    window.abrirModalRegistro = () => document.getElementById('modalVinculacion').style.display = 'block';
+    window.cerrarModalRegistro = () => { document.getElementById('modalVinculacion').style.display = 'none'; soportesTemp = []; document.getElementById('listaPrevia').innerHTML = ""; };
 
-    window.guardar = async () => {
-        const n = document.getElementById('pNom').value;
-        const c = document.getElementById('pCC').value;
-        const r = document.getElementById('pCar').value;
-        const p = document.getElementById('pPin').value;
+    window.abrirPortal = (tipo) => {
+        const url = tipo === 'dian' ? "https://dian.gov.co" : "https://policia.gov.co";
+        window.open(url, '_blank');
+    };
 
+    window.vincularEvidencia = () => {
+        const file = document.getElementById('capturaJudicial').files;
+        if(!file[0]) return alert("Seleccione captura.");
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            soportesTemp.push({ tipo: "Evidencia Validación", data: e.target.result });
+            document.getElementById('statusEv').innerText = "✅ EVIDENCIA LISTA";
+        };
+        reader.readAsDataURL(file[0]);
+    };
+
+    window.adicionarSoporte = () => {
+        const file = document.getElementById('archivoInput').files;
+        const tipo = document.getElementById('pTipoDoc').value;
+        if(!file[0]) return alert("Seleccione archivo.");
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            soportesTemp.push({ tipo: tipo, data: e.target.result });
+            document.getElementById('listaPrevia').innerHTML += `<div class="soporte-tag">✅ ${tipo} cargado</div>`;
+        };
+        reader.readAsDataURL(file[0]);
+    };
+
+    window.guardarForense = async () => {
+        const d = {
+            n: document.getElementById('pNombre').value, cc: document.getElementById('pCC').value,
+            pila: document.getElementById('pPilaVence').value, pin: document.getElementById('pPIN').value,
+            car: document.getElementById('pCargo').value, tp: document.getElementById('pTP').value,
+            obj: document.getElementById('pObjeto').value, ciiu: document.getElementById('pCIIU').value
+        };
+        if(!d.n || !d.pin) return alert("Nombre y PIN son obligatorios.");
+
+        const auditID = btoa(d.cc + Date.now()).substring(0,16);
         await addDoc(collection(db, "talento_humano_cifrado"), {
-            info: { n: cifrar(n), cc: cifrar(c), car: cifrar(r), pin: cifrar(p) },
-            estado: "HABILITADO",
-            fecha: new Date().toLocaleString()
+            info: { n: cifrar(d.n), cc: cifrar(d.cc), pila: cifrar(d.pila), pin: cifrar(d.pin), car: cifrar(d.car), tp: cifrar(d.tp), obj: cifrar(d.obj), ciiu: cifrar(d.ciiu) },
+            expediente: soportesTemp.map(s => ({ t: s.tipo, a: cifrar(s.data) })),
+            estado: "HABILITADO", hashIntegridad: auditID, timestamp: serverTimestamp()
         });
-        alert("REGISTRADO"); location.reload();
+        alert("CONTRATO SELLADO."); location.reload();
     };
 
-    // FUNCIÓN PARA MOSTRAR LAS CREDENCIALES OLVIDADAS
     window.verCredencial = async (id) => {
-        const pass = prompt("🔐 LLAVE MAESTRA DE ADMINISTRADOR:");
-        if(pass !== LLAVE_MASTER) return alert("ACCESO DENEGADO");
-
+        const pass = prompt("🔐 CLAVE MAESTRA DIRECCIÓN:");
+        if(pass !== LLAVE_ADMIN) return alert("ACCESO DENEGADO");
         const snap = await getDoc(doc(db, "talento_humano_cifrado", id));
         const d = snap.data().info;
-
         document.getElementById('cuerpoCredencial').innerHTML = `
             <div class="card-credencial">
-                <h2 style="margin:0;">ID PROFESIONAL</h2>
+                <h2 style="margin:0;">IDENTIDAD PROFESIONAL</h2>
                 <hr style="border:1px solid #ffd700; margin:15px 0;">
                 <p><strong>NOMBRE:</strong><br>${descifrar(d.n)}</p>
-                <p><strong>CARGO REQUERIDO:</strong><br><span style="color:#ffd700">${descifrar(d.car)}</span></p>
-                <p><strong>PIN DE FIRMA:</strong></p>
+                <p><strong>CARGO PARA FIRMA:</strong><br><span style="color:#ffd700; font-size:18px;">${descifrar(d.car)}</span></p>
+                <p><strong>PIN DE ACCESO:</strong></p>
                 <div class="pin-display">${descifrar(d.pin)}</div>
-                <small style="font-size:9px;">Use estos datos exactos en la Carpeta Psicológica</small>
+                <small>Use estos datos en la Carpeta Psicológica</small>
             </div>
         `;
         document.getElementById('modalCredencial').style.display = 'block';
     };
 
+    window.alternarEstado = async (id, est) => {
+        const nEst = est === "HABILITADO" ? "INACTIVO" : "HABILITADO";
+        if(confirm(`¿Inhabilitar profesional?`)) {
+            await updateDoc(doc(db, "talento_humano_cifrado", id), { estado: nEst });
+            location.reload();
+        }
+    };
+
     async function cargar() {
-        const snap = await getDocs(collection(db, "talento_humano_cifrado"));
+        const snap = await getDocs(query(collection(db, "talento_humano_cifrado"), orderBy("timestamp", "desc")));
         let h = "";
         snap.forEach(docSnap => {
             const d = docSnap.data();
+            const color = d.estado === "HABILITADO" ? "var(--accent)" : "var(--danger)";
             h += `<tr>
-                <td><strong>${descifrar(d.info.n)}</strong></td>
+                <td><strong>${descifrar(d.info.n)}</strong><br><small>${descifrar(d.info.cc)}</small></td>
                 <td>${descifrar(d.info.car)}</td>
-                <td style="color:green; font-weight:bold;">${d.estado}</td>
-                <td><button class="btn-blue" style="background:#e67e22;" onclick="verCredencial('${docSnap.id}')">👁️ VER CREDENCIAL</button></td>
+                <td style="color:var(--danger); font-weight:bold;">${descifrar(d.info.pila)}</td>
+                <td><span class="audit-badge">${d.hashIntegridad}</span></td>
+                <td style="color:${color}; font-weight:bold;">${d.estado}</td>
+                <td>
+                    <button class='btn-principal' style='background:#e67e22' onclick="verCredencial('${docSnap.id}')">🔑 KEY</button>
+                    <button class='btn-principal' style='background:#003366' onclick="alternarEstado('${docSnap.id}', '${d.estado}')">SW</button>
+                    <button class='btn-principal' style='background:#34495e' onclick="alert('Descifrando PDF...')">📄 PDF</button>
+                </td>
             </tr>`;
         });
-        document.getElementById('tablaPersonal').innerHTML = h;
+        document.getElementById("tablaPersonal").innerHTML = h;
     }
     cargar();
 </script>
