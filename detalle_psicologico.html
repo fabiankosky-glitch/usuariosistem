@@ -9,82 +9,68 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-        :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #1a1a2e; }
+        :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #1a1a2e; margin: 0; padding: 10px; font-size: 11px; }
-        .container { max-width: 1400px; margin: auto; background: white; padding: 30px; border-radius: 25px; box-shadow: 0 10px 50px rgba(0,0,0,0.5); }
-        
-        /* CABECERA INSTITUCIONAL */
+        .container { max-width: 1350px; margin: auto; background: white; padding: 30px; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         .form-header { display: grid; grid-template-columns: 150px 1fr 200px; border: 2px solid #000; margin-bottom: 15px; background: #fff; }
         .form-header div { padding: 10px; border-right: 1px solid #000; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; }
         .form-header div:last-child { border-right: none; flex-direction: column; font-size: 8px; align-items: flex-start; }
-
         .section-header { background: var(--primary); color: white; padding: 8px 15px; font-weight: bold; margin-top: 15px; border-radius: 5px; text-transform: uppercase; font-size: 10px; }
-        
         .grid-clinico { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 10px; }
         .col-full { grid-column: 1 / -1; }
-
         label { font-weight: bold; color: var(--primary); display: block; margin-bottom: 3px; text-transform: uppercase; font-size: 9px; }
         textarea, input, select { width: 100%; padding: 8px; border: 1px solid #999; border-radius: 4px; box-sizing: border-box; font-size: 11px; background: #fff; }
-        
         .btn-blue { background: var(--primary); color: white; padding: 15px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; font-size: 13px; }
-        .evolucion-card { text-align: left; background: #fff; border-left: 10px solid #9b59b6; padding: 25px; margin-bottom: 25px; border-radius: 15px; border: 1px solid #eee; position: relative; }
-        .btn-mini { padding: 8px 15px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer; font-size: 10px; text-transform: uppercase; margin-right: 10px; }
-
-        #video { width: 100%; max-width: 350px; border-radius: 10px; background: #000; border: 2px solid #ddd; }
-        #imgPreview { width: 100%; max-width: 350px; border-radius: 10px; border: 3px solid var(--accent); display: none; }
-        .cie-tag { background: #eef2f7; border: 1px solid var(--primary); padding: 4px 8px; border-radius: 4px; display: inline-block; margin: 2px; font-weight: bold; }
-
+        .evolucion-card { text-align: left; background: #fff; border-left: 10px solid #9b59b6; padding: 25px; margin-bottom: 25px; border-radius: 15px; border: 1px solid #eee; }
+        .btn-mini { padding: 6px 12px; border-radius: 6px; border: none; color: white; font-weight: bold; cursor: pointer; font-size: 9px; text-transform: uppercase; margin-right: 5px; }
+        #video { width: 100%; max-width: 320px; border-radius: 10px; background: #000; border: 2px solid #ddd; }
+        #imgPreview { width: 100%; max-width: 320px; border-radius: 10px; border: 3px solid var(--accent); display: none; }
+        .cie-tag { background: #eef2f7; border: 1px solid var(--primary); padding: 2px 6px; border-radius: 4px; display: inline-block; margin: 2px; font-size: 10px; font-weight: bold; }
         .modal-legal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(8px); overflow-y: auto; }
-        .modal-content { background: white; margin: 5% auto; padding: 40px; border-radius: 30px; width: 90%; max-width: 500px; border: 4px solid var(--primary); text-align: center; }
+        .modal-content { background: white; margin: 10% auto; padding: 40px; border-radius: 30px; width: 90%; max-width: 500px; border: 4px solid var(--primary); text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 id="nombrePaciente" style="color: var(--primary);">EXPEDIENTE MAESTRO DE SALUD MENTAL</h2>
-    
+    <h2 id="nombrePaciente" style="color: var(--primary); margin: 0 0 10px 0;">EXPEDIENTE MAESTRO DE SALUD MENTAL</h2>
     <div style="display:flex; gap:10px;">
         <button class="btn-blue" onclick="validarAcceso('registro')">📂 NUEVA APERTURA DE FOLIO COMPLETO</button>
         <button class="btn-blue" style="background:#2980b9" onclick="validarAcceso('historial')">🔓 VER ARCHIVO CLÍNICO DESCIFRADO</button>
     </div>
 
-    <!-- AREA DE REGISTRO COMPLETO -->
     <div id="areaRegistro" style="display:none; margin-top: 20px;">
         <div class="form-header">
             <div>LOGOTIPO IPS</div>
             <div>CENTRO DE REHABILITACIÓN NUEVOS CAMINOS SAS<br><small>HISTORIA CLÍNICA INTEGRAL - RESOLUCIÓN 1995/99</small></div>
-            <div><span>NIT: 900753908-8</span><span>Versión: 16.0</span><span>Vigencia: 2 Años</span></div>
+            <div><span>Código: NC-HCE-01</span><span>Versión: 17.0</span></div>
         </div>
-
         <div style="text-align:center; background:#f9f9f9; padding:15px; border-radius:15px;">
             <video id="video" autoplay playsinline></video>
             <canvas id="canvas" style="display:none;"></canvas>
             <img id="imgPreview">
             <br><button class="btn-blue" style="background:#34495e; width:auto; padding:8px 20px; font-size:10px;" onclick="tomarFoto()">📸 CAPTURAR EVIDENCIA FOTOGRÁFICA</button>
         </div>
-
-        <div class="section-header">1. RIPS Y SIGNOS VITALES</div>
+        <div class="section-header">1. DATOS RIPS Y SIGNOS VITALES</div>
         <div class="grid-clinico">
-            <div><label>Finalidad:</label><select id="rFin"><option value="Atención Salud Mental">Atención Salud Mental</option></select></div>
+            <div><label>Finalidad Consulta:</label><select id="rFin"><option value="Atención Salud Mental">Atención Salud Mental</option></select></div>
             <div><label>Peso (kg):</label><input type="number" id="vP" oninput="calcIMC()"></div>
             <div><label>Talla (cm):</label><input type="number" id="vT" oninput="calcIMC()"></div>
             <div><label>IMC:</label><input type="text" id="vI" readonly></div>
-            <div><label>TA:</label><input type="text" id="vTA" placeholder="120/80"></div>
+            <div><label>Tensión Art.:</label><input type="text" id="vTA" placeholder="120/80"></div>
             <div><label>FC / FR:</label><input type="text" id="vFCFR"></div>
         </div>
-
         <div class="section-header">2. ANAMNESIS Y ANTECEDENTES (S.O.G.C)</div>
         <div class="grid-clinico">
             <div><label>Informante:</label><input type="text" id="fInf"></div>
             <div><label>Confiabilidad:</label><select id="fConf"><option>Alta</option><option>Media</option><option>Baja</option></select></div>
-            <div class="col-full"><label>Motivo Consulta:</label><textarea id="fMot" rows="2"></textarea></div>
+            <div class="col-full"><label>Motivo Consulta (Textual):</label><textarea id="fMot" rows="2"></textarea></div>
             <div class="col-full"><label>Enfermedad Actual:</label><textarea id="fEnf" rows="4"></textarea></div>
-            <div><label>Patológicos:</label><textarea id="aPat"></textarea></div>
+            <div><label>Antecedentes Patológicos:</label><textarea id="aPat"></textarea></div>
             <div><label>Psiquiátricos:</label><textarea id="aPsi"></textarea></div>
             <div><label>Farmacológicos:</label><textarea id="aFar"></textarea></div>
-            <div><label>Tóxicos:</label><textarea id="aTox"></textarea></div>
+            <div><label>Tóxicos (SPA):</label><textarea id="aTox"></textarea></div>
         </div>
-
         <div class="section-header">3. EXAMEN DEL ESTADO MENTAL</div>
         <div class="grid-clinico" style="background:#eef2f7; padding:10px; border-radius:10px;">
             <div><label>Porte y Actitud:</label><input type="text" id="mPor"></div>
@@ -93,27 +79,24 @@
             <div><label>Sensopercepción:</label><input type="text" id="mSen"></div>
             <div><label>Riesgo Suicida:</label><select id="mRie"><option>Nulo</option><option>Bajo</option><option>Moderado</option><option>Alto</option></select></div>
         </div>
-
         <div class="section-header">4. DIAGNÓSTICO CIE-10 Y PLAN</div>
         <div class="grid-clinico">
             <div class="col-full">
-                <label>Diagnósticos Seleccionados:</label>
                 <div id="displayCie" style="background:#fff; border:1px solid #ccc; padding:10px; min-height:30px; margin-bottom:5px; border-radius:5px;"></div>
                 <select id="selectCie" onchange="addCie()">
-                    <option value="">-- AGREGAR CÓDIGO CIE-10 --</option>
+                    <option value="">-- AGREGAR DIAGNÓSTICO --</option>
                     <option value="F14.2|Cocaína">F14.2 Dependencia Cocaína</option>
                     <option value="F10.2|Alcohol">F10.2 Dependencia Alcohol</option>
                     <option value="F32.9|Depresión">F32.9 Depresión</option>
+                    <option value="F41.1|Ansiedad">F41.1 Ansiedad</option>
                     <option value="X70|Riesgo Suicida">X70 Riesgo Suicida</option>
                 </select>
             </div>
             <div class="col-full"><label>Análisis del Caso:</label><textarea id="fAna" rows="3"></textarea></div>
             <div class="col-full"><label>Plan de Manejo:</label><textarea id="fPla" rows="3"></textarea></div>
         </div>
-
         <button class="btn-blue" style="background:var(--accent); font-size:18px;" onclick="guardarHCEFinal()">💾 FIRMAR Y SELLAR EXPEDIENTE</button>
     </div>
-
     <div id="contenedorHistorial" style="margin-top:30px;"></div>
 </div>
 
@@ -145,8 +128,8 @@
     let diagCie = [], fotoB64 = "", stream = null;
 
     const cifrar = (t) => CryptoJS.AES.encrypt(t, LL_CL).toString();
-    const desc Cl = (h) => { try { return CryptoJS.AES.decrypt(h || "", LL_CL).toString(CryptoJS.enc.Utf8); } catch(e){return "";} };
-    const desc Ad = (h) => { try { return CryptoJS.AES.decrypt(h || "", LL_AD).toString(CryptoJS.enc.Utf8); } catch(e){return "";} };
+    const descCl = (h) => { try { return CryptoJS.AES.decrypt(h || "", LL_CL).toString(CryptoJS.enc.Utf8); } catch(e){return "";} };
+    const descAd = (h) => { try { return CryptoJS.AES.decrypt(h || "", LL_AD).toString(CryptoJS.enc.Utf8); } catch(e){return "";} };
 
     window.calcIMC = () => {
         const p = document.getElementById('vP').value, t = document.getElementById('vT').value / 100;
@@ -160,12 +143,11 @@
             const q = query(collection(db, "talento_humano_cifrado"));
             const snap = await getDocs(q);
             let prof = null;
-            snap.forEach(d => { const data = d.data(); if(desc Ad(data.info.pin) === p && desc Ad(data.info.car) === r) prof = data; });
-            
+            snap.forEach(d => { const data = d.data(); if(descAd(data.info.pin) === p && descAd(data.info.car) === r) prof = data; });
             if(prof && prof.estado !== "INACTIVO") {
                 cerrarModal();
-                sessionStorage.setItem("pNom", desc Ad(prof.info.n));
-                sessionStorage.setItem("pTP", desc Ad(prof.info.tp || "N/A"));
+                sessionStorage.setItem("pNom", descAd(prof.info.n));
+                sessionStorage.setItem("pTP", descAd(prof.info.tp || "N/A"));
                 if(accion === 'registro') { document.getElementById('areaRegistro').style.display='block'; iniciarCam(); }
                 if(accion === 'historial') cargarHist();
                 if(accion === 'pdf') generarReporte(docId);
@@ -179,12 +161,7 @@
     window.addCie = () => { const s = document.getElementById('selectCie'), [c, d] = s.value.split('|'); if(!c) return; diagCie.push({ cod: c, desc: d }); document.getElementById('displayCie').innerHTML = diagCie.map(x => `<span class="cie-tag">${x.cod}</span>`).join(' '); s.value = ""; };
 
     window.guardarHCEFinal = async () => {
-        const hce = {
-            v: { p: document.getElementById('vP').value, i: document.getElementById('vI').value, ta: document.getElementById('vTA').value, fc: document.getElementById('vFCFR').value },
-            a: { mot: document.getElementById('fMot').value, enf: document.getElementById('fEnf').value, ant: document.getElementById('aPat').value, tox: document.getElementById('aTox').value },
-            m: { por: document.getElementById('mPor').value, rie: document.getElementById('mRie').value },
-            cie: diagCie, p: document.getElementById('fPla').value || document.getElementById('fAna').value
-        };
+        const hce = { v: { p: document.getElementById('vP').value, i: document.getElementById('vI').value, ta: document.getElementById('vTA').value, fc: document.getElementById('vFCFR').value }, a: { mot: document.getElementById('fMot').value, enf: document.getElementById('fEnf').value, ant: document.getElementById('aPat').value, tox: document.getElementById('aTox').value }, m: { por: document.getElementById('mPor').value, rie: document.getElementById('mRie').value }, cie: diagCie, p: document.getElementById('fPla').value || document.getElementById('fAna').value };
         await addDoc(collection(db, "evoluciones_psicologicas"), { idPaciente, dataHCE: cifrar(JSON.stringify(hce)), foto: fotoB64, autor: cifrar(sessionStorage.getItem("pNom")), tp: cifrar(sessionStorage.getItem("pTP")), fecha: new Date().toLocaleString(), timestamp: serverTimestamp(), hash: btoa(hce.a.mot + Date.now()).substring(0,16), aclaratorias: [] });
         location.reload();
     };
@@ -193,51 +170,23 @@
         const snap = await getDocs(query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente)));
         let h = "";
         snap.forEach(docSnap => {
-            const d = docSnap.data(), c = JSON.parse(desc Cl(d.dataHCE));
-            h += `<div class="evolucion-card">
-                <span style="float:right; font-size:9px; color:green;">ID: ${d.hash}</span>
-                <strong>📅 ${d.fecha}</strong><p><strong>MOTIVO:</strong> ${c.a.mot}</p>
-                <button class="btn-mini" style="background:#2c3e50" onclick="alert('Exportando JSON...')">JSON</button>
-                <button class="btn-mini" style="background:#e67e22" onclick="validarAcceso('pdf', '${docSnap.id}')">📄 PDF FULL</button>
-                <button class="btn-mini" style="background:#9b59b6" onclick="validarAcceso('aclarar', '${docSnap.id}')">🖋️ ACLARAR</button>
-                ${d.aclaratorias.length > 0 ? `<div class="bloque-aclaratoria">${d.aclaratorias.map(a=>`• [${a.fecha}] ${desc Cl(a.texto)}`).join('<br>')}</div>` : ''}
-            </div>`;
+            const d = docSnap.data(), c = JSON.parse(descCl(d.dataHCE));
+            h += `<div class="evolucion-card"><span style="float:right; font-size:9px; color:green;">ID: ${d.hash}</span><strong>📅 ${d.fecha}</strong><p><strong>MOTIVO:</strong> ${c.a.mot}</p><button class="btn-mini" style="background:#e67e22" onclick="validarAcceso('pdf', '${docSnap.id}')">📄 PDF FULL</button><button class="btn-mini" style="background:#9b59b6" onclick="validarAcceso('aclarar', '${docSnap.id}')">🖋️ ACLARAR</button></div>`;
         });
         document.getElementById('contenedorHistorial').innerHTML = h;
     };
 
     window.generarReporte = async (id) => {
-        const d = (await getDoc(doc(db, "evoluciones_psicologicas", id))).data(), pac = (await getDoc(doc(db, "pacientes", idPaciente))).data(), c = JSON.parse(desc Cl(d.dataHCE));
+        const d = (await getDoc(doc(db, "evoluciones_psicologicas", id))).data(), pac = (await getDoc(doc(db, "pacientes", idPaciente))).data(), c = JSON.parse(descCl(d.dataHCE));
         const docP = new jspdf.jsPDF();
-        
         docP.rect(10, 10, 190, 275); docP.line(10, 35, 200, 35);
         docP.setFontSize(12); docP.text("FUNDACION NUEVOS CAMINOS - IPS", 105, 20, {align:"center"});
-        docP.setFontSize(8); docP.text("REPORTE CLINICO INTEGRAL (HISTORIA COMPLETA)", 105, 26, {align:"center"});
-        
         docP.setFont(undefined, 'bold'); docP.text(`PACIENTE: ${pac.nombre.toUpperCase()}`, 12, 42); docP.text(`FECHA: ${d.fecha}`, 140, 42);
-        
         let y = 50;
-        const s = [
-            {t:"SIGNOS VITALES", d:`Peso: ${c.v.p}kg | IMC: ${c.v.i} | TA: ${c.v.ta} | FC: ${c.v.fc}`},
-            {t:"MOTIVO DE CONSULTA", d:c.a.mot},
-            {t:"ENFERMEDAD ACTUAL", d:c.a.enf},
-            {t:"ANTECEDENTES", d:c.a.ant},
-            {t:"EXAMEN MENTAL", d:`Porte: ${c.m.por} | Riesgo: ${c.m.rie}`},
-            {t:"DIAGNOSTICOS CIE-10", d: c.cie.map(x=>`[${x.cod}] ${x.desc}`).join(', ')},
-            {t:"PLAN DE MANEJO", d:c.p}
-        ];
-
-        s.forEach(sec => {
-            docP.setFillColor(230, 230, 230); docP.rect(10, y, 190, 7, 'F');
-            docP.setFont(undefined, 'bold'); docP.text(sec.t, 12, y+5);
-            docP.setFont(undefined, 'normal'); const lines = docP.splitTextToSize(sec.d || "No registra", 180);
-            docP.text(lines, 12, y+12);
-            y += (lines.length * 5) + 18;
-        });
-
+        const s = [{t:"SIGNOS VITALES", d:`Peso: ${c.v.p}kg | IMC: ${c.v.i} | TA: ${c.v.ta} | FC: ${c.v.fc}`}, {t:"MOTIVO DE CONSULTA", d:c.a.mot}, {t:"ENFERMEDAD ACTUAL", d:c.a.enf}, {t:"ANTECEDENTES", d:c.a.ant}, {t:"EXAMEN MENTAL", d:`Porte: ${c.m.por} | Riesgo: ${c.m.rie}`}, {t:"DIAGNOSTICOS CIE-10", d: c.cie.map(x=>`[${x.cod}] ${x.desc}`).join(', ')}, {t:"PLAN DE MANEJO", d:c.p}];
+        s.forEach(sec => { docP.setFillColor(230, 230, 230); docP.rect(10, y, 190, 7, 'F'); docP.setFont(undefined, 'bold'); docP.text(sec.t, 12, y+5); docP.setFont(undefined, 'normal'); const lines = docP.splitTextToSize(sec.d || "No registra", 180); docP.text(lines, 12, y+12); y += (lines.length * 5) + 18; });
         if(d.foto) docP.addImage(d.foto, 'JPEG', 150, 40, 40, 30);
-        docP.text("__________________________", 12, 260);
-        docP.text(`${desc Cl(d.autor)} - TP: ${desc Cl(d.tp)}`, 12, 265);
+        docP.text("__________________________", 12, 260); docP.text(`${descCl(d.autor)} - TP: ${descCl(d.tp)}`, 12, 265);
         docP.save(`HCE_FULL_${pac.nombre}.pdf`);
     };
 
@@ -247,4 +196,4 @@
     const pRef = await getDoc(doc(db, "pacientes", idPaciente)); if(pRef.exists()) document.getElementById('nombrePaciente').innerText = "HCE: " + pRef.data().nombre.toUpperCase();
 </script>
 </body>
-</html
+</html>
