@@ -287,25 +287,53 @@
         alert("✔️ EXPEDIENTE SELLADO."); location.reload();
     };
 
-    window.cargarHistorial = async () => {
-        const q = query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente), orderBy("timestamp", "desc"));
+window.cargarHistorial = async () => {
+    // 1. Pedimos los datos sin ordenar para que Firebase no nos bloquee
+    const q = query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente));
+    
+    try {
         const snap = await getDocs(q);
-        let h = "";
+        let evoluciones = [];
+        
+        if (snap.empty) {
+            document.getElementById('contenedorHistorial').innerHTML = "<p style='color:gray;'>Este paciente no tiene registros aún.</p>";
+            return;
+        }
+
+        // 2. Traemos todo y lo guardamos en una lista temporal
         snap.forEach(docSnap => {
             const d = docSnap.data();
-            const c = JSON.parse(descifrarClinico(d.dataHCE));
-            h += `<div class="evolucion-card">
-                <strong>📅 ${d.fecha}</strong><br>
-                <small>DIAGNÓSTICOS: ${c.cie10.map(x=>x.cod).join(', ')}</small>
-                <p><strong>MOTIVO:</strong> ${c.anamnesis.mot}</p>
-                <button class="btn-blue" style="width:auto; padding:5px 12px; font-size:9px;" onclick="validarAcceso('pdf', '${docSnap.id}')">📄 PDF PRO</button>
-                <button class="btn-blue" style="width:auto; padding:5px 12px; background:var(--accent); font-size:9px;" onclick="validarAcceso('aclarar', '${docSnap.id}')">🖋️ ACLARAR</button>
-                ${d.aclaratorias.length > 0 ? `<div class="bloque-aclaratoria">${d.aclaratorias.map(a=>`• ${descifrarClinico(a.texto)}`).join('<br>')}</div>` : ''}
+            const raw = descifrarClinico(d.dataHCE);
+            if(raw) {
+                const contenido = JSON.parse(raw);
+                evoluciones.push({ ...d, contenido, id: docSnap.id });
+            }
+        });
+
+        // 3. Ordenamos nosotros mismos (Ingeniería de cliente) de más reciente a más antiguo
+        evoluciones.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+        // 4. Dibujamos en pantalla
+        let h = "";
+        evoluciones.forEach(ev => {
+            h += `
+            <div class="evolucion-card">
+                <span style="float:right; font-size:10px; color:var(--accent);">HASH: ${ev.hash || 'N/A'}</span>
+                <strong>📅 ${ev.fecha}</strong><br>
+                <p><strong>MOTIVO:</strong> ${ev.contenido.anamnesis.mot}</p>
+                <div style="margin-top:10px;">
+                    <button class="btn-blue" style="width:auto; padding:5px 12px; font-size:9px;" onclick="validarAcceso('pdf', '${ev.id}')">📄 VER PDF</button>
+                    <button class="btn-blue" style="width:auto; padding:5px 12px; background:var(--accent); font-size:9px;" onclick="validarAcceso('aclarar', '${ev.id}')">🖋️ ACLARAR</button>
+                </div>
             </div>`;
         });
-        document.getElementById('contenedorHistorial').innerHTML = h || "Sin registros.";
-    };
+        document.getElementById('contenedorHistorial').innerHTML = h;
 
+    } catch (error) {
+        console.error("Error cargando historial:", error);
+        alert("Hubo un problema al descifrar los datos. Verifique su conexión.");
+    }
+};
     window.prepararAclaratoria = (id) => {
         const html = `<textarea id="tAcl" rows="4" placeholder="Nota marginal legal..."></textarea>`;
         abrirModal("🖋️ NUEVA ACLARATORIA", html, async () => {
