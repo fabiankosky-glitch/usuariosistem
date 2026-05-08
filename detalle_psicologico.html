@@ -11,81 +11,71 @@
     <style>
         :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #1a1a2e; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: #333; margin: 0; padding: 10px; }
-        .container { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 15px 50px rgba(0,0,0,0.5); text-align: center; }
+        .container { max-width: 1050px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 15px 50px rgba(0,0,0,0.5); text-align: center; }
         
-        /* ESTILOS FORMATO */
-        .form-header { display: grid; grid-template-columns: 1fr 2fr 1fr; border: 2px solid #000; margin-bottom: 20px; font-size: 11px; background: #fff; }
-        .form-header div { padding: 10px; border-right: 1px solid #000; display: flex; align-items: center; justify-content: center; }
-        .form-header div:last-child { border-right: none; text-align: left; flex-direction: column; align-items: flex-start; }
+        /* CABECERA DEL FORMATO INSTITUCIONAL */
+        .form-header { display: grid; grid-template-columns: 1fr 2fr 1fr; border: 2px solid #000; margin-bottom: 15px; font-size: 10px; background: #fff; }
+        .form-header div { padding: 8px; border-right: 1px solid #000; display: flex; align-items: center; justify-content: center; }
+        .form-header div:last-child { border-right: none; flex-direction: column; text-align: left; align-items: flex-start; }
 
-        .btn-principal { background: var(--primary); color: white; padding: 15px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-bottom: 10px; transition: 0.3s; text-transform: uppercase; font-size: 12px; }
-        .btn-principal:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .btn-blue { background: var(--primary); color: white; padding: 15px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-bottom: 10px; transition: 0.3s; text-transform: uppercase; font-size: 13px; }
+        .btn-blue:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
 
         #areaRegistro { display: none; background: #fff; padding: 20px; border-radius: 15px; border: 2px solid var(--primary); margin-top: 20px; }
         
         label { font-weight: bold; font-size: 11px; color: var(--primary); margin-top: 8px; display: block; text-align: left; text-transform: uppercase; }
         textarea, input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #000; font-size: 13px; box-sizing: border-box; background: #fcfcfc; margin-bottom: 5px; }
 
-        /* TARJETAS HISTORIAL */
-        .evolucion-card { text-align: left; background: white; border-left: 10px solid #9b59b6; padding: 20px; margin-bottom: 20px; border-radius: 15px; position: relative; border: 1px solid #eee; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        /* ESTILO DE LAS EVOLUCIONES DESCRIPTADAS */
+        .evolucion-card { text-align: left; background: white; border-left: 10px solid #9b59b6; padding: 20px; margin-bottom: 20px; border-radius: 15px; border: 1px solid #eee; position: relative; box-shadow: 0 5px 10px rgba(0,0,0,0.05); }
         .bloque-aclaratoria { background: #fff9e6; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 5px solid #f1c40f; font-size: 12px; border: 1px solid #ffeeba; }
 
-        .modal-legal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); overflow-y: auto; }
-        .modal-content { background: white; margin: 5% auto; padding: 30px; border-radius: 25px; width: 90%; max-width: 500px; border: 3px solid var(--primary); text-align: center; }
+        .modal-legal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(8px); overflow-y: auto; }
+        .modal-content { background: white; margin: 5% auto; padding: 30px; border-radius: 25px; width: 90%; max-width: 450px; border: 3px solid var(--primary); text-align: center; }
         
-        #video { width: 100%; border-radius: 10px; background: #000; margin-bottom: 10px; }
-        #imgPreview { width: 100%; border-radius: 10px; border: 3px solid var(--accent); margin-bottom: 10px; display: none; }
+        #video { width: 100%; border-radius: 10px; background: #000; margin-top: 10px; }
+        #imgPreview { width: 100%; border-radius: 10px; border: 3px solid var(--accent); display: none; margin-top: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 id="nombrePaciente" style="color: var(--primary); margin-bottom: 5px;">HISTORIA CLÍNICA PSIQUIATRÍA</h2>
+    <h2 id="nombrePaciente" style="color: var(--primary);">CARPETA CLÍNICA PSIQUIATRÍA</h2>
     <div style="background:#d1e7dd; padding:10px; border-radius:10px; margin-bottom:20px; font-size:11px; font-weight:bold; color:#0f5132; border:1px solid #badbcc;">
-        🔒 BÓVEDA E2EE ACTIVADA | PROTOCOLO RES. 1995/99 | FORMATO NC-PSQ-01
+        🔒 SISTEMA USC-E2EE | PROTOCOLO RES. 1995/99 | FORMATO PROFESIONAL NC-PSQ-01
     </div>
 
-    <button class="btn-principal" onclick="validarAcceso('registro')">📂 INICIAR NUEVA EVOLUCIÓN CLÍNICA</button>
-    <button class="btn-principal" style="background:#2980b9" onclick="validarAcceso('historial')">🔓 DESCIFRAR EXPEDIENTE COMPLETO</button>
+    <!-- BOTONES MAESTROS -->
+    <button class="btn-blue" onclick="validarAcceso('registro')">📂 INICIAR NUEVA EVOLUCIÓN CLÍNICA</button>
+    <button class="btn-blue" style="background:#2980b9" onclick="validarAcceso('historial')">🔓 DESCIFRAR EXPEDIENTE COMPLETO</button>
 
-    <!-- ÁREA DE REGISTRO UNIFICADA -->
+    <!-- ÁREA DE REGISTRO UNIFICADA (FORMULARIO + CÁMARA + CIE10) -->
     <div id="areaRegistro">
         <div class="form-header">
             <div><img src="https://placeholder.com" alt="Logo"></div>
             <div><strong>CENTRO DE REHABILITACION NUEVOS CAMINOS<br>NIT: 900753908-8</strong></div>
-            <div><span>Código: NC-PSQ-01</span><span>Versión: 02</span><span>Vigencia: 2 Años</span></div>
+            <div><span>Cod: NC-PSQ-01</span><span>Ver: 02</span><span>Vig: 2 Años</span></div>
         </div>
 
-        <!-- MÓDULO CÁMARA -->
+        <!-- MÓDULO CÁMARA FORENSE -->
         <video id="video" autoplay playsinline></video>
         <canvas id="canvas" style="display:none;"></canvas>
         <img id="imgPreview">
-        <button class="btn-principal" style="background:#34495e; padding:8px; font-size:10px;" onclick="tomarFoto()">📸 CAPTURAR ANEXO FOTOGRÁFICO</button>
+        <button class="btn-blue" style="background:#34495e; padding:8px; font-size:10px; margin-top:5px;" onclick="tomarFoto()">📸 CAPTURAR EVIDENCIA FOTOGRÁFICA</button>
 
-        <!-- FORMULARIO ESTRUCTURADO -->
-        <label>1. Motivo de consulta:</label>
-        <textarea id="fMotivo" rows="2"></textarea>
-
-        <label>2. Enfermedad actual:</label>
-        <textarea id="fEnfermedad" rows="4"></textarea>
-
-        <label>3. Antecedentes personales y familiares:</label>
-        <textarea id="fAntecedentes" rows="2"></textarea>
-
+        <!-- CAMPOS DEL FORMATO PSIQUIATRÍA -->
+        <label>1. Motivo de consulta:</label><textarea id="fMotivo" rows="2" placeholder="Cifrado E2EE..."></textarea>
+        <label>2. Enfermedad actual:</label><textarea id="fEnfermedad" rows="4" placeholder="Evolución detallada..."></textarea>
+        <label>3. Antecedentes personales y familiares:</label><textarea id="fAntecedentes" rows="2" placeholder="Médicos, Tox, Farm..."></textarea>
+        
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div>
-                <label>4. Examen mental:</label>
-                <textarea id="fExamen" rows="5"></textarea>
-            </div>
-            <div>
-                <label>5. Plan de manejo y observaciones:</label>
-                <textarea id="fPlan" rows="5"></textarea>
-            </div>
+            <div><label>4. Examen mental:</label><textarea id="fExamen" rows="5" placeholder="Estado de conciencia..."></textarea></div>
+            <div><label>5. Plan de manejo:</label><textarea id="fPlan" rows="5" placeholder="Conducta y fármacos..."></textarea></div>
         </div>
 
         <!-- VADEMÉCUM CIE-10 -->
         <label>Diagnósticos (CIE-10):</label>
-        <div id="displayCie" style="background:#f1f1f1; padding:10px; border:1px solid #000; min-height:20px; margin-bottom:5px; font-size:11px; text-align:left;"></div>
+        <div id="displayCie" style="background:#f1f1f1; padding:10px; border:1px solid #000; min-height:20px; font-size:11px; text-align:left; margin-bottom:5px;"></div>
         <select id="selectCie" onchange="agregarCie()">
             <option value="">-- SELECCIONE DIAGNÓSTICO --</option>
             <option value="F14.2|Dependencia a Cocaína">F14.2 Dependencia Cocaína</option>
@@ -95,25 +85,27 @@
         </select>
         
         <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="btn-principal" style="background:var(--accent); flex:2;" onclick="guardarTodoIntegral()">💾 FIRMAR Y SELLAR EN BÓVEDA</button>
-            <button class="btn-principal" style="background:var(--danger); flex:1;" onclick="location.reload()">CANCELAR</button>
+            <button class="btn-blue" style="background:var(--accent); flex:2;" onclick="guardarTodoIntegral()">💾 FIRMAR Y SELLAR EN BÓVEDA</button>
+            <button class="btn-blue" style="background:var(--danger); flex:1;" onclick="location.reload()">CANCELAR</button>
         </div>
     </div>
 
+    <!-- CONTENEDOR DE EVOLUCIONES DESCRIPTADAS -->
     <div id="contenedorHistorial" style="margin-top: 30px;"></div>
 </div>
 
-<!-- MODAL DE PIN / ACLARATORIA -->
+<!-- VENTANA EMERGENTE DE SEGURIDAD (MODAL MAESTRO) -->
 <div id="modalMaestro" class="modal-legal">
     <div class="modal-content">
         <h3 id="modalTit" style="color:var(--primary); margin-top:0; border-bottom:2px solid var(--primary);">Firma Digital</h3>
         <div id="modalCuerpo"></div>
-        <button id="btnModalOk" class="btn-principal" style="background:var(--accent); margin-top:15px;">CONFIRMAR</button>
+        <button id="btnModalOk" class="btn-blue" style="background:var(--accent); margin-top:15px;">AUTORIZAR ACCIÓN</button>
         <button onclick="cerrarModal()" style="background:none; border:none; color:var(--danger); cursor:pointer; margin-top:10px; font-weight:bold;">CANCELAR</button>
     </div>
 </div>
 
 <script type="module">
+    // CORRECCIÓN DE ENLACES PARA EVITAR ERRORES DE CORS
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, doc, getDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
@@ -123,6 +115,7 @@
             storageBucket: "caminosnuevosdatabase.firebasestorage.app",
             appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
         };
+
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const idPaciente = new URLSearchParams(window.location.search).get("id");
@@ -130,31 +123,41 @@
 
     let diagnosticos = [], fotoData = "", streamCam = null;
 
+    // MOTOR DE CIFRADO
     const cifrar = (t) => CryptoJS.AES.encrypt(t, LLAVE_MAESTRA).toString();
     const descifrar = (h) => {
-        try { return CryptoJS.AES.decrypt(h || "", LLAVE_MAESTRA).toString(CryptoJS.enc.Utf8); }
-        catch(e) { return ""; }
+        try { 
+            const bytes = CryptoJS.AES.decrypt(h || "", LLAVE_MAESTRA);
+            return bytes.toString(CryptoJS.enc.Utf8) || ""; 
+        } catch(e) { return ""; }
     };
 
-    // VALIDACIÓN DE PROFESIONALES
+    // --- FUNCIONES PEGADAS AL OBJETO WINDOW (PARA QUE ONCLICK LAS VEA) ---
+    
     window.validarAcceso = (accion, docId = null) => {
-        const html = `<input type="password" id="pinP" style="text-align:center; font-size:28px; letter-spacing:10px;" maxlength="4">`;
-        abrirModal("🔒 VALIDACIÓN DE IDENTIDAD", html, async () => {
+        const html = `<p style="font-size:12px;">Firma del Especialista Requerida:</p><input type="password" id="pinP" style="text-align:center; font-size:28px; letter-spacing:10px;" maxlength="4" autofocus>`;
+        window.abrirModal("🔒 VALIDACIÓN DE IDENTIDAD", html, async () => {
             const pin = document.getElementById('pinP').value;
             const q = query(collection(db, "talento_humano_cifrado"));
             const snap = await getDocs(q);
             let prof = null;
-            snap.forEach(d => { if(descifrar(d.data().identidad.pin_acceso) === pin) prof = d.data(); });
+            
+            snap.forEach(d => { 
+                const pInfo = d.data();
+                if(descifrar(pInfo.identidad.pin_acceso) === pin) prof = pInfo; 
+            });
 
-            if(prof && prof.estado !== "INACTIVO") {
-                cerrarModal();
+            if(prof) {
+                if(prof.estado === "INACTIVO") return alert("⛔ ACCESO DENEGADO: Su perfil ha sido inhabilitado por la Dirección.");
+                window.cerrarModal();
                 sessionStorage.setItem("pNom", descifrar(prof.identidad.nombre));
                 sessionStorage.setItem("pTP", descifrar(prof.identidad.tp));
+                
                 if(accion === 'registro') { document.getElementById('areaRegistro').style.display='block'; activarCamara(); }
                 if(accion === 'historial') mostrarHistorial();
                 if(accion === 'pdf') procesarPDF(docId);
                 if(accion === 'aclarar') prepararAclaratoria(docId);
-            } else { alert("ACCESO DENEGADO"); }
+            } else { alert("❌ PIN INCORRECTO O NO REGISTRADO."); }
         });
     };
 
@@ -164,13 +167,22 @@
         document.getElementById('btnModalOk').onclick = func;
         document.getElementById('modalMaestro').style.display = 'block';
     };
-    window.cerrarModal = () => document.getElementById('modalMaestro').style.display = 'none';
+    
+    window.cerrarModal = () => {
+        document.getElementById('modalMaestro').style.display = 'none';
+        if(streamCam) { 
+            streamCam.getTracks().forEach(track => track.stop());
+            streamCam = null;
+        }
+    };
 
-    // MÓDULO CÁMARA
     async function activarCamara() {
-        streamCam = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-        document.getElementById('video').srcObject = streamCam;
+        try {
+            streamCam = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+            document.getElementById('video').srcObject = streamCam;
+        } catch(e) { console.log("Cámara no iniciada."); }
     }
+
     window.tomarFoto = () => {
         const v = document.getElementById('video'), c = document.getElementById('canvas');
         c.width = v.videoWidth; c.height = v.videoHeight;
@@ -183,13 +195,13 @@
 
     window.agregarCie = () => {
         const s = document.getElementById('selectCie');
+        if(!s.value) return;
         const [c, d] = s.value.split('|');
         diagnosticos.push({ cod: c, desc: d });
-        document.getElementById('displayCie').innerHTML = diagnosticos.map(x => `[${x.cod}] ${x.desc}<br>`).join('');
+        document.getElementById('displayCie').innerHTML = diagnosticos.map(x => `[${x.cod}] `).join(' ');
         s.value = "";
     };
 
-    // GUARDADO INTEGRAL
     window.guardarTodoIntegral = async () => {
         const hce = {
             m: document.getElementById('fMotivo').value,
@@ -198,53 +210,60 @@
             ex: document.getElementById('fExamen').value,
             p: document.getElementById('fPlan').value
         };
-        if(!hce.m || !hce.p) return alert("Complete los campos obligatorios.");
+        
+        if(!hce.m || !hce.p) return alert("Motivo y Plan de Manejo son obligatorios.");
 
-        await addDoc(collection(db, "evoluciones_psicologicas"), {
-            idPaciente,
-            dataHCE: cifrar(JSON.stringify(hce)),
-            cie10: cifrar(JSON.stringify(diagnosticos)),
-            foto: fotoData,
-            autor: cifrar(sessionStorage.getItem("pNom")),
-            tp: cifrar(sessionStorage.getItem("pTP")),
-            fecha: new Date().toLocaleString(),
-            timestamp: serverTimestamp(),
-            hash: btoa(hce.m + Date.now()).substring(0,12),
-            aclaratorias: []
-        });
-        alert("✅ EXPEDIENTE SELLADO."); location.reload();
+        try {
+            await addDoc(collection(db, "evoluciones_psicologicas"), {
+                idPaciente,
+                dataHCE: cifrar(JSON.stringify(hce)),
+                cie10: cifrar(JSON.stringify(diagnosticos)),
+                foto: fotoData,
+                autor: cifrar(sessionStorage.getItem("pNom")),
+                tp: cifrar(sessionStorage.getItem("pTP")),
+                fecha: new Date().toLocaleString(),
+                timestamp: serverTimestamp(),
+                hash: btoa(hce.m + Date.now()).substring(0,12),
+                aclaratorias: []
+            });
+            alert("✅ REGISTRO SELLADO CON ÉXITO.");
+            location.reload();
+        } catch(e) { alert("Error Firebase: " + e.message); }
     };
 
     window.mostrarHistorial = async () => {
         const q = query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente), orderBy("timestamp", "desc"));
         const snap = await getDocs(q);
         let h = "";
+        
         snap.forEach(docSnap => {
             const d = docSnap.data();
             let c = d.dataHCE ? JSON.parse(descifrar(d.dataHCE)) : {m: descifrar(d.evolucion || d.texto)};
+            
             h += `<div class="evolucion-card">
-                <span style="float:right; font-size:10px; color:var(--accent);">ID: ${d.hash}</span>
+                <span style="float:right; font-size:10px; color:var(--accent); font-family:monospace;">ID: ${d.hash}</span>
                 <strong>📅 ${d.fecha}</strong>
-                <p><strong>MOTIVO:</strong> ${c.m}</p>
-                <small>Firmado por: ${descifrar(d.autor)}</small>
-                <div style="margin-top:10px;">
-                    <button class="btn-principal" style="width:auto; padding:5px 10px; background:var(--secondary); font-size:9px;" onclick="validarAcceso('pdf', '${docSnap.id}')">📄 PDF PRO</button>
-                    <button class="btn-principal" style="width:auto; padding:5px 10px; background:var(--accent); font-size:9px;" onclick="validarAcceso('aclarar', '${docSnap.id}')">🖋️ ACLARAR</button>
+                <p style="margin:10px 0;"><strong>MOTIVO:</strong> ${c.m}</p>
+                <small style="color:var(--primary); font-weight:bold;">Autor: ${descifrar(d.autor)}</small>
+                <div style="margin-top:10px; display:flex; gap:5px;">
+                    <button class="btn-blue" style="width:auto; padding:5px 12px; background:var(--secondary); font-size:9px;" onclick="validarAcceso('pdf', '${docSnap.id}')">📄 FORMATO PDF</button>
+                    <button class="btn-blue" style="width:auto; padding:5px 12px; background:var(--accent); font-size:9px;" onclick="validarAcceso('aclarar', '${docSnap.id}')">🖋️ ACLARAR</button>
                 </div>
-                ${d.aclaratorias && d.aclaratorias.length > 0 ? `<div class="bloque-aclaratoria"><strong>NOTAS ACLARATORIAS:</strong><br>${d.aclaratorias.map(a=>`• [${a.fecha}] ${descifrar(a.texto)}`).join('<br>')}</div>` : ''}
+                ${d.aclaratorias && d.aclaratorias.length > 0 ? `<div class="bloque-aclaratoria"><strong>NOTAS ACLARATORIAS (RES 1995):</strong><br>${d.aclaratorias.map(a=>`• [${a.fecha}] ${descifrar(a.texto)}`).join('<br>')}</div>` : ''}
             </div>`;
         });
-        document.getElementById('contenedorHistorial').innerHTML = h || "Sin registros.";
+        document.getElementById('contenedorHistorial').innerHTML = h || "Sin registros descifrados.";
     };
 
     window.prepararAclaratoria = (id) => {
-        const h = `<textarea id="tAcl" rows="4" placeholder="Nota legal..."></textarea>`;
-        abrirModal("🖋️ NUEVA ACLARATORIA", h, async () => {
+        const h = `<textarea id="tAcl" rows="4" placeholder="Ingrese aclaratoria legal..."></textarea>`;
+        window.abrirModal("🖋️ NUEVA ACLARATORIA LEGAL", h, async () => {
             const txt = document.getElementById('tAcl').value;
+            if(!txt) return;
             await updateDoc(doc(db, "evoluciones_psicologicas", id), {
                 aclaratorias: arrayUnion({ texto: cifrar(txt), fecha: new Date().toLocaleString(), autor: cifrar(sessionStorage.getItem("pNom")) })
             });
-            alert("NOTA VINCULADA."); location.reload();
+            alert("VINCULADA."); location.reload();
         });
     };
 
@@ -257,32 +276,41 @@
         docPDF.rect(10, 10, 190, 275); 
         docPDF.setFontSize(14); docPDF.text("HISTORIA CLINICA PSIQUIATRIA", 105, 20, {align:"center"});
         docPDF.setFontSize(8); docPDF.text("FUNDACIÓN NUEVOS CAMINOS | NIT: 900753908-8", 105, 25, {align:"center"});
-        
         docPDF.line(10, 30, 200, 30);
-        docPDF.text(`PACIENTE: ${pac.nombre.toUpperCase()} | ID: ${pac.cedula} | FECHA: ${d.fecha}`, 12, 35);
+        docPDF.text(`PACIENTE: ${pac.nombre.toUpperCase()} | CC: ${pac.cedula} | FECHA: ${d.fecha}`, 12, 35);
         docPDF.line(10, 38, 200, 38);
 
         let y = 45;
-        const secs = [{t:"MOTIVO:", d:h.m}, {t:"ENFERMEDAD:", d:h.e}, {t:"ANTECEDENTES:", d:h.a}, {t:"EXAMEN:", d:h.ex}, {t:"PLAN:", d:h.p}];
+        const secs = [
+            {t:"MOTIVO DE CONSULTA:", d:h.m}, 
+            {t:"ENFERMEDAD ACTUAL:", d:h.e}, 
+            {t:"ANTECEDENTES:", d:h.a}, 
+            {t:"EXAMEN MENTAL:", d:h.ex}, 
+            {t:"PLAN DE MANEJO:", d:h.p}
+        ];
+        
         secs.forEach(s => {
             if(!s.d) return;
             docPDF.setFont(undefined, 'bold'); docPDF.text(s.t, 12, y);
             docPDF.setFont(undefined, 'normal');
             const l = docPDF.splitTextToSize(s.d, 180);
             docPDF.text(l, 12, y + 5);
-            y += (l.length * 5) + 10;
+            y += (l.length * 5) + 12;
+            docPDF.line(10, y-5, 200, y-5);
         });
 
-        if(d.foto) { docPDF.addImage(d.foto, 'JPEG', 12, y, 60, 45); y += 70; }
-
+        if(d.foto) { docPDF.addImage(d.foto, 'JPEG', 12, y, 60, 45); y += 50; }
+        
         docPDF.text("__________________________", 12, 260);
         docPDF.text(descifrar(d.autor) + " - TP: " + descifrar(d.tp), 12, 265);
-        docPDF.text("Hash: " + d.hash, 12, 270);
+        docPDF.setFontSize(6); docPDF.text("Sello Forense: " + d.hash, 12, 270);
         docPDF.save(`HC_${pac.nombre}.pdf`);
     };
 
-    const p = await getDoc(doc(db, "pacientes", idPaciente));
-    if(p.exists()) document.getElementById('nombrePaciente').innerText = "EXPEDIENTE: " + p.data().nombre.toUpperCase();
+    // Cargar nombre del paciente al inicio
+    const snapP = await getDoc(doc(db, "pacientes", idPaciente));
+    if(snapP.exists()) document.getElementById('nombrePaciente').innerText = "EXPEDIENTE: " + snapP.data().nombre.toUpperCase();
+
 </script>
 </body>
 </html>
