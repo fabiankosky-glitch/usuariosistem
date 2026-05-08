@@ -11,45 +11,48 @@
     <style>
         :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #1a1a2e; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: #333; margin: 0; padding: 10px; }
-        .container { max-width: 1050px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 15px 50px rgba(0,0,0,0.5); text-align: center; }
+        .container { max-width: 1100px; margin: auto; background: white; padding: 30px; border-radius: 25px; box-shadow: 0 20px 60px rgba(0,0,0,0.6); text-align: center; }
         
-        /* CABECERA DEL FORMATO INSTITUCIONAL */
-        .form-header { display: grid; grid-template-columns: 1fr 2fr 1fr; border: 2px solid #000; margin-bottom: 15px; font-size: 10px; background: #fff; }
-        .form-header div { padding: 8px; border-right: 1px solid #000; display: flex; align-items: center; justify-content: center; }
-        .form-header div:last-child { border-right: none; flex-direction: column; text-align: left; align-items: flex-start; }
+        /* CABECERA INSTITUCIONAL */
+        .form-header { display: grid; grid-template-columns: 1fr 2fr 1fr; border: 2px solid #000; margin-bottom: 20px; font-size: 11px; background: #fff; }
+        .form-header div { padding: 10px; border-right: 1px solid #000; display: flex; align-items: center; justify-content: center; }
+        .form-header div:last-child { border-right: none; flex-direction: column; text-align: left; }
 
-        .btn-blue { background: var(--primary); color: white; padding: 15px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-bottom: 10px; transition: 0.3s; text-transform: uppercase; font-size: 13px; }
-        .btn-blue:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        .btn-principal { background: var(--primary); color: white; padding: 16px; width: 100%; border: none; border-radius: 15px; font-weight: bold; cursor: pointer; margin-bottom: 12px; transition: 0.3s; text-transform: uppercase; font-size: 13px; }
+        .btn-principal:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.2); }
 
-        #areaRegistro { display: none; background: #fff; padding: 20px; border-radius: 15px; border: 2px solid var(--primary); margin-top: 20px; }
-        
-        label { font-weight: bold; font-size: 11px; color: var(--primary); margin-top: 8px; display: block; text-align: left; text-transform: uppercase; }
-        textarea, input, select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #000; font-size: 13px; box-sizing: border-box; background: #fcfcfc; margin-bottom: 5px; }
+        /* FORMULARIO ESTRUCTURADO */
+        #areaRegistro { display: none; background: #fff; padding: 25px; border-radius: 20px; border: 3px solid var(--primary); margin-top: 20px; animation: slideIn 0.5s ease; }
+        label { font-weight: bold; font-size: 11px; color: var(--primary); margin-top: 10px; display: block; text-align: left; text-transform: uppercase; }
+        textarea, input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #000; font-size: 14px; box-sizing: border-box; background: #fcfcfc; margin-bottom: 8px; }
 
-        /* ESTILO DE LAS EVOLUCIONES DESCRIPTADAS */
-        .evolucion-card { text-align: left; background: white; border-left: 10px solid #9b59b6; padding: 20px; margin-bottom: 20px; border-radius: 15px; border: 1px solid #eee; position: relative; box-shadow: 0 5px 10px rgba(0,0,0,0.05); }
+        /* HISTORIAL */
+        .evolucion-card { text-align: left; background: white; border-left: 10px solid #9b59b6; padding: 25px; margin-bottom: 20px; border-radius: 15px; position: relative; border: 1px solid #eee; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
         .bloque-aclaratoria { background: #fff9e6; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 5px solid #f1c40f; font-size: 12px; border: 1px solid #ffeeba; }
-
-        .modal-legal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(8px); overflow-y: auto; }
-        .modal-content { background: white; margin: 5% auto; padding: 30px; border-radius: 25px; width: 90%; max-width: 450px; border: 3px solid var(--primary); text-align: center; }
         
-        #video { width: 100%; border-radius: 10px; background: #000; margin-top: 10px; }
-        #imgPreview { width: 100%; border-radius: 10px; border: 3px solid var(--accent); display: none; margin-top: 10px; }
+        /* MULTIMEDIA */
+        #video { width: 100%; max-width: 400px; border-radius: 15px; background: #000; margin-bottom: 10px; }
+        #imgPreview { width: 100%; max-width: 400px; border-radius: 15px; border: 3px solid var(--accent); display: none; margin-bottom: 10px; }
+
+        /* MODALES */
+        .modal-legal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); overflow-y: auto; }
+        .modal-content { background: white; margin: 5% auto; padding: 40px; border-radius: 30px; width: 90%; max-width: 500px; border: 4px solid var(--primary); text-align: center; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 id="nombrePaciente" style="color: var(--primary);">CARPETA CLÍNICA PSIQUIATRÍA</h2>
-    <div style="background:#d1e7dd; padding:10px; border-radius:10px; margin-bottom:20px; font-size:11px; font-weight:bold; color:#0f5132; border:1px solid #badbcc;">
-        🔒 SISTEMA USC-E2EE | PROTOCOLO RES. 1995/99 | FORMATO PROFESIONAL NC-PSQ-01
+    <h2 id="nombrePaciente" style="color: var(--primary); letter-spacing: 1px;">CARPETA CLÍNICA MAESTRA</h2>
+    <div style="background:#d1e7dd; padding:12px; border-radius:12px; margin-bottom:25px; font-size:11px; font-weight:bold; color:#0f5132; border:1px solid #badbcc;">
+        🛡️ SEGURIDAD NIVEL 4 USC | CIFRADO E2EE AES-256 | PROTOCOLO LEGAL RES. 1995/99
     </div>
 
-    <!-- BOTONES MAESTROS -->
-    <button class="btn-blue" onclick="validarAcceso('registro')">📂 INICIAR NUEVA EVOLUCIÓN CLÍNICA</button>
-    <button class="btn-blue" style="background:#2980b9" onclick="validarAcceso('historial')">🔓 DESCIFRAR EXPEDIENTE COMPLETO</button>
+    <button class="btn-principal" onclick="validarAcceso('registro')">📂 INICIAR NUEVA EVOLUCIÓN CLÍNICA</button>
+    <button class="btn-principal" style="background:#2980b9" onclick="validarAcceso('historial')">🔓 DESCIFRAR EXPEDIENTE COMPLETO</button>
 
-    <!-- ÁREA DE REGISTRO UNIFICADA (FORMULARIO + CÁMARA + CIE10) -->
+    <!-- ÁREA DE REGISTRO INTEGRAL -->
     <div id="areaRegistro">
         <div class="form-header">
             <div><img src="https://placeholder.com" alt="Logo"></div>
@@ -57,25 +60,22 @@
             <div><span>Cod: NC-PSQ-01</span><span>Ver: 02</span><span>Vig: 2 Años</span></div>
         </div>
 
-        <!-- MÓDULO CÁMARA FORENSE -->
         <video id="video" autoplay playsinline></video>
         <canvas id="canvas" style="display:none;"></canvas>
         <img id="imgPreview">
-        <button class="btn-blue" style="background:#34495e; padding:8px; font-size:10px; margin-top:5px;" onclick="tomarFoto()">📸 CAPTURAR EVIDENCIA FOTOGRÁFICA</button>
+        <button class="btn-principal" style="background:#34495e; padding:10px; font-size:11px;" onclick="tomarFoto()">📸 CAPTURAR EVIDENCIA FOTOGRÁFICA</button>
 
-        <!-- CAMPOS DEL FORMATO PSIQUIATRÍA -->
-        <label>1. Motivo de consulta:</label><textarea id="fMotivo" rows="2" placeholder="Cifrado E2EE..."></textarea>
-        <label>2. Enfermedad actual:</label><textarea id="fEnfermedad" rows="4" placeholder="Evolución detallada..."></textarea>
-        <label>3. Antecedentes personales y familiares:</label><textarea id="fAntecedentes" rows="2" placeholder="Médicos, Tox, Farm..."></textarea>
+        <label>1. Motivo de consulta:</label><textarea id="fMotivo" rows="2"></textarea>
+        <label>2. Enfermedad actual:</label><textarea id="fEnfermedad" rows="4"></textarea>
+        <label>3. Antecedentes personales y familiares:</label><textarea id="fAntecedentes" rows="2"></textarea>
         
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div><label>4. Examen mental:</label><textarea id="fExamen" rows="5" placeholder="Estado de conciencia..."></textarea></div>
-            <div><label>5. Plan de manejo:</label><textarea id="fPlan" rows="5" placeholder="Conducta y fármacos..."></textarea></div>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div><label>4. Examen mental:</label><textarea id="fExamen" rows="6"></textarea></div>
+            <div><label>5. Plan de manejo:</label><textarea id="fPlan" rows="6"></textarea></div>
         </div>
 
-        <!-- VADEMÉCUM CIE-10 -->
-        <label>Diagnósticos (CIE-10):</label>
-        <div id="displayCie" style="background:#f1f1f1; padding:10px; border:1px solid #000; min-height:20px; font-size:11px; text-align:left; margin-bottom:5px;"></div>
+        <label>Diagnósticos CIE-10:</label>
+        <div id="displayCie" style="background:#f8f9fa; padding:10px; border:1px solid #000; min-height:20px; font-size:12px; text-align:left; margin-bottom:10px;"></div>
         <select id="selectCie" onchange="agregarCie()">
             <option value="">-- SELECCIONE DIAGNÓSTICO --</option>
             <option value="F14.2|Dependencia a Cocaína">F14.2 Dependencia Cocaína</option>
@@ -85,27 +85,25 @@
         </select>
         
         <div style="margin-top:20px; display:flex; gap:10px;">
-            <button class="btn-blue" style="background:var(--accent); flex:2;" onclick="guardarTodoIntegral()">💾 FIRMAR Y SELLAR EN BÓVEDA</button>
-            <button class="btn-blue" style="background:var(--danger); flex:1;" onclick="location.reload()">CANCELAR</button>
+            <button class="btn-principal" style="background:var(--accent); flex:2;" onclick="guardarRegistroMaestro()">💾 FIRMAR Y SELLAR EN BÓVEDA</button>
+            <button class="btn-principal" style="background:var(--danger); flex:1;" onclick="location.reload()">CANCELAR</button>
         </div>
     </div>
 
-    <!-- CONTENEDOR DE EVOLUCIONES DESCRIPTADAS -->
-    <div id="contenedorHistorial" style="margin-top: 30px;"></div>
+    <div id="contenedorHistorial" style="margin-top: 40px;"></div>
 </div>
 
-<!-- VENTANA EMERGENTE DE SEGURIDAD (MODAL MAESTRO) -->
+<!-- MODAL DE IDENTIDAD (TIPO PROFESIONAL + PIN) -->
 <div id="modalMaestro" class="modal-legal">
     <div class="modal-content">
-        <h3 id="modalTit" style="color:var(--primary); margin-top:0; border-bottom:2px solid var(--primary);">Firma Digital</h3>
+        <h3 id="modalTit" style="color:var(--primary); margin-top:0; border-bottom:3px solid var(--primary);">VALIDACIÓN PROFESIONAL</h3>
         <div id="modalCuerpo"></div>
-        <button id="btnModalOk" class="btn-blue" style="background:var(--accent); margin-top:15px;">AUTORIZAR ACCIÓN</button>
+        <button id="btnModalOk" class="btn-principal" style="background:var(--accent); margin-top:20px;">AUTORIZAR ACCESO</button>
         <button onclick="cerrarModal()" style="background:none; border:none; color:var(--danger); cursor:pointer; margin-top:10px; font-weight:bold;">CANCELAR</button>
     </div>
 </div>
 
 <script type="module">
-    // CORRECCIÓN DE ENLACES PARA EVITAR ERRORES DE CORS
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, doc, getDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
@@ -123,41 +121,53 @@
 
     let diagnosticos = [], fotoData = "", streamCam = null;
 
-    // MOTOR DE CIFRADO
     const cifrar = (t) => CryptoJS.AES.encrypt(t, LLAVE_MAESTRA).toString();
     const descifrar = (h) => {
-        try { 
-            const bytes = CryptoJS.AES.decrypt(h || "", LLAVE_MAESTRA);
-            return bytes.toString(CryptoJS.enc.Utf8) || ""; 
-        } catch(e) { return ""; }
+        try { return CryptoJS.AES.decrypt(h || "", LLAVE_MAESTRA).toString(CryptoJS.enc.Utf8); }
+        catch(e) { return ""; }
     };
 
-    // --- FUNCIONES PEGADAS AL OBJETO WINDOW (PARA QUE ONCLICK LAS VEA) ---
-    
     window.validarAcceso = (accion, docId = null) => {
-        const html = `<p style="font-size:12px;">Firma del Especialista Requerida:</p><input type="password" id="pinP" style="text-align:center; font-size:28px; letter-spacing:10px;" maxlength="4" autofocus>`;
-        window.abrirModal("🔒 VALIDACIÓN DE IDENTIDAD", html, async () => {
-            const pin = document.getElementById('pinP').value;
+        const h = `
+            <label>Seleccione su Rol:</label>
+            <select id="rolP">
+                <option value="Psicologia">Psicología</option>
+                <option value="Terapeuta">Terapeuta</option>
+                <option value="Director(a) Terapeutico">Director(a) Terapéutico</option>
+                <option value="Psiquiatria">Psiquiatría</option>
+                <option value="Medico">Médico</option>
+                <option value="Director(a) General">Director(a) General</option>
+                <option value="Administrador">Administrador</option>
+            </select>
+            <label>Ingrese PIN de Firma:</label>
+            <input type="password" id="pinP" style="text-align:center; font-size:28px; letter-spacing:10px;" maxlength="4" autofocus>
+        `;
+        window.abrirModal("🔒 FIRMA ELECTRÓNICA", h, async () => {
+            const rolI = document.getElementById('rolP').value;
+            const pinI = document.getElementById('pinP').value;
+            
             const q = query(collection(db, "talento_humano_cifrado"));
             const snap = await getDocs(q);
-            let prof = null;
-            
-            snap.forEach(d => { 
-                const pInfo = d.data();
-                if(descifrar(pInfo.identidad.pin_acceso) === pin) prof = pInfo; 
+            let profMatch = null;
+
+            snap.forEach(d => {
+                const data = d.data();
+                if (data.info && data.info.pin) {
+                    if (descifrar(data.info.pin) === pinI && descifrar(data.info.car) === rolI) {
+                        profMatch = data;
+                    }
+                }
             });
 
-            if(prof) {
-                if(prof.estado === "INACTIVO") return alert("⛔ ACCESO DENEGADO: Su perfil ha sido inhabilitado por la Dirección.");
+            if (profMatch && profMatch.estado !== "INACTIVO") {
                 window.cerrarModal();
-                sessionStorage.setItem("pNom", descifrar(prof.identidad.nombre));
-                sessionStorage.setItem("pTP", descifrar(prof.identidad.tp));
-                
-                if(accion === 'registro') { document.getElementById('areaRegistro').style.display='block'; activarCamara(); }
-                if(accion === 'historial') mostrarHistorial();
-                if(accion === 'pdf') procesarPDF(docId);
-                if(accion === 'aclarar') prepararAclaratoria(docId);
-            } else { alert("❌ PIN INCORRECTO O NO REGISTRADO."); }
+                sessionStorage.setItem("pNom", descifrar(profMatch.info.n));
+                sessionStorage.setItem("pTP", descifrar(profMatch.info.tp || "N/A"));
+                if (accion === 'registro') { document.getElementById('areaRegistro').style.display='block'; activarCamara(); }
+                if (accion === 'historial') cargarHistorialMaestro();
+                if (accion === 'pdf') generarPDFPro(docId);
+                if (accion === 'aclarar') prepararAclaratoria(docId);
+            } else { alert("❌ CREDENCIALES INVÁLIDAS O USUARIO INACTIVO."); }
         });
     };
 
@@ -167,14 +177,7 @@
         document.getElementById('btnModalOk').onclick = func;
         document.getElementById('modalMaestro').style.display = 'block';
     };
-    
-    window.cerrarModal = () => {
-        document.getElementById('modalMaestro').style.display = 'none';
-        if(streamCam) { 
-            streamCam.getTracks().forEach(track => track.stop());
-            streamCam = null;
-        }
-    };
+    window.cerrarModal = () => document.getElementById('modalMaestro').style.display = 'none';
 
     async function activarCamara() {
         try {
@@ -195,14 +198,13 @@
 
     window.agregarCie = () => {
         const s = document.getElementById('selectCie');
-        if(!s.value) return;
         const [c, d] = s.value.split('|');
         diagnosticos.push({ cod: c, desc: d });
         document.getElementById('displayCie').innerHTML = diagnosticos.map(x => `[${x.cod}] `).join(' ');
         s.value = "";
     };
 
-    window.guardarTodoIntegral = async () => {
+    window.guardarRegistroMaestro = async () => {
         const hce = {
             m: document.getElementById('fMotivo').value,
             e: document.getElementById('fEnfermedad').value,
@@ -210,56 +212,48 @@
             ex: document.getElementById('fExamen').value,
             p: document.getElementById('fPlan').value
         };
-        
-        if(!hce.m || !hce.p) return alert("Motivo y Plan de Manejo son obligatorios.");
+        if(!hce.m || !hce.p) return alert("Complete los campos obligatorios.");
 
-        try {
-            await addDoc(collection(db, "evoluciones_psicologicas"), {
-                idPaciente,
-                dataHCE: cifrar(JSON.stringify(hce)),
-                cie10: cifrar(JSON.stringify(diagnosticos)),
-                foto: fotoData,
-                autor: cifrar(sessionStorage.getItem("pNom")),
-                tp: cifrar(sessionStorage.getItem("pTP")),
-                fecha: new Date().toLocaleString(),
-                timestamp: serverTimestamp(),
-                hash: btoa(hce.m + Date.now()).substring(0,12),
-                aclaratorias: []
-            });
-            alert("✅ REGISTRO SELLADO CON ÉXITO.");
-            location.reload();
-        } catch(e) { alert("Error Firebase: " + e.message); }
+        await addDoc(collection(db, "evoluciones_psicologicas"), {
+            idPaciente, dataHCE: cifrar(JSON.stringify(hce)),
+            cie10: cifrar(JSON.stringify(diagnosticos)),
+            foto: fotoData,
+            autor: cifrar(sessionStorage.getItem("pNom")),
+            tp: cifrar(sessionStorage.getItem("pTP")),
+            fecha: new Date().toLocaleString(),
+            timestamp: serverTimestamp(),
+            hash: btoa(hce.m + Date.now()).substring(0,12),
+            aclaratorias: []
+        });
+        alert("✅ EXPEDIENTE SELLADO."); location.reload();
     };
 
-    window.mostrarHistorial = async () => {
+    window.cargarHistorialMaestro = async () => {
         const q = query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente), orderBy("timestamp", "desc"));
         const snap = await getDocs(q);
-        let h = "";
-        
+        let html = "";
         snap.forEach(docSnap => {
             const d = docSnap.data();
             let c = d.dataHCE ? JSON.parse(descifrar(d.dataHCE)) : {m: descifrar(d.evolucion || d.texto)};
-            
-            h += `<div class="evolucion-card">
-                <span style="float:right; font-size:10px; color:var(--accent); font-family:monospace;">ID: ${d.hash}</span>
+            html += `<div class="evolucion-card">
+                <span style="float:right; font-size:10px; color:var(--accent);">HASH: ${d.hash}</span>
                 <strong>📅 ${d.fecha}</strong>
-                <p style="margin:10px 0;"><strong>MOTIVO:</strong> ${c.m}</p>
-                <small style="color:var(--primary); font-weight:bold;">Autor: ${descifrar(d.autor)}</small>
-                <div style="margin-top:10px; display:flex; gap:5px;">
-                    <button class="btn-blue" style="width:auto; padding:5px 12px; background:var(--secondary); font-size:9px;" onclick="validarAcceso('pdf', '${docSnap.id}')">📄 FORMATO PDF</button>
-                    <button class="btn-blue" style="width:auto; padding:5px 12px; background:var(--accent); font-size:9px;" onclick="validarAcceso('aclarar', '${docSnap.id}')">🖋️ ACLARAR</button>
+                <p><strong>MOTIVO:</strong> ${c.m}</p>
+                <small>Firmado por: ${descifrar(d.autor)}</small>
+                <div style="margin-top:10px;">
+                    <button class="btn-principal" style="width:auto; padding:5px 12px; background:var(--secondary); font-size:9px;" onclick="validarAcceso('pdf', '${docSnap.id}')">📄 FORMATO PDF</button>
+                    <button class="btn-principal" style="width:auto; padding:5px 12px; background:var(--accent); font-size:9px;" onclick="validarAcceso('aclarar', '${docSnap.id}')">🖋️ ACLARAR</button>
                 </div>
-                ${d.aclaratorias && d.aclaratorias.length > 0 ? `<div class="bloque-aclaratoria"><strong>NOTAS ACLARATORIAS (RES 1995):</strong><br>${d.aclaratorias.map(a=>`• [${a.fecha}] ${descifrar(a.texto)}`).join('<br>')}</div>` : ''}
+                ${d.aclaratorias && d.aclaratorias.length > 0 ? `<div class="bloque-aclaratoria"><strong>NOTAS ACLARATORIAS:</strong><br>${d.aclaratorias.map(a=>`• [${a.fecha}] ${descifrar(a.texto)}`).join('<br>')}</div>` : ''}
             </div>`;
         });
-        document.getElementById('contenedorHistorial').innerHTML = h || "Sin registros descifrados.";
+        document.getElementById('contenedorHistorial').innerHTML = html || "Sin registros.";
     };
 
     window.prepararAclaratoria = (id) => {
-        const h = `<textarea id="tAcl" rows="4" placeholder="Ingrese aclaratoria legal..."></textarea>`;
-        window.abrirModal("🖋️ NUEVA ACLARATORIA LEGAL", h, async () => {
+        const html = `<textarea id="tAcl" rows="4" placeholder="Ingrese aclaratoria legal..."></textarea>`;
+        window.abrirModal("🖋️ NOTA MARGINAL (RES. 1995)", html, async () => {
             const txt = document.getElementById('tAcl').value;
-            if(!txt) return;
             await updateDoc(doc(db, "evoluciones_psicologicas", id), {
                 aclaratorias: arrayUnion({ texto: cifrar(txt), fecha: new Date().toLocaleString(), autor: cifrar(sessionStorage.getItem("pNom")) })
             });
@@ -267,7 +261,7 @@
         });
     };
 
-    window.procesarPDF = async (id) => {
+    window.generarPDFPro = async (id) => {
         const d = (await getDoc(doc(db, "evoluciones_psicologicas", id))).data();
         const pac = (await getDoc(doc(db, "pacientes", idPaciente))).data();
         const docPDF = new jspdf.jsPDF();
@@ -277,18 +271,11 @@
         docPDF.setFontSize(14); docPDF.text("HISTORIA CLINICA PSIQUIATRIA", 105, 20, {align:"center"});
         docPDF.setFontSize(8); docPDF.text("FUNDACIÓN NUEVOS CAMINOS | NIT: 900753908-8", 105, 25, {align:"center"});
         docPDF.line(10, 30, 200, 30);
-        docPDF.text(`PACIENTE: ${pac.nombre.toUpperCase()} | CC: ${pac.cedula} | FECHA: ${d.fecha}`, 12, 35);
+        docPDF.text(`PACIENTE: ${pac.nombre.toUpperCase()} | ID: ${pac.cedula} | FECHA: ${d.fecha}`, 12, 35);
         docPDF.line(10, 38, 200, 38);
 
         let y = 45;
-        const secs = [
-            {t:"MOTIVO DE CONSULTA:", d:h.m}, 
-            {t:"ENFERMEDAD ACTUAL:", d:h.e}, 
-            {t:"ANTECEDENTES:", d:h.a}, 
-            {t:"EXAMEN MENTAL:", d:h.ex}, 
-            {t:"PLAN DE MANEJO:", d:h.p}
-        ];
-        
+        const secs = [{t:"MOTIVO:", d:h.m}, {t:"ENFERMEDAD:", d:h.e}, {t:"ANTECEDENTES:", d:h.a}, {t:"EXAMEN:", d:h.ex}, {t:"PLAN:", d:h.p}];
         secs.forEach(s => {
             if(!s.d) return;
             docPDF.setFont(undefined, 'bold'); docPDF.text(s.t, 12, y);
@@ -300,17 +287,14 @@
         });
 
         if(d.foto) { docPDF.addImage(d.foto, 'JPEG', 12, y, 60, 45); y += 50; }
-        
         docPDF.text("__________________________", 12, 260);
         docPDF.text(descifrar(d.autor) + " - TP: " + descifrar(d.tp), 12, 265);
-        docPDF.setFontSize(6); docPDF.text("Sello Forense: " + d.hash, 12, 270);
+        docPDF.setFontSize(6); docPDF.text("Sello Digital: " + d.hash, 12, 270);
         docPDF.save(`HC_${pac.nombre}.pdf`);
     };
 
-    // Cargar nombre del paciente al inicio
-    const snapP = await getDoc(doc(db, "pacientes", idPaciente));
-    if(snapP.exists()) document.getElementById('nombrePaciente').innerText = "EXPEDIENTE: " + snapP.data().nombre.toUpperCase();
-
+    const pRef = await getDoc(doc(db, "pacientes", idPaciente));
+    if(pRef.exists()) document.getElementById('nombrePaciente').innerText = "EXPEDIENTE: " + pRef.data().nombre.toUpperCase();
 </script>
 </body>
 </html>
