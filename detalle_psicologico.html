@@ -9,69 +9,168 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-          :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #1a1a2e; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; }
-        .container { max-width: 1000px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 15px 50px rgba(0,0,0,0.5); text-align: center; }
-        .form-header { display: grid; grid-template-columns: 1fr 2fr 1fr; border: 2px solid #000; margin-bottom: 20px; font-size: 11px; background: #fff; }
-        .form-header div { padding: 10px; border-right: 1px solid #000; display: flex; align-items: center; justify-content: center; }
-        .form-header div:last-child { border-right: none; text-align: left; flex-direction: column; }
-        .btn-blue { background: var(--primary); color: white; padding: 15px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-bottom: 10px; transition: 0.3s; text-transform: uppercase; font-size: 13px; }
-        #areaRegistro { display: none; background: #fff; padding: 20px; border-radius: 15px; border: 2px solid var(--primary); margin-top: 20px; text-align: left; }
-        label { font-weight: bold; font-size: 11px; color: var(--primary); margin-top: 10px; display: block; text-transform: uppercase; }
-        textarea, input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #000; font-size: 14px; box-sizing: border-box; background: #fcfcfc; margin-bottom: 8px; }
-        .evolucion-card { text-align: left; background: white; border-left: 10px solid #9b59b6; padding: 20px; margin-bottom: 20px; border-radius: 15px; border: 1px solid #eee; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .modal-legal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); overflow-y: auto; }
-        .modal-content { background: white; margin: 5% auto; padding: 30px; border-radius: 30px; width: 90%; max-width: 450px; border: 4px solid var(--primary); text-align: center; }
-        #video { width: 100%; border-radius: 10px; background: #000; margin-bottom: 10px; }
-        #imgPreview { width: 100%; border-radius: 10px; border: 3px solid var(--accent); display: none; margin-bottom: 10px; }
+        :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; }
+        body { font-family: 'Segoe UI', Arial, sans-serif; background: #1a1a2e; margin: 0; padding: 10px; font-size: 11px; }
+        .container { max-width: 1400px; margin: auto; background: white; padding: 30px; border-radius: 25px; box-shadow: 0 10px 50px rgba(0,0,0,0.5); }
+        
+        /* CABECERA INSTITUCIONAL */
+        .form-header { display: grid; grid-template-columns: 150px 1fr 180px; border: 2px solid #000; margin-bottom: 15px; }
+        .form-header div { padding: 8px; border-right: 1px solid #000; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; }
+        .form-header div:last-child { border-right: none; flex-direction: column; font-size: 8px; align-items: flex-start; }
+
+        .section-header { background: var(--primary); color: white; padding: 8px 15px; font-weight: bold; margin-top: 15px; border-radius: 5px; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between; }
+        
+        .grid-clinico { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 10px; text-align: left; }
+        .col-full { grid-column: 1 / -1; }
+
+        label { font-weight: bold; color: var(--primary); display: block; margin-bottom: 3px; text-transform: uppercase; font-size: 9px; }
+        textarea, input, select { width: 100%; padding: 8px; border: 1px solid #999; border-radius: 4px; box-sizing: border-box; font-size: 11px; font-family: inherit; }
+        textarea { background: #fafafa; resize: vertical; }
+        
+        .btn-blue { background: var(--primary); color: white; padding: 15px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; font-size: 13px; transition: 0.3s; }
+        .btn-blue:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+
+        /* ESTILOS DE EVIDENCIA Y VISUALIZACIÓN */
+        #video { width: 100%; max-width: 350px; border-radius: 10px; background: #000; border: 2px solid #ddd; }
+        #imgPreview { width: 100%; max-width: 350px; border-radius: 10px; border: 3px solid var(--accent); display: none; }
+        .evolucion-card { text-align: left; background: white; border-left: 10px solid #9b59b6; padding: 25px; margin-bottom: 25px; border-radius: 15px; border: 1px solid #eee; position: relative; }
+        .bloque-aclaratoria { background: #fff9e6; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 5px solid #f1c40f; font-size: 12px; border: 1px solid #ffeeba; }
+        .cie-tag { background: #eef2f7; border: 1px solid var(--primary); padding: 3px 6px; border-radius: 4px; display: inline-block; margin: 2px; font-weight: bold; }
+
+        /* MODALES */
+        .modal-legal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(8px); overflow-y: auto; }
+        .modal-content { background: white; margin: 5% auto; padding: 40px; border-radius: 30px; width: 90%; max-width: 500px; border: 4px solid var(--primary); text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2 id="nombrePaciente" style="color: var(--primary);">EXPEDIENTE MAESTRO</h2>
-    <div style="background:#d1e7dd; padding:10px; border-radius:10px; margin-bottom:20px; font-size:11px; font-weight:bold; color:#0f5132; border:1px solid #badbcc;">🔒 SISTEMA USC-E2EE | VALIDACIÓN PROFESIONAL ACTIVA</div>
-
-    <button class="btn-blue" onclick="validarAcceso('registro')">📂 INICIAR NUEVA EVOLUCIÓN CLÍNICA</button>
-    <button class="btn-blue" style="background:#2980b9" onclick="validarAcceso('historial')">🔓 DESCIFRAR EXPEDIENTE COMPLETO</button>
-
-    <div id="areaRegistro">
-        <div class="form-header">
-            <div>LOGOTIPO</div>
-            <div><strong>CENTRO DE REHABILITACION NUEVOS CAMINOS<br>NIT: 900753908-8</strong></div>
-            <div><span>Cod: NC-PSQ-01</span><span>Ver: 02</span></div>
-        </div>
-
-        <video id="video" autoplay playsinline></video>
-        <canvas id="canvas" style="display:none;"></canvas>
-        <img id="imgPreview">
-        <button class="btn-blue" style="background:#34495e; padding:8px; font-size:10px;" onclick="tomarFoto()">📸 CAPTURAR ANEXO</button>
-
-        <label>1. Motivo de consulta:</label><textarea id="fMotivo" rows="2"></textarea>
-        <label>2. Enfermedad actual:</label><textarea id="fEnfermedad" rows="4"></textarea>
-        <label>3. Antecedentes:</label><textarea id="fAntecedentes" rows="2"></textarea>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-            <div><label>4. Examen mental:</label><textarea id="fExamen" rows="5"></textarea></div>
-            <div><label>5. Plan de manejo:</label><textarea id="fPlan" rows="5"></textarea></div>
-        </div>
-        
-        <button class="btn-blue" style="background:var(--accent); margin-top:15px;" onclick="guardarTodoMaestro()">💾 FIRMAR Y SELLAR</button>
+    <h2 id="nombrePaciente" style="color: var(--primary); margin: 0 0 10px 0;">EXPEDIENTE MAESTRO INTEGRAL (HCE DIGITAL)</h2>
+    
+    <div style="display:flex; gap:10px;">
+        <button class="btn-blue" onclick="validarAcceso('registro')">📂 NUEVA APERTURA DE HISTORIA CLÍNICA</button>
+        <button class="btn-blue" style="background:#2980b9" onclick="validarAcceso('historial')">🔓 VER HISTORIAL Y ARCHIVO</button>
     </div>
-    <div id="contenedorHistorial" style="margin-top: 30px;"></div>
+
+    <!-- ÁREA DE REGISTRO INTEGRAL (TODO EN UNO) -->
+    <div id="areaRegistro" style="display:none;">
+        <div class="form-header">
+            <div>CENTRO DE REHABILITACIÓN</div>
+            <div>FUNDACIÓN NUEVOS CAMINOS<br><small>HISTORIA CLÍNICA ÚNICA DE SALUD MENTAL - LEY 1995/99</small></div>
+            <div><span>NIT: 900753908-8</span><span>Código: HC-INT-01</span><span>Versión: 10</span></div>
+        </div>
+
+        <!-- MÓDULO CÁMARA ACTIVO -->
+        <div class="section-header">Evidencia Fotográfica de Atención</div>
+        <div style="display: flex; gap: 20px; justify-content: center; background: #f8f9fa; padding: 15px; border-radius: 10px; margin-top: 10px;">
+            <video id="video" autoplay playsinline></video>
+            <canvas id="canvas" style="display:none;"></canvas>
+            <img id="imgPreview">
+        </div>
+        <button class="btn-blue" style="background:#34495e; width:auto; padding:8px 20px; font-size:10px; margin: auto; display: block;" onclick="tomarFoto()">📸 CAPTURAR IDENTIDAD VISUAL</button>
+
+        <!-- 1. DATOS RIPS Y ADMINISTRATIVOS -->
+        <div class="section-header">1. Datos de Atención y RIPS</div>
+        <div class="grid-clinico">
+            <div><label>Finalidad Consulta:</label><select id="rFin"><option value="01">Atención Salud Mental</option><option value="02">Detección Temprana</option></select></div>
+            <div><label>Causa Externa:</label><select id="rCau"><option value="13">Enfermedad General</option><option value="15">Otra</option></select></div>
+            <div><label>Informante:</label><input type="text" id="fInf" placeholder="Madre, Paciente, etc."></div>
+            <div><label>Confiabilidad:</label><select id="fConf"><option>Alta</option><option>Media</option><option>Baja</option></select></div>
+        </div>
+
+        <!-- 2. SIGNOS VITALES -->
+        <div class="section-header">2. Signos Vitales y Biometría</div>
+        <div class="grid-clinico">
+            <div><label>Peso (kg):</label><input type="number" id="vP" oninput="calcIMC()"></div>
+            <div><label>Talla (cm):</label><input type="number" id="vT" oninput="calcIMC()"></div>
+            <div><label>IMC:</label><input type="text" id="vI" readonly style="background:#f1f1f1"></div>
+            <div><label>Tensión (TA):</label><input type="text" id="vTA" placeholder="120/80"></div>
+            <div><label>Frec. Card (FC):</label><input type="text" id="vFC"></div>
+            <div><label>Frec. Resp (FR):</label><input type="text" id="vFR"></div>
+            <div><label>Temp (°C):</label><input type="text" id="vTemp"></div>
+            <div><label>Saturación O2:</label><input type="text" id="vSato2"></div>
+        </div>
+
+        <!-- 3. ANAMNESIS Y MOTIVO -->
+        <div class="section-header">3. Anamnesis Especializada</div>
+        <div class="grid-clinico">
+            <div class="col-full"><label>Motivo de Consulta (Textual):</label><textarea id="fMot" rows="2"></textarea></div>
+            <div class="col-full"><label>Enfermedad Actual (Evolución de síntomas):</label><textarea id="fEnf" rows="5"></textarea></div>
+        </div>
+
+        <!-- 4. ANTECEDENTES INTEGRALES (S.O.G.C) -->
+        <div class="section-header">4. Antecedentes Personales y Familiares</div>
+        <div class="grid-clinico">
+            <div><label>Patológicos:</label><textarea id="aPat"></textarea></div>
+            <div><label>Psiquiátricos Previos:</label><textarea id="aPsi"></textarea></div>
+            <div><label>Farmacológicos:</label><textarea id="aFar"></textarea></div>
+            <div><label>Tóxicos (SPA):</label><textarea id="aTox"></textarea></div>
+            <div><label>Quirúrgicos:</label><textarea id="aQui"></textarea></div>
+            <div><label>Legales:</label><textarea id="aLeg"></textarea></div>
+            <div class="col-full"><label>Dinámica Familiar y Red Social:</label><textarea id="aFam"></textarea></div>
+        </div>
+
+        <!-- 5. EXAMEN MENTAL DE ALTA COMPLEJIDAD -->
+        <div class="section-header">5. Examen del Estado Mental</div>
+        <div class="grid-clinico" style="background:#eef2f7; padding:15px; border-radius:10px;">
+            <div><label>Porte y Actitud:</label><input type="text" id="mPor"></div>
+            <div><label>Conciencia:</label><input type="text" id="mCon"></div>
+            <div><label>Orientación (T,E,P):</label><input type="text" id="mOri"></div>
+            <div><label>Atención/Memoria:</label><input type="text" id="mMem"></div>
+            <div><label>Pensamiento (F/C):</label><input type="text" id="mPen"></div>
+            <div><label>Sensopercepción:</label><input type="text" id="mSen"></div>
+            <div><label>Afecto:</label><input type="text" id="mAfe"></div>
+            <div><label>Juicio/Raciocinio:</label><input type="text" id="mJui"></div>
+            <div><label>Insight (Conciencia):</label><input type="text" id="mIns"></div>
+            <div style="border: 2px solid var(--danger); padding: 5px; border-radius: 5px;">
+                <label style="color:var(--danger)">RIESGO SUICIDA:</label>
+                <select id="mRie"><option>Nulo</option><option>Bajo</option><option>Moderado</option><option>Alto</option></select>
+            </div>
+        </div>
+
+        <!-- 6. DIAGNÓSTICOS CIE-10 -->
+        <div class="section-header">6. Impresión Diagnóstica (CIE-10)</div>
+        <div class="grid-clinico">
+            <div class="col-full">
+                <div id="displayCie" style="background:#eee; padding:10px; border-radius:5px; margin-bottom:10px; min-height:20px;"></div>
+                <select id="selectCie" onchange="addCie()">
+                    <option value="">-- SELECCIONE CÓDIGOS LEGALES --</option>
+                    <option value="F14.2|Dependencia Cocaína">F14.2 Dependencia Cocaína</option>
+                    <option value="F10.2|Dependencia Alcohol">F10.2 Dependencia Alcohol</option>
+                    <option value="F32.9|Episodio Depresivo">F32.9 Depresión</option>
+                    <option value="F41.1|Ansiedad Generalizada">F41.1 Ansiedad</option>
+                    <option value="X70|Riesgo Suicida Activo">X70 Riesgo Suicida</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- 7. PLAN Y CONDUCTA -->
+        <div class="section-header">7. Análisis y Plan de Manejo</div>
+        <div class="grid-clinico">
+            <div class="col-full"><label>Análisis del Caso:</label><textarea id="fAna" rows="4"></textarea></div>
+            <div class="col-full"><label>Plan de Manejo / Recomendaciones:</label><textarea id="fPla" rows="4"></textarea></div>
+        </div>
+
+        <button class="btn-blue" style="background:var(--accent); font-size:18px; margin-bottom:40px;" onclick="guardarTodoFinal()">💾 FIRMAR, SELLAR Y ENCRIPTAR HISTORIA</button>
+        <button class="btn-blue" style="background:#95a5a6" onclick="location.reload()">CANCELAR</button>
+    </div>
+    
+    <div id="contenedorHistorial" style="margin-top:30px;"></div>
 </div>
 
+<!-- MODAL DE FIRMA DIGITAL -->
 <div id="modalMaestro" class="modal-legal">
     <div class="modal-content">
-        <h3 id="modalTit" style="color:var(--primary); margin-top:0;">IDENTIDAD DIGITAL</h3>
+        <h3 id="modalTit" style="color:var(--primary); margin-top:0;">FIRMA ELECTRÓNICA</h3>
         <div id="modalCuerpo"></div>
-        <button id="btnModalOk" class="btn-blue" style="background:var(--accent); margin-top:15px;">CONFIRMAR</button>
-        <button onclick="cerrarModal()" style="background:none; border:none; color:var(--danger); cursor:pointer; margin-top:10px; font-weight:bold;">CANCELAR</button>
+        <button id="btnModalOk" class="btn-blue" style="background:var(--accent); margin-top:15px;">AUTORIZAR ACCIÓN</button>
+        <button onclick="cerrarModal()" style="margin-top:10px; background:none; border:none; color:var(--danger); cursor:pointer; font-weight:bold;">CANCELAR</button>
     </div>
 </div>
 
 <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, doc, getDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import {getFirestore, collection, addDoc, query, where, getDocs, orderBy, doc, getDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
             authDomain: "caminosnuevosdatabase.firebaseapp.com",
@@ -80,24 +179,33 @@
             appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
         };
 
+
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const idPaciente = new URLSearchParams(window.location.search).get("id");
-
+    
     const LLAVE_CLINICA = "FundacionNuevosCaminos2024*USC";
     const LLAVE_ADMIN = "ADMIN2024*";
 
-    let fotoData = "", streamCam = null;
+    let diagnosticos = [], fotoData = "", streamCam = null;
 
+    // MOTORES DE CIFRADO
     const cifrar = (t) => CryptoJS.AES.encrypt(t, LLAVE_CLINICA).toString();
     const descifrarClinico = (h) => {
-        try { return CryptoJS.AES.decrypt(h || "", LLAVE_CLINICA).toString(CryptoJS.enc.Utf8); } catch(e) { return ""; }
+        try { return CryptoJS.AES.decrypt(h || "", LLAVE_CLINICA).toString(CryptoJS.enc.Utf8); } catch(e){return "";}
     };
     const descifrarAdmin = (h) => {
-        try { return CryptoJS.AES.decrypt(h || "", LLAVE_ADMIN).toString(CryptoJS.enc.Utf8); } catch(e) { return ""; }
+        try { return CryptoJS.AES.decrypt(h || "", LLAVE_ADMIN).toString(CryptoJS.enc.Utf8); } catch(e){return "";}
     };
 
-    window.validarAcceso = (accion) => {
+    window.calcIMC = () => {
+        const p = document.getElementById('vP').value;
+        const t = document.getElementById('vT').value / 100;
+        if(p > 0 && t > 0) document.getElementById('vI').value = (p / (t * t)).toFixed(2);
+    };
+
+    // VALIDACIÓN INTEGRAL PROFESIONAL
+    window.validarAcceso = (accion, docId = null) => {
         const h = `
             <label>Cargo:</label>
             <select id="rolP">
@@ -105,55 +213,38 @@
                 <option value="Terapeuta">Terapeuta</option>
                 <option value="Director(a) Terapeutico">Director(a) Terapéutico</option>
                 <option value="Psiquiatria">Psiquiatría</option>
-                <option value="Medico">Médico</option>
-                <option value="Director(a) General">Director(a) General</option>
                 <option value="Administrador">Administrador</option>
             </select>
-            <label>PIN Personal:</label>
+            <label>PIN Firma Digital:</label>
             <input type="password" id="pinP" style="text-align:center; font-size:28px; letter-spacing:10px;" maxlength="4" autofocus>
         `;
-        window.abrirModal("🔒 VALIDACIÓN DE FIRMA", h, async () => {
-            const rSel = document.getElementById('rolP').value;
-            const pSel = document.getElementById('pinP').value;
+        abrirModal("🔒 VALIDACIÓN DE IDENTIDAD", h, async () => {
+            const r = document.getElementById('rolP').value;
+            const p = document.getElementById('pinP').value;
             const q = query(collection(db, "talento_humano_cifrado"));
             const snap = await getDocs(q);
-            let profMatch = null;
+            let prof = null;
 
             snap.forEach(d => {
                 const data = d.data();
-                if (data.info && data.info.pin) {
-                    const pinReal = descifrarAdmin(data.info.pin);
-                    const carReal = descifrarAdmin(data.info.car);
-                    if (pinReal === pSel && carReal === rSel) profMatch = data;
-                }
+                if(data.info && descifrarAdmin(data.info.pin) === p && descifrarAdmin(data.info.car) === r) prof = data;
             });
 
-            if (profMatch) {
-                if (profMatch.estado === "INACTIVO") return alert("Acceso Revocado.");
-                window.cerrarModal();
-                sessionStorage.setItem("pNom", descifrarAdmin(profMatch.info.n));
-                sessionStorage.setItem("pTP", descifrarAdmin(profMatch.info.tp || ""));
-                if (accion === 'registro') { document.getElementById('areaRegistro').style.display='block'; activarCamara(); }
-                if (accion === 'historial') cargarHistorial();
-            } else {
-                alert("❌ PIN o CARGO incorrectos.");
-            }
+            if(prof && prof.estado !== "INACTIVO") {
+                cerrarModal();
+                sessionStorage.setItem("pNom", descifrarAdmin(prof.info.n));
+                sessionStorage.setItem("pTP", descifrarAdmin(prof.info.tp || ""));
+                if(accion === 'registro') { document.getElementById('areaRegistro').style.display='block'; activarCamara(); }
+                if(accion === 'historial') cargarHistorial();
+                if(accion === 'aclarar') prepararAclaratoria(docId);
+                if(accion === 'pdf') generarPDF(docId);
+            } else { alert("❌ CREDENCIALES INVÁLIDAS."); }
         });
     };
 
-    window.abrirModal = (tit, html, func) => {
-        document.getElementById('modalTit').innerText = tit;
-        document.getElementById('modalCuerpo').innerHTML = html;
-        document.getElementById('btnModalOk').onclick = func;
-        document.getElementById('modalMaestro').style.display = 'block';
-    };
-    window.cerrarModal = () => document.getElementById('modalMaestro').style.display = 'none';
-
     async function activarCamara() {
-        try {
-            streamCam = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
-            document.getElementById('video').srcObject = streamCam;
-        } catch(e) { console.log("Cámara no activa."); }
+        streamCam = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        document.getElementById('video').srcObject = streamCam;
     }
 
     window.tomarFoto = () => {
@@ -166,37 +257,97 @@
         v.style.display = 'none';
     };
 
-    window.guardarTodoMaestro = async () => {
+    window.addCie = () => {
+        const s = document.getElementById('selectCie');
+        const [c, d] = s.value.split('|');
+        if(!c) return;
+        diagnosticos.push({ cod: c, desc: d });
+        document.getElementById('displayCie').innerHTML = diagnosticos.map(x => `<span class="cie-tag">${x.cod}</span>`).join(' ');
+        s.value = "";
+    };
+
+    window.guardarTodoFinal = async () => {
         const hce = {
-            m: document.getElementById('fMotivo').value,
-            e: document.getElementById('fEnfermedad').value,
-            a: document.getElementById('fAntecedentes').value,
-            ex: document.getElementById('fExamen').value,
-            p: document.getElementById('fPlan').value
+            rips: { fin: document.getElementById('rFin').value, cau: document.getElementById('rCau').value },
+            vitals: { p: document.getElementById('vP').value, imc: document.getElementById('vI').value },
+            anamnesis: { mot: document.getElementById('fMot').value, enf: document.getElementById('fEnf').value },
+            mental: { rie: document.getElementById('mRie').value, por: document.getElementById('mPor').value },
+            cie10: diagnosticos,
+            conducta: { ana: document.getElementById('fAna').value, pla: document.getElementById('fPla').value }
         };
+
+        if(!hce.anamnesis.mot || diagnosticos.length === 0) return alert("Motivo y CIE-10 son obligatorios.");
+
         await addDoc(collection(db, "evoluciones_psicologicas"), {
             idPaciente, dataHCE: cifrar(JSON.stringify(hce)), foto: fotoData,
             autor: cifrar(sessionStorage.getItem("pNom")), tp: cifrar(sessionStorage.getItem("pTP")),
             fecha: new Date().toLocaleString(), timestamp: serverTimestamp(),
-            hash: btoa(hce.m + Date.now()).substring(0,12)
+            hash: btoa(hce.anamnesis.mot + Date.now()).substring(0,16), aclaratorias: []
         });
-        alert("Expediente Sellado."); location.reload();
+        alert("✔️ EXPEDIENTE SELLADO."); location.reload();
     };
 
-    async function cargarHistorial() {
+    window.cargarHistorial = async () => {
         const q = query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente), orderBy("timestamp", "desc"));
         const snap = await getDocs(q);
         let h = "";
-        snap.forEach(d => {
-            const dat = d.data();
-            const c = JSON.parse(descifrarClinico(dat.dataHCE));
-            h += `<div class="evolucion-card"><strong>📅 ${dat.fecha}</strong><p>Motivo: ${c.m}</p><small>Por: ${descifrarClinico(dat.autor)}</small></div>`;
+        snap.forEach(docSnap => {
+            const d = docSnap.data();
+            const c = JSON.parse(descifrarClinico(d.dataHCE));
+            h += `<div class="evolucion-card">
+                <strong>📅 ${d.fecha}</strong><br>
+                <small>DIAGNÓSTICOS: ${c.cie10.map(x=>x.cod).join(', ')}</small>
+                <p><strong>MOTIVO:</strong> ${c.anamnesis.mot}</p>
+                <button class="btn-blue" style="width:auto; padding:5px 12px; font-size:9px;" onclick="validarAcceso('pdf', '${docSnap.id}')">📄 PDF PRO</button>
+                <button class="btn-blue" style="width:auto; padding:5px 12px; background:var(--accent); font-size:9px;" onclick="validarAcceso('aclarar', '${docSnap.id}')">🖋️ ACLARAR</button>
+                ${d.aclaratorias.length > 0 ? `<div class="bloque-aclaratoria">${d.aclaratorias.map(a=>`• ${descifrarClinico(a.texto)}`).join('<br>')}</div>` : ''}
+            </div>`;
         });
-        document.getElementById('contenedorHistorial').innerHTML = h || "No hay registros.";
-    }
+        document.getElementById('contenedorHistorial').innerHTML = h || "Sin registros.";
+    };
 
-    const snapP = await getDoc(doc(db, "pacientes", idPaciente));
-    if(snapP.exists()) document.getElementById('nombrePaciente').innerText = "EXPEDIENTE: " + snapP.data().nombre.toUpperCase();
+    window.prepararAclaratoria = (id) => {
+        const html = `<textarea id="tAcl" rows="4" placeholder="Nota marginal legal..."></textarea>`;
+        abrirModal("🖋️ NUEVA ACLARATORIA", html, async () => {
+            const txt = document.getElementById('tAcl').value;
+            await updateDoc(doc(db, "evoluciones_psicologicas", id), {
+                aclaratorias: arrayUnion({ texto: cifrar(txt), fecha: new Date().toLocaleString(), autor: cifrar(sessionStorage.getItem("pNom")) })
+            });
+            alert("VINCULADA."); location.reload();
+        });
+    };
+
+    window.generarPDF = async (id) => {
+        const d = (await getDoc(doc(db, "evoluciones_psicologicas", id))).data();
+        const pac = (await getDoc(doc(db, "pacientes", idPaciente))).data();
+        const docPDF = new jspdf.jsPDF();
+        const c = JSON.parse(descifrarClinico(d.dataHCE));
+
+        docPDF.rect(10, 10, 190, 275);
+        docPDF.setFontSize(14); docPDF.text("HISTORIA CLINICA INTEGRAL", 105, 20, {align:"center"});
+        docPDF.setFontSize(8); docPDF.text("PACIENTE: " + pac.nombre.toUpperCase() + " | FECHA: " + d.fecha, 12, 35);
+        
+        let y = 45;
+        const s = [{t:"MOTIVO:", d:c.anamnesis.mot}, {t:"ENFERMEDAD:", d:c.anamnesis.enf}, {t:"ANALISIS:", d:c.conducta.ana}, {t:"PLAN:", d:c.conducta.pla}];
+        s.forEach(sec => {
+            docPDF.setFont(undefined, 'bold'); docPDF.text(sec.t, 12, y);
+            docPDF.setFont(undefined, 'normal');
+            const lines = docPDF.splitTextToSize(sec.d, 180);
+            docPDF.text(lines, 12, y + 5);
+            y += (lines.length * 5) + 12;
+        });
+
+        if(d.foto) docPDF.addImage(d.foto, 'JPEG', 150, 30, 40, 30);
+        docPDF.text("Firma: " + descifrarClinico(d.autor) + " | TP: " + descifrarClinico(d.tp), 12, 260);
+        docPDF.text("Hash Sello: " + d.hash, 12, 265);
+        docPDF.save(`HC_${pac.nombre}.pdf`);
+    };
+
+    window.abrirModal = (t, h, f) => { document.getElementById('modalTit').innerText = t; document.getElementById('modalCuerpo').innerHTML = h; document.getElementById('btnModalOk').onclick = f; document.getElementById('modalMaestro').style.display='block'; };
+    window.cerrarModal = () => document.getElementById('modalMaestro').style.display='none';
+
+    const pRef = await getDoc(doc(db, "pacientes", idPaciente));
+    if(pRef.exists()) document.getElementById('nombrePaciente').innerText = "HCE: " + pRef.data().nombre.toUpperCase();
 </script>
 </body>
 </html>
