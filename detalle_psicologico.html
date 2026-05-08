@@ -9,31 +9,22 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
  <style>
-        :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #1a1a2e; }
+        :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #f4f7f6; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #1a1a2e; margin: 0; padding: 10px; font-size: 11px; }
-        .container { max-width: 1300px; margin: auto; background: white; padding: 30px; border-radius: 25px; box-shadow: 0 10px 50px rgba(0,0,0,0.5); }
-        
+        .container { max-width: 1350px; margin: auto; background: white; padding: 30px; border-radius: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); }
         .form-header { display: grid; grid-template-columns: 150px 1fr 200px; border: 2px solid #000; margin-bottom: 15px; background: #fff; }
         .form-header div { padding: 10px; border-right: 1px solid #000; display: flex; align-items: center; justify-content: center; text-align: center; font-weight: bold; }
         .form-header div:last-child { border-right: none; flex-direction: column; font-size: 8px; align-items: flex-start; }
-
         .section-header { background: var(--primary); color: white; padding: 8px 15px; font-weight: bold; margin-top: 15px; border-radius: 5px; text-transform: uppercase; font-size: 10px; }
         .grid-clinico { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 10px; }
-        .col-full { grid-column: 1 / -1; }
-
-        label { font-weight: bold; color: var(--primary); display: block; margin-bottom: 3px; text-transform: uppercase; font-size: 9px; }
-        textarea, input, select { width: 100%; padding: 8px; border: 1px solid #999; border-radius: 4px; box-sizing: border-box; font-size: 11px; background: #fff; }
-        
         .btn-blue { background: var(--primary); color: white; padding: 15px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase; margin-top: 10px; font-size: 13px; }
         .evolucion-card { text-align: left; background: #fff; border-left: 10px solid #9b59b6; padding: 25px; margin-bottom: 25px; border-radius: 15px; border: 1px solid #eee; position: relative; }
-        .btn-mini { padding: 8px 15px; border-radius: 8px; border: none; color: white; font-weight: bold; cursor: pointer; font-size: 10px; text-transform: uppercase; margin-right: 10px; margin-top: 10px; }
-
+        .cie-tag { background: #eef2f7; border: 1px solid var(--primary); padding: 4px 8px; border-radius: 4px; display: inline-block; margin: 2px; font-weight: bold; color: var(--primary); }
+        .modal-legal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(8px); }
+        .modal-content { background: white; margin: 5% auto; padding: 40px; border-radius: 30px; width: 90%; max-width: 500px; border: 4px solid var(--primary); text-align: center; }
         #video { width: 100%; max-width: 320px; border-radius: 10px; background: #000; }
         #imgPreview { width: 100%; max-width: 320px; border-radius: 10px; border: 3px solid var(--accent); display: none; }
-        .cie-tag { background: #eef2f7; border: 1px solid var(--primary); padding: 4px 8px; border-radius: 4px; display: inline-block; margin: 2px; font-weight: bold; color: var(--primary); }
-
-        .modal-legal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(8px); overflow-y: auto; }
-        .modal-content { background: white; margin: 5% auto; padding: 40px; border-radius: 30px; width: 90%; max-width: 500px; border: 4px solid var(--primary); text-align: center; }
+        .btn-mini { padding: 6px 12px; border-radius: 6px; border: none; color: white; font-weight: bold; cursor: pointer; font-size: 9px; text-transform: uppercase; margin-right: 5px; }
     </style>
 </head>
 <body>
@@ -45,70 +36,59 @@
         <button class="btn-blue" style="background:#2980b9" onclick="validarAcceso('historial')">🔓 VER ARCHIVO CLÍNICO DESCIFRADO</button>
     </div>
 
-    <!-- AREA DE REGISTRO -->
     <div id="areaRegistro" style="display:none; margin-top: 20px;">
         <div class="form-header">
-            <div>IPS NUEVOS CAMINOS</div>
-            <div>CENTRO DE REHABILITACIÓN Y SALUD MENTAL<br><small>HISTORIA CLÍNICA INTEGRAL - RESOLUCIÓN 1995/99</small></div>
-            <div><span>NIT: 900753908-8</span><span>Versión: 25.0</span><span>Vigencia: 2 Años</span></div>
+            <div>LOGOTIPO IPS</div>
+            <div>CENTRO DE REHABILITACIÓN NUEVOS CAMINOS SAS<br><small>HISTORIA CLÍNICA INTEGRAL - FOLIO ELECTRÓNICO</small></div>
+            <div><span id="numFolioVisual">Folio No: Cargando...</span><span>Versión: 26.0</span></div>
         </div>
 
         <div style="text-align:center; background:#f9f9f9; padding:15px; border-radius:15px;">
             <video id="video" autoplay playsinline></video>
             <canvas id="canvas" style="display:none;"></canvas>
             <img id="imgPreview">
-            <br><button class="btn-blue" style="background:#34495e; width:auto; padding:8px 20px;" onclick="tomarFoto()">📸 CAPTURAR EVIDENCIA DE ATENCIÓN</button>
+            <br><button class="btn-blue" style="background:#34495e; width:auto; padding:8px 20px; font-size:10px;" onclick="tomarFoto()">📸 CAPTURAR EVIDENCIA FOTOGRÁFICA</button>
         </div>
 
         <div class="section-header">1. RIPS Y SIGNOS VITALES</div>
         <div class="grid-clinico">
-            <div><label>Finalidad:</label><select id="rFin"><option value="Consulta Salud Mental">Consulta Salud Mental</option></select></div>
             <div><label>Peso (kg):</label><input type="number" id="vP" oninput="calcIMC()"></div>
             <div><label>Talla (cm):</label><input type="number" id="vT" oninput="calcIMC()"></div>
-            <div><label>IMC:</label><input type="text" id="vI" readonly style="background:#eee"></div>
-            <div><label>Tensión (TA):</label><input type="text" id="vTA" placeholder="120/80"></div>
-            <div><label>FC / FR:</label><input type="text" id="vFCFR"></div>
+            <div><label>IMC:</label><input type="text" id="vI" readonly></div>
+            <div><label>TA:</label><input type="text" id="vTA" placeholder="120/80"></div>
+            <div><label>FC/FR:</label><input type="text" id="vFCFR"></div>
         </div>
 
         <div class="section-header">2. ANAMNESIS Y ANTECEDENTES</div>
         <div class="grid-clinico">
-            <div class="col-full"><label>Motivo Consulta (Textual):</label><textarea id="fMot" rows="2"></textarea></div>
-            <div class="col-full"><label>Enfermedad Actual:</label><textarea id="fEnf" rows="4"></textarea></div>
-            <div><label>Patológicos:</label><textarea id="aPat"></textarea></div>
-            <div><label>Tóxicos (SPA):</label><textarea id="aTox"></textarea></div>
+            <div style="grid-column: 1/-1;"><label>Motivo Consulta:</label><textarea id="fMot" rows="2"></textarea></div>
+            <div style="grid-column: 1/-1;"><label>Enfermedad Actual:</label><textarea id="fEnf" rows="4"></textarea></div>
+            <div><label>Antecedentes Patológicos:</label><textarea id="aPat"></textarea></div>
+            <div><label>Psiquiátricos/SPA:</label><textarea id="aTox"></textarea></div>
         </div>
 
-        <div class="section-header">3. EXAMEN MENTAL</div>
-        <div class="grid-clinico" style="background:#eef2f7; padding:10px; border-radius:10px;">
-            <div><label>Porte/Actitud:</label><input type="text" id="mPor"></div>
-            <div><label>Sensopercepción:</label><input type="text" id="mSen"></div>
-            <div><label>Juicio/Raciocinio:</label><input type="text" id="mJui"></div>
-            <div><label>Riesgo Suicida:</label><select id="mRie"><option>Nulo</option><option>Bajo</option><option>Moderado</option><option>Alto</option></select></div>
-        </div>
-
-        <div class="section-header">4. DIAGNÓSTICOS CIE-10 (MULTIAXIAL)</div>
+        <div class="section-header">3. DIAGNÓSTICO CIE-10 (TRASTORNOS ESPECIFICADOS)</div>
         <div class="grid-clinico">
-            <div class="col-full">
-                <div id="displayCie" style="background:#fff; border:1px solid #ccc; padding:10px; min-height:30px; margin-bottom:5px;"></div>
+            <div style="grid-column: 1/-1;">
+                <div id="displayCie" style="background:#fff; border:1px solid #ccc; padding:10px; min-height:30px; margin-bottom:5px; border-radius:5px;"></div>
                 <select id="selectCie" onchange="addCie()">
                     <option value="">-- SELECCIONE TRASTORNO --</option>
-                    <option value="F14.2|Trastornos Mentales por Cocaína">F14.2 Dependencia Cocaína</option>
-                    <option value="F10.2|Síndrome de Dependencia Alcohol">F10.2 Dependencia Alcohol</option>
-                    <option value="F32.9|Episodio Depresivo">F32.9 Depresión</option>
-                    <option value="F41.1|Ansiedad Generalizada">F41.1 Ansiedad</option>
-                    <option value="X70|Riesgo Suicida Activo">X70 Riesgo Suicida</option>
+                    <option value="F14.2|Trastornos mentales y del comportamiento debidos al consumo de cocaína">F14.2 Dependencia Cocaína</option>
+                    <option value="F10.2|Síndrome de dependencia al alcohol">F10.2 Dependencia Alcohol</option>
+                    <option value="F32.9|Episodio depresivo, no especificado">F32.9 Depresión</option>
+                    <option value="X70|Lesión autoinfligida intencionalmente (Riesgo Suicida)">X70 Riesgo Suicida</option>
                 </select>
             </div>
-            <div class="col-full"><label>Plan de Manejo y Recomendaciones:</label><textarea id="fPla" rows="4"></textarea></div>
+            <div style="grid-column: 1/-1;"><label>Plan de Manejo y Conducta:</label><textarea id="fPla" rows="4"></textarea></div>
         </div>
-        <button class="btn-blue" style="background:var(--accent); font-size:18px;" onclick="guardarTodoFinal()">💾 FIRMAR Y SELLAR EXPEDIENTE</button>
+        <button class="btn-blue" style="background:var(--accent); font-size:18px;" onclick="guardarHCEFinal()">💾 FIRMAR Y SELLAR FOLIO</button>
     </div>
     <div id="contenedorHistorial" style="margin-top:30px;"></div>
 </div>
 
 <div id="modalMaestro" class="modal-legal">
     <div class="modal-content">
-        <h3 id="modalTit">Firma Digital</h3>
+        <h3 id="modalTit">Validación de Seguridad</h3>
         <div id="modalCuerpo"></div>
         <button id="btnModalOk" class="btn-blue" style="background:var(--accent)">AUTORIZAR</button>
         <button onclick="cerrarModal()" style="margin-top:10px; background:none; border:none; color:var(--danger); cursor:pointer;">CANCELAR</button>
@@ -116,7 +96,7 @@
 </div>
 
 <script type="module">
-            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+          import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import {getFirestore, collection, addDoc, query, where, getDocs, doc, getDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
@@ -128,12 +108,10 @@
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const idPaciente = new URLSearchParams(window.location.search).get("id");
-    
-    // LLAVES CRÍTICAS
     const LL_CL = "FundacionNuevosCaminos2024*USC";
     const LL_AD = "ADMIN2024*";
 
-    let diagCie = [], fotoB64 = "", stream = null;
+    let diagCie = [], fotoB64 = "", stream = null, nFolio = 0;
 
     const cifrar = (t) => CryptoJS.AES.encrypt(t, LL_CL).toString();
     const descCl = (h) => { try { return CryptoJS.AES.decrypt(h || "", LL_CL).toString(CryptoJS.enc.Utf8); } catch(e){return "";} };
@@ -145,150 +123,103 @@
     };
 
     window.validarAcceso = (accion, docId = null) => {
-        const h = `<select id="rolP" style="margin-bottom:10px;"><option value="Psicologia">Psicología</option><option value="Administrador">Administrador</option></select><input type="password" id="pinP" style="text-align:center; font-size:28px;" maxlength="4">`;
-        abrirModal("🔒 IDENTIDAD", h, async () => {
+        const h = `
+            <label>Cargo del Profesional:</label>
+            <select id="rolP" style="margin-bottom:15px;">
+                <option value="Psicologia">Psicología</option>
+                <option value="Terapeuta">Terapeuta</option>
+                <option value="Psiquiatria">Psiquiatría</option>
+                <option value="Administrador">Administrador</option>
+            </select>
+            <label>PIN de Firma Digital:</label>
+            <input type="password" id="pinP" style="text-align:center; font-size:28px; letter-spacing:10px;" maxlength="4" autofocus>
+        `;
+        abrirModal("🔒 IDENTIDAD Y FIRMA", h, async () => {
             const r = document.getElementById('rolP').value, p = document.getElementById('pinP').value;
             const q = query(collection(db, "talento_humano_cifrado"));
             const snap = await getDocs(q);
             let prof = null;
-            
             snap.forEach(d => { 
                 const data = d.data(); 
-                if (data && data.info && data.info.pin) {
-                    if(descAd(data.info.pin) === p && descAd(data.info.car) === r) prof = data; 
-                }
+                if (data && data.info && descAd(data.info.pin) === p && descAd(data.info.car) === r) prof = data; 
             });
-            
             if(prof && prof.estado !== "INACTIVO") {
                 cerrarModal();
                 sessionStorage.setItem("pNom", descAd(prof.info.n));
                 sessionStorage.setItem("pTP", descAd(prof.info.tp || "N/A"));
-                if(accion === 'registro') { document.getElementById('areaRegistro').style.display='block'; iniciarCam(); }
+                if(accion === 'registro') { 
+                    const snapCount = await getDocs(query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente)));
+                    nFolio = snapCount.size + 1;
+                    document.getElementById('numFolioVisual').innerText = "Folio No: " + nFolio;
+                    document.getElementById('areaRegistro').style.display='block'; 
+                    iniciarCam(); 
+                }
                 if(accion === 'historial') cargarHist();
-                if(accion === 'pdf') generarReporte(docId);
-                if(accion === 'json') exportarJSON(docId);
+                if(accion === 'pdf') generarReportePDF(docId);
                 if(accion === 'aclarar') ejecutarAclarar(docId);
-            } else { alert("ACCESO DENEGADO"); }
+            } else { alert("CREDENCIALES INVÁLIDAS"); }
         });
     };
 
-    async function iniciarCam() { try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }); document.getElementById('video').srcObject = stream; } catch(e){alert("Cámara no iniciada");} }
+    async function iniciarCam() { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }); document.getElementById('video').srcObject = stream; }
     window.tomarFoto = () => { const v = document.getElementById('video'), c = document.getElementById('canvas'); c.width = v.videoWidth; c.height = v.videoHeight; c.getContext('2d').drawImage(v,0,0); fotoB64 = c.toDataURL('image/jpeg', 0.6); document.getElementById('imgPreview').src = fotoB64; document.getElementById('imgPreview').style.display='block'; v.style.display='none'; };
-    window.addCie = () => { const s = document.getElementById('selectCie'), [c, d] = s.value.split('|'); if(!c) return; diagCie.push({ cod: c, desc: d }); document.getElementById('displayCie').innerHTML = diagCie.map(x => `<span class="cie-tag">${x.cod}</span>`).join(' '); s.value = ""; };
+    
+    window.addCie = () => { 
+        const s = document.getElementById('selectCie'), [c, d] = s.value.split('|'); 
+        if(!c) return; 
+        diagCie.push({ cod: c, desc: d }); 
+        document.getElementById('displayCie').innerHTML = diagCie.map(x => `<span class="cie-tag" title="${x.desc}">${x.cod}</span>`).join(' '); 
+        s.value = ""; 
+    };
 
-    window.guardarTodoFinal = async () => {
+    window.guardarHCEFinal = async () => {
         const hce = {
-            v: { p: document.getElementById('vP').value, i: document.getElementById('vI').value, ta: document.getElementById('vTA').value, fc: document.getElementById('vFCFR').value },
-            a: { mot: document.getElementById('fMot').value, enf: document.getElementById('fEnf').value, pat: document.getElementById('aPat').value, tox: document.getElementById('aTox').value },
-            m: { por: document.getElementById('mPor').value, sen: document.getElementById('mSen').value, jui: document.getElementById('mJui').value, rie: document.getElementById('mRie').value },
-            cie: diagCie, pla: document.getElementById('fPla').value
+            v: { p: document.getElementById('vP').value, i: document.getElementById('vI').value, ta: document.getElementById('vTA').value },
+            a: { mot: document.getElementById('fMot').value, enf: document.getElementById('fEnf').value, ant: document.getElementById('aPat').value },
+            cie: diagCie, pla: document.getElementById('fPla').value, folio: nFolio
         };
         await addDoc(collection(db, "evoluciones_psicologicas"), { idPaciente, dataHCE: cifrar(JSON.stringify(hce)), foto: fotoB64, autor: cifrar(sessionStorage.getItem("pNom")), tp: cifrar(sessionStorage.getItem("pTP")), fecha: new Date().toLocaleString(), timestamp: serverTimestamp(), hash: btoa(hce.a.mot + Date.now()).substring(0,16), aclaratorias: [] });
         location.reload();
     };
 
-window.cargarHist = async () => {
-    console.log("Iniciando descifrado de historial...");
-    const contenedor = document.getElementById('contenedorHistorial');
-    contenedor.innerHTML = "<p style='color:blue;'>🔓 Descifrando archivos de la bóveda...</p>";
-
-    try {
-        // 1. Consulta simple (Evita el error de índice de Firebase)
+    window.cargarHist = async () => {
         const q = query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente));
         const snap = await getDocs(q);
-        
-        if (snap.empty) {
-            contenedor.innerHTML = "<p style='color:gray;'>📭 No hay registros en el archivo para este paciente.</p>";
-            return;
-        }
-
-        let listaEvoluciones = [];
-
-        // 2. Procesamiento con Escudo Anti-Errores
-        snap.forEach(docSnap => {
-            const d = docSnap.data();
-            try {
-                const textoPlano = descCl(d.dataHCE); // Intentamos abrir el candado
-                if (textoPlano) {
-                    const datos = JSON.parse(textoPlano);
-                    listaEvoluciones.push({ ...d, datos, id: docSnap.id });
-                }
-            } catch (e) {
-                console.warn("Registro omitido: No se pudo descifrar o formato antiguo.");
-            }
-        });
-
-        // 3. Ordenar por fecha (El más reciente primero)
-        listaEvoluciones.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
-
-        // 4. Dibujar en pantalla con todos los botones
-        let htmlFinal = "";
-        listaEvoluciones.forEach(ev => {
-            htmlFinal += `
-            <div class="evolucion-card">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start;">
-                    <strong>📅 ${ev.fecha}</strong>
-                    <span style="font-size:9px; color:green; font-family:monospace;">HASH: ${ev.hash || 'PROTEGIDO'}</span>
-                </div>
-                <p><strong>MOTIVO:</strong> ${ev.datos.a ? ev.datos.a.mot : (ev.datos.mot || "Ver en PDF")}</p>
-                
-                <div style="margin-top:15px; border-top:1px solid #eee; padding-top:10px;">
-                    <button class="btn-mini" style="background:#2c3e50" onclick="exportarJSON('${ev.id}')">JSON</button>
-                    <button class="btn-mini" style="background:#e67e22" onclick="validarAcceso('pdf', '${ev.id}')">📄 PDF FULL</button>
-                    <button class="btn-mini" style="background:#9b59b6" onclick="validarAcceso('aclarar', '${ev.id}')">🖋️ ACLARAR</button>
-                </div>
-
-                ${ev.aclaratorias && ev.aclaratorias.length > 0 ? `
-                    <div class="bloque-aclaratoria">
-                        <strong>NOTAS MARGINALES:</strong><br>
-                        ${ev.aclaratorias.map(a => `• [${a.fecha}] ${descCl(a.texto)}`).join('<br>')}
-                    </div>
-                ` : ''}
+        let evs = [];
+        snap.forEach(d => { const raw = descCl(d.data().dataHCE); if(raw) evs.push({...d.data(), c: JSON.parse(raw), id: d.id }); });
+        evs.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
+        let h = "";
+        evs.forEach(ev => {
+            h += `<div class="evolucion-card">
+                <span style="float:right; font-size:10px; color:green;">ID: ${ev.hash}</span>
+                <strong>📅 ${ev.fecha} | FOLIO No: ${ev.c.folio || 'N/A'}</strong>
+                <p><strong>MOTIVO:</strong> ${ev.c.a.mot}</p>
+                <button class="btn-mini" style="background:#e67e22" onclick="validarAcceso('pdf', '${ev.id}')">📄 PDF FULL</button>
+                <button class="btn-mini" style="background:#9b59b6" onclick="validarAcceso('aclarar', '${ev.id}')">🖋️ ACLARAR</button>
+                ${ev.aclaratorias.length > 0 ? `<div class="bloque-aclaratoria">${ev.aclaratorias.map(a=>`• [${a.fecha}] ${descCl(a.texto)}`).join('<br>')}</div>` : ''}
             </div>`;
         });
-
-        contenedor.innerHTML = htmlFinal;
-
-    } catch (error) {
-        console.error("Fallo total en historial:", error);
-        contenedor.innerHTML = "<p style='color:red;'>❌ Error crítico al conectar con la bóveda.</p>";
-    }
-};
-
-    window.generarReporte = async (id) => {
-        const d = (await getDoc(doc(db, "evoluciones_psicologicas", id))).data(), pac = (await getDoc(doc(db, "pacientes", idPaciente))).data(), c = JSON.parse(descCl(d.dataHCE));
-        const docP = new jspdf.jsPDF();
-        
-        docP.rect(10, 10, 190, 275); docP.line(10, 35, 200, 35);
-        docP.setFontSize(12); docP.text("FUNDACION NUEVOS CAMINOS - REPORTE CLINICO", 105, 20, {align:"center"});
-        docP.setFont(undefined, 'bold'); docP.setFontSize(9); docP.text(`PACIENTE: ${pac.nombre.toUpperCase()} | CC: ${pac.cedula}`, 12, 42); docP.text(`FECHA: ${d.fecha}`, 140, 42);
-        
-        let y = 50;
-        const sections = [
-            {t:"1. SIGNOS VITALES", d:`Peso: ${c.v.p}kg | IMC: ${c.v.i} | TA: ${c.v.ta}`},
-            {t:"2. MOTIVO Y ENFERMEDAD", d:`MOTIVO: ${c.a.mot}\n\nENFERMEDAD ACTUAL: ${c.a.enf}`},
-            {t:"3. ANTECEDENTES", d:`PAT: ${c.a.pat} | TOX: ${c.a.tox}`},
-            {t:"4. EXAMEN MENTAL", d:`PORTE: ${c.m.por} | RIESGO: ${c.m.rie}`},
-            {t:"5. DIAGNOSTICOS CIE-10", d: c.cie.map(x=>`[${x.cod}] ${x.desc}`).join(', ')},
-            {t:"6. PLAN DE MANEJO", d:c.pla}
-        ];
-
-        sections.forEach(sec => {
-            docP.setFillColor(235); docP.rect(10, y, 190, 7, 'F'); docP.setFont(undefined, 'bold'); docP.text(sec.t, 12, y+5);
-            docP.setFont(undefined, 'normal'); const lines = docP.splitTextToSize(sec.d || "N/R", 180); docP.text(lines, 12, y+12);
-            y += (lines.length * 5) + 18;
-        });
-
-        if(d.foto) docP.addImage(d.foto, 'JPEG', 160, 37, 35, 25);
-        docP.text("__________________________", 12, 260); docP.text(`${descCl(d.autor)} - TP: ${descCl(d.tp)}`, 12, 265);
-        docP.save(`HCE_NC_${pac.nombre}.pdf`);
+        document.getElementById('contenedorHistorial').innerHTML = h || "Sin registros.";
     };
 
-    window.exportarJSON = async (id) => { const d = (await getDoc(doc(db, "evoluciones_psicologicas", id))).data(); const b = new Blob([JSON.stringify(d, null, 2)], {type: "application/json"}); const u = URL.createObjectURL(b); const a = document.createElement("a"); a.href = u; a.download = `auditoria_${id}.json`; a.click(); };
+    window.generarReportePDF = async (id) => {
+        const d = (await getDoc(doc(db, "evoluciones_psicologicas", id))).data(), pac = (await getDoc(doc(db, "pacientes", idPaciente))).data(), c = JSON.parse(descCl(d.dataHCE));
+        const docP = new jspdf.jsPDF();
+        docP.rect(10, 10, 190, 275); docP.line(10, 35, 200, 35);
+        docP.setFontSize(12); docP.text("REPORTE INTEGRAL - FUNDACIÓN NC", 105, 20, {align:"center"});
+        docP.setFontSize(9); docP.text(`PACIENTE: ${pac.nombre.toUpperCase()} | CC: ${pac.cedula} | FOLIO: ${c.folio || '1'}`, 12, 42);
+        let y = 50;
+        const s = [{t:"SIGNOS VITALES", d:`Peso: ${c.v.p}kg | IMC: ${c.v.i} | TA: ${c.v.ta}`}, {t:"MOTIVO Y ENFERMEDAD", d:c.a.mot + "\n" + c.a.enf}, {t:"DIAGNOSTICOS CIE-10", d: c.cie.map(x=>`[${x.cod}] ${x.desc}`).join(', ')}, {t:"PLAN DE MANEJO", d:c.pla}];
+        s.forEach(sec => { docP.setFillColor(235); docP.rect(10, y, 190, 7, 'F'); docP.setFont(undefined, 'bold'); docP.text(sec.t, 12, y+5); docP.setFont(undefined, 'normal'); const lines = docP.splitTextToSize(sec.d || "N/R", 180); docP.text(lines, 12, y+12); y += (lines.length * 5) + 18; });
+        if(d.foto) docP.addImage(d.foto, 'JPEG', 150, 40, 40, 30);
+        docP.text("__________________________", 12, 260); docP.text(`${descCl(d.autor)} - TP: ${descCl(d.tp)}`, 12, 265);
+        docP.save(`FOLIO_${c.folio || '1'}_${pac.nombre}.pdf`);
+    };
+
     window.ejecutarAclarar = (id) => { const t = prompt("Nota marginal legal:"); if(t) updateDoc(doc(db, "evoluciones_psicologicas", id), { aclaratorias: arrayUnion({ texto: cifrar(t), fecha: new Date().toLocaleString() }) }).then(()=>location.reload()); };
     window.abrirModal = (t,h,f) => { document.getElementById('modalTit').innerText = t; document.getElementById('modalCuerpo').innerHTML = h; document.getElementById('btnModalOk').onclick = f; document.getElementById('modalMaestro').style.display='block'; };
     window.cerrarModal = () => document.getElementById('modalMaestro').style.display='none';
     const pRef = await getDoc(doc(db, "pacientes", idPaciente)); if(pRef.exists()) document.getElementById('nombrePaciente').innerText = "HCE: " + pRef.data().nombre.toUpperCase();
 </script>
 </body>
-</html>
+</html
