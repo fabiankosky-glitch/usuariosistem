@@ -9,9 +9,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
-        :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #1a1a2e; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
-        .container { max-width: 1100px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 15px 50px rgba(0,0,0,0.5); text-align: center; }
+          :root { --primary: #0f3460; --secondary: #16213e; --accent: #27ae60; --danger: #e74c3c; --bg: #1a1a2e; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        .container { max-width: 1000px; margin: auto; background: white; padding: 25px; border-radius: 20px; box-shadow: 0 15px 50px rgba(0,0,0,0.5); text-align: center; }
         .form-header { display: grid; grid-template-columns: 1fr 2fr 1fr; border: 2px solid #000; margin-bottom: 20px; font-size: 11px; background: #fff; }
         .form-header div { padding: 10px; border-right: 1px solid #000; display: flex; align-items: center; justify-content: center; }
         .form-header div:last-child { border-right: none; text-align: left; flex-direction: column; }
@@ -20,18 +20,17 @@
         label { font-weight: bold; font-size: 11px; color: var(--primary); margin-top: 10px; display: block; text-transform: uppercase; }
         textarea, input, select { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #000; font-size: 14px; box-sizing: border-box; background: #fcfcfc; margin-bottom: 8px; }
         .evolucion-card { text-align: left; background: white; border-left: 10px solid #9b59b6; padding: 20px; margin-bottom: 20px; border-radius: 15px; border: 1px solid #eee; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
-        .bloque-aclaratoria { background: #fff9e6; padding: 15px; border-radius: 10px; margin-top: 15px; border-left: 5px solid #f1c40f; font-size: 12px; border: 1px solid #ffeeba; }
-        #video { width: 100%; border-radius: 10px; background: #000; margin-bottom: 10px; }
-        #imgPreview { width: 100%; border-radius: 10px; border: 3px solid var(--accent); display: none; margin-bottom: 10px; }
         .modal-legal { display: none; position: fixed; z-index: 10000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px); overflow-y: auto; }
         .modal-content { background: white; margin: 5% auto; padding: 30px; border-radius: 30px; width: 90%; max-width: 450px; border: 4px solid var(--primary); text-align: center; }
+        #video { width: 100%; border-radius: 10px; background: #000; margin-bottom: 10px; }
+        #imgPreview { width: 100%; border-radius: 10px; border: 3px solid var(--accent); display: none; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <h2 id="nombrePaciente" style="color: var(--primary);">EXPEDIENTE MAESTRO</h2>
-    <div style="background:#d1e7dd; padding:10px; border-radius:10px; margin-bottom:20px; font-size:11px; font-weight:bold; color:#0f5132; border:1px solid #badbcc;">🔒 SISTEMA USC-E2EE | PROTOCOLO RES. 1995/99</div>
+    <div style="background:#d1e7dd; padding:10px; border-radius:10px; margin-bottom:20px; font-size:11px; font-weight:bold; color:#0f5132; border:1px solid #badbcc;">🔒 SISTEMA USC-E2EE | VALIDACIÓN PROFESIONAL ACTIVA</div>
 
     <button class="btn-blue" onclick="validarAcceso('registro')">📂 INICIAR NUEVA EVOLUCIÓN CLÍNICA</button>
     <button class="btn-blue" style="background:#2980b9" onclick="validarAcceso('historial')">🔓 DESCIFRAR EXPEDIENTE COMPLETO</button>
@@ -55,33 +54,24 @@
             <div><label>4. Examen mental:</label><textarea id="fExamen" rows="5"></textarea></div>
             <div><label>5. Plan de manejo:</label><textarea id="fPlan" rows="5"></textarea></div>
         </div>
-
-        <label>Diagnósticos CIE-10:</label>
-        <div id="displayCie" style="background:#f1f1f1; padding:10px; border:1px solid #000; min-height:20px; font-size:11px; margin-bottom:5px;"></div>
-        <select id="selectCie" onchange="agregarCie()">
-            <option value="">-- SELECCIONE CIE-10 --</option>
-            <option value="F14.2|Dependencia a Cocaína">F14.2 Dependencia Cocaína</option>
-            <option value="F10.2|Dependencia al Alcohol">F10.2 Dependencia Alcohol</option>
-            <option value="X70|Riesgo Suicida Activo">X70 Riesgo Suicida</option>
-        </select>
         
-        <button class="btn-blue" style="background:var(--accent); margin-top:15px;" onclick="guardarRegistro()">💾 FIRMAR Y SELLAR</button>
+        <button class="btn-blue" style="background:var(--accent); margin-top:15px;" onclick="guardarTodoMaestro()">💾 FIRMAR Y SELLAR</button>
     </div>
     <div id="contenedorHistorial" style="margin-top: 30px;"></div>
 </div>
 
 <div id="modalMaestro" class="modal-legal">
     <div class="modal-content">
-        <h3 id="modalTit" style="color:var(--primary); margin-top:0;">Firma Digital</h3>
+        <h3 id="modalTit" style="color:var(--primary); margin-top:0;">IDENTIDAD DIGITAL</h3>
         <div id="modalCuerpo"></div>
-        <button id="btnModalOk" class="btn-blue" style="background:var(--accent); margin-top:15px;">AUTORIZAR ACCESO</button>
+        <button id="btnModalOk" class="btn-blue" style="background:var(--accent); margin-top:15px;">CONFIRMAR</button>
         <button onclick="cerrarModal()" style="background:none; border:none; color:var(--danger); cursor:pointer; margin-top:10px; font-weight:bold;">CANCELAR</button>
     </div>
 </div>
 
 <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import getFirestore, collection, addDoc, query, where, getDocs, orderBy, doc, getDoc, updateDoc, arrayUnion, serverTimestampp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, doc, getDoc, updateDoc, arrayUnion, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
             authDomain: "caminosnuevosdatabase.firebaseapp.com",
@@ -97,7 +87,7 @@
     const LLAVE_CLINICA = "FundacionNuevosCaminos2024*USC";
     const LLAVE_ADMIN = "ADMIN2024*";
 
-    let diagnosticos = [], fotoData = "", streamCam = null;
+    let fotoData = "", streamCam = null;
 
     const cifrar = (t) => CryptoJS.AES.encrypt(t, LLAVE_CLINICA).toString();
     const descifrarClinico = (h) => {
@@ -107,9 +97,9 @@
         try { return CryptoJS.AES.decrypt(h || "", LLAVE_ADMIN).toString(CryptoJS.enc.Utf8); } catch(e) { return ""; }
     };
 
-    window.validarAcceso = (accion, docId = null) => {
+    window.validarAcceso = (accion) => {
         const h = `
-            <label style="text-align:left;">Rol:</label>
+            <label>Cargo:</label>
             <select id="rolP">
                 <option value="Psicologia">Psicología</option>
                 <option value="Terapeuta">Terapeuta</option>
@@ -119,10 +109,10 @@
                 <option value="Director(a) General">Director(a) General</option>
                 <option value="Administrador">Administrador</option>
             </select>
-            <label style="text-align:left;">PIN de Firma:</label>
+            <label>PIN Personal:</label>
             <input type="password" id="pinP" style="text-align:center; font-size:28px; letter-spacing:10px;" maxlength="4" autofocus>
         `;
-        window.abrirModal("🔒 VALIDACIÓN PROFESIONAL", h, async () => {
+        window.abrirModal("🔒 VALIDACIÓN DE FIRMA", h, async () => {
             const rSel = document.getElementById('rolP').value;
             const pSel = document.getElementById('pinP').value;
             const q = query(collection(db, "talento_humano_cifrado"));
@@ -139,15 +129,15 @@
             });
 
             if (profMatch) {
-                if (profMatch.estado === "INACTIVO") return alert("⛔ ACCESO REVOCADO.");
+                if (profMatch.estado === "INACTIVO") return alert("Acceso Revocado.");
                 window.cerrarModal();
                 sessionStorage.setItem("pNom", descifrarAdmin(profMatch.info.n));
                 sessionStorage.setItem("pTP", descifrarAdmin(profMatch.info.tp || ""));
                 if (accion === 'registro') { document.getElementById('areaRegistro').style.display='block'; activarCamara(); }
                 if (accion === 'historial') cargarHistorial();
-                if (accion === 'aclarar') prepararAclaratoria(docId);
-                if (accion === 'pdf') generarPDF(docId);
-            } else { alert("❌ CREDENCIALES INVÁLIDAS. Verifique en Administración."); }
+            } else {
+                alert("❌ PIN o CARGO incorrectos.");
+            }
         });
     };
 
@@ -163,7 +153,7 @@
         try {
             streamCam = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
             document.getElementById('video').srcObject = streamCam;
-        } catch(e) { console.log("Cámara no iniciada."); }
+        } catch(e) { console.log("Cámara no activa."); }
     }
 
     window.tomarFoto = () => {
@@ -176,15 +166,7 @@
         v.style.display = 'none';
     };
 
-    window.agregarCie = () => {
-        const s = document.getElementById('selectCie');
-        const [c, d] = s.value.split('|');
-        diagnosticos.push({ cod: c, desc: d });
-        document.getElementById('displayCie').innerHTML = diagnosticos.map(x => `[${x.cod}] `).join(' ');
-        s.value = "";
-    };
-
-    window.guardarRegistro = async () => {
+    window.guardarTodoMaestro = async () => {
         const hce = {
             m: document.getElementById('fMotivo').value,
             e: document.getElementById('fEnfermedad').value,
@@ -192,58 +174,29 @@
             ex: document.getElementById('fExamen').value,
             p: document.getElementById('fPlan').value
         };
-        if(!hce.m || !hce.p) return alert("Complete Motivo y Plan.");
         await addDoc(collection(db, "evoluciones_psicologicas"), {
-            idPaciente, dataHCE: cifrar(JSON.stringify(hce)), cie10: cifrar(JSON.stringify(diagnosticos)), foto: fotoData,
+            idPaciente, dataHCE: cifrar(JSON.stringify(hce)), foto: fotoData,
             autor: cifrar(sessionStorage.getItem("pNom")), tp: cifrar(sessionStorage.getItem("pTP")),
-            fecha: new Date().toLocaleString(), timestamp: serverTimestamp(), hash: btoa(hce.m + Date.now()).substring(0,12), aclaratorias: []
+            fecha: new Date().toLocaleString(), timestamp: serverTimestamp(),
+            hash: btoa(hce.m + Date.now()).substring(0,12)
         });
-        alert("✔️ REGISTRO SELLADO."); location.reload();
+        alert("Expediente Sellado."); location.reload();
     };
 
-    window.cargarHistorial = async () => {
+    async function cargarHistorial() {
         const q = query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente), orderBy("timestamp", "desc"));
         const snap = await getDocs(q);
-        let html = "";
-        snap.forEach(docSnap => {
-            const d = docSnap.data();
-            let c = d.dataHCE ? JSON.parse(descifrarClinico(d.dataHCE)) : {m: descifrarClinico(d.evolucion || d.texto)};
-            html += `<div class="evolucion-card">
-                <strong>📅 ${d.fecha}</strong><p>MOTIVO: ${c.m}</p>
-                <button class="btn-blue" style="width:auto; padding:5px 10px; font-size:9px;" onclick="validarAcceso('pdf', '${docSnap.id}')">📄 PDF</button>
-                <button class="btn-blue" style="width:auto; padding:5px 10px; background:var(--accent); font-size:9px;" onclick="validarAcceso('aclarar', '${docSnap.id}')">🖋️ ACLARAR</button>
-                ${d.aclaratorias && d.aclaratorias.length > 0 ? `<div class="bloque-aclaratoria">${d.aclaratorias.map(a=>`• ${descifrarClinico(a.texto)}`).join('<br>')}</div>` : ''}
-            </div>`;
+        let h = "";
+        snap.forEach(d => {
+            const dat = d.data();
+            const c = JSON.parse(descifrarClinico(dat.dataHCE));
+            h += `<div class="evolucion-card"><strong>📅 ${dat.fecha}</strong><p>Motivo: ${c.m}</p><small>Por: ${descifrarClinico(dat.autor)}</small></div>`;
         });
-        document.getElementById('contenedorHistorial').innerHTML = html || "Sin registros.";
-    };
+        document.getElementById('contenedorHistorial').innerHTML = h || "No hay registros.";
+    }
 
-    window.prepararAclaratoria = (id) => {
-        const html = `<textarea id="tAcl" rows="4" placeholder="Nota legal..."></textarea>`;
-        window.abrirModal("🖋️ NUEVA ACLARATORIA", html, async () => {
-            const txt = document.getElementById('tAcl').value;
-            await updateDoc(doc(db, "evoluciones_psicologicas", id), {
-                aclaratorias: arrayUnion({ texto: cifrar(txt), fecha: new Date().toLocaleString() })
-            });
-            alert("VINCULADA."); location.reload();
-        });
-    };
-
-    window.generarPDF = async (id) => {
-        const d = (await getDoc(doc(db, "evoluciones_psicologicas", id))).data();
-        const pac = (await getDoc(doc(db, "pacientes", idPaciente))).data();
-        const docPDF = new jspdf.jsPDF();
-        let h = d.dataHCE ? JSON.parse(descifrarClinico(d.dataHCE)) : {m: descifrarClinico(d.evolucion)};
-        docPDF.rect(10, 10, 190, 275); docPDF.text("HISTORIA CLINICA", 105, 20, {align:"center"});
-        docPDF.text(`PACIENTE: ${pac.nombre.toUpperCase()}`, 12, 40);
-        docPDF.text(`MOTIVO: ${h.m}`, 12, 50);
-        if(d.foto) docPDF.addImage(d.foto, 'JPEG', 12, 100, 50, 40);
-        docPDF.text("Sello: " + d.hash, 12, 270);
-        docPDF.save(`HC_${pac.nombre}.pdf`);
-    };
-
-    const pRef = await getDoc(doc(db, "pacientes", idPaciente));
-    if(pRef.exists()) document.getElementById('nombrePaciente').innerText = "EXPEDIENTE: " + pRef.data().nombre.toUpperCase();
+    const snapP = await getDoc(doc(db, "pacientes", idPaciente));
+    if(snapP.exists()) document.getElementById('nombrePaciente').innerText = "EXPEDIENTE: " + snapP.data().nombre.toUpperCase();
 </script>
 </body>
 </html>
