@@ -165,29 +165,62 @@ html<!DOCTYPE html>
         location.reload();
     };
 
-    window.cargarHistorialTerapeutico = async () => {
+  window.cargarHistorialTerapeutico = async () => {
+    const contenedor = document.getElementById('contenedorHistorial');
+    contenedor.innerHTML = "<p style='color:blue;'>🔓 Accediendo a la bóveda...</p>";
+
+    try {
         const q = query(collection(db, "evoluciones_terapeuticas"), where("idPaciente", "==", idPaciente));
         const snap = await getDocs(q);
+        
+        if (snap.empty) {
+            contenedor.innerHTML = "<p style='color:gray;'>📭 No se encontraron folios terapéuticos.</p>";
+            return;
+        }
+
         let evs = [];
-        snap.forEach(d => { const raw = descCl(d.data().dataHCE); if(raw) { try { evs.push({...d.data(), c: JSON.parse(raw), id: d.id }); } catch(e){ evs.push({...d.data(), c: {d:{obj:"Registro antiguo"}}, id: d.id }); } } });
-        evs.sort((a,b) => new Date(b.fecha) - new Date(a.fecha));
-        let h = "";
+        snap.forEach(d => {
+            const data = d.data();
+            // ESCUDO: Solo procesamos si existe dataHCE
+            if (data && data.dataHCE) {
+                const raw = descCl(data.dataHCE);
+                if (raw) {
+                    try {
+                        const contenidoParsed = JSON.parse(raw);
+                        evs.push({ ...data, c: contenidoParsed, id: d.id });
+                    } catch (e) {
+                        console.warn("Folio con formato antiguo detectado:", d.id);
+                        evs.push({ ...data, c: { d: { obj: "Registro en formato anterior" } }, id: d.id });
+                    }
+                }
+            }
+        });
+
+        // Ordenamos por fecha manual (más reciente arriba)
+        evs.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+        let htmlFinal = "";
         evs.forEach(ev => {
-            h += `<div class="evolucion-card">
-                <span style="float:right; font-size:10px; color:var(--primary);">ID: ${ev.hash}</span>
+            htmlFinal += `
+            <div class="evolucion-card">
+                <span style="float:right; font-size:10px; color:var(--primary);">ID: ${ev.hash || 'S/N'}</span>
                 <strong style="color:var(--primary)">📅 ${ev.fecha} | FOLIO: ${ev.c.folio || '1'}</strong>
-                <p><strong>OBJETIVO:</strong> ${ev.c.d ? ev.c.d.obj : ev.c.desarrollo.obj}</p>
+                <p style="margin:15px 0;"><strong>OBJETIVO:</strong> ${ev.c.d ? ev.c.d.obj : (ev.c.desarrollo ? ev.c.desarrollo.obj : "Consultar PDF")}</p>
                 <div style="border-top:1px solid #eee; padding-top:15px;">
                     <button class="btn-mini" style="background:#2c3e50" onclick="exportarJSON('${ev.id}')">JSON</button>
                     <button class="btn-mini" style="background:#e67e22" onclick="validarAcceso('pdf', '${ev.id}')">📄 PDF PRO</button>
                     <button class="btn-mini" style="background:#9b59b6" onclick="validarAcceso('aclarar', '${ev.id}')">🖋️ ACLARAR</button>
-                    ${(ev.aclaratorias || []).length > 0 ? `<button class="btn-mini" style="background:#34495e" onclick="alert('Ver en el PDF')">👁️ NOTAS (${ev.aclaratorias.length})</button>` : ''}
                 </div>
             </div>`;
         });
-        document.getElementById('contenedorHistorial').innerHTML = h || "Sin registros.";
-    };
 
+        contenedor.innerHTML = htmlFinal;
+
+    } catch (error) {
+        console.error("Error crítico en historial:", error);
+        contenedor.innerHTML = "<p style='color:red;'>❌ Error al descifrar el archivo: " + error.message + "</p>";
+    }
+};
     window.generarReporteTerapeutico = async (id) => {
         const d = (await getDoc(doc(db, "evoluciones_terapeuticas", id))).data(), pac = (await getDoc(doc(db, "pacientes", idPaciente))).data(), c = JSON.parse(descCl(d.dataHCE));
         const docP = new jspdf.jsPDF();
