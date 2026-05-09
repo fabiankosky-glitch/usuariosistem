@@ -230,19 +230,148 @@
         document.getElementById('contenedorHistorial').innerHTML = h || "Sin registros.";
     };
 
-    window.generarReporteEstructural = async (id) => {
-        const d = (await getDoc(doc(db, "evoluciones_psicologicas", id))).data(), pac = (await getDoc(doc(db, "pacientes", idPaciente))).data(), c = JSON.parse(descCl(d.dataHCE));
-        const docP = new jspdf.jsPDF();
-        docP.rect(10, 10, 190, 275); docP.line(10, 35, 200, 35);
-        docP.setFontSize(12); docP.text("IPS NUEVOS CAMINOS - HISTORIA CLINICA", 105, 20, {align:"center"});
-        docP.setFontSize(9); docP.text(`PACIENTE: ${pac.nombre.toUpperCase()} | CC: ${pac.cedula} | FOLIO: ${c.folio || '1'}`, 12, 42);
-        let y = 50;
-        const s = [{t:"1. SIGNOS VITALES", d:`Peso: ${c.vits.p}kg | IMC: ${c.vits.i} | TA: ${c.vits.ta}`}, {t:"2. ANAMNESIS", d:c.anam.mot + "\n\n" + c.anam.enf}, {t:"3. EXAMEN MENTAL", d:`Porte: ${c.mental.por}\nPensamiento: ${c.mental.pen}\nAfecto: ${c.mental.afe}\nJuicio: ${c.mental.jui}`}, {t:"4. DIAGNOSTICOS CIE-10", d: c.cie.map(x=>`[${x.cod}] ${x.desc}`).join(', ')}, {t:"5. PLAN DE MANEJO", d:c.plan}];
-        s.forEach(sec => { docP.setFillColor(240); docP.rect(10, y, 190, 7, 'F'); docP.setFont(undefined, 'bold'); docP.text(sec.t, 12, y+5); docP.setFont(undefined, 'normal'); const lines = docP.splitTextToSize(sec.d || "N/A", 180); docP.text(lines, 12, y+12); y += (lines.length * 5) + 18; });
-        if(d.foto) docP.addImage(d.foto, 'JPEG', 150, 40, 35, 25);
-        docP.text("__________________________", 12, 260); docP.text(`${descCl(d.autor)} - TP: ${descCl(d.tp)}`, 12, 265);
-        docP.save(`HCE_NC_${pac.nombre}.pdf`);
-    };
+window.generarReporteEstructural = async (id) => {
+    try {
+        const dSnap = await getDoc(doc(db, "evoluciones_psicologicas", id));
+        const d = dSnap.data();
+        const pSnap = await getDoc(doc(db, "pacientes", idPaciente));
+        const pac = pSnap.data();
+        const c = JSON.parse(descCl(d.dataHCE));
+        
+        const { jsPDF } = window.jspdf;
+        const docP = new jsPDF('p', 'mm', 'letter'); // Formato Carta
+
+        // --- CONFIGURACIÓN DE ESTILOS ---
+        const black = [0, 0, 0];
+        const gray = [240, 240, 240];
+        const marginX = 10;
+        let currentY = 10;
+
+        const drawRect = (x, y, w, h, fill = false) => {
+            if(fill) docP.setFillColor(gray[0], gray[1], gray[2]);
+            docP.rect(x, y, w, h, fill ? 'FD' : 'S');
+        };
+
+        // --- 1. ENCABEZADO TRIPARTITO (DISEÑO EXACTO) ---
+        drawRect(marginX, currentY, 195, 25);
+        docP.line(55, currentY, 55, currentY + 25); // Divisor Logo
+        docP.line(150, currentY, 150, currentY + 25); // Divisor Calidad
+
+        docP.setFont("helvetica", "bold");
+        docP.setFontSize(8);
+        docP.text("FUNDACIÓN NUEVOS CAMINOS", 32.5, currentY + 12, { align: "center" }); // Espacio para Logo
+        
+        docP.setFontSize(11);
+        docP.text("HISTORIA CLÍNICA INTEGRAL", 102.5, currentY + 10, { align: "center" });
+        docP.setFontSize(8);
+        docP.text("CENTRO DE REHABILITACIÓN Y SALUD MENTAL", 102.5, currentY + 15, { align: "center" });
+        docP.text("NIT: 900753908-8", 102.5, currentY + 20, { align: "center" });
+
+        docP.setFontSize(7);
+        docP.text("CÓDIGO: NC-HCE-01", 152, currentY + 7);
+        docP.text("VERSIÓN: 03", 152, currentY + 12);
+        docP.text("VIGENCIA: 2 AÑOS", 152, currentY + 17);
+        docP.text(`FOLIO No: ${c.folio || '1'}`, 152, currentY + 22);
+
+        currentY += 25;
+
+        // --- 2. DATOS DE IDENTIFICACIÓN (BLOQUE TABULAR) ---
+        drawRect(marginX, currentY, 195, 15, true);
+        docP.setFontSize(9);
+        docP.text(`APELLIDOS Y NOMBRES: ${pac.nombre.toUpperCase()}`, marginX + 3, currentY + 6);
+        docP.text(`DOCUMENTO DE IDENTIDAD: ${pac.cedula}`, marginX + 3, currentY + 11);
+        docP.text(`FECHA DE ATENCIÓN: ${d.fecha}`, 130, currentY + 6);
+        docP.text(`EDAD: ${pac.edad || '--'} AÑOS`, 130, currentY + 11);
+
+        currentY += 15;
+
+        // --- 3. SIGNOS VITALES (FILA TÉCNICA) ---
+        drawRect(marginX, currentY, 195, 10);
+        docP.line(marginX + 40, currentY, marginX + 40, currentY + 10);
+        docP.line(marginX + 80, currentY, marginX + 80, currentY + 10);
+        docP.line(marginX + 120, currentY, marginX + 120, currentY + 10);
+        docP.line(marginX + 160, currentY, marginX + 160, currentY + 10);
+
+        docP.setFontSize(8);
+        docP.text(`PESO: ${c.vits.p} kg`, marginX + 2, currentY + 6);
+        docP.text(`TALLA: ${c.vits.t || '--'} cm`, marginX + 42, currentY + 6);
+        docP.text(`IMC: ${c.vits.i}`, marginX + 82, currentY + 6);
+        docP.text(`T.A: ${c.vits.ta}`, marginX + 122, currentY + 6);
+        docP.text(`FC/FR: ${c.vits.fc || '--'}`, marginX + 162, currentY + 6);
+
+        currentY += 10;
+
+        // --- 4. SECCIONES DE TEXTO (DIBUJO DE CUADROS DINÁMICOS) ---
+        const renderSection = (title, content) => {
+            docP.setFont("helvetica", "bold");
+            drawRect(marginX, currentY, 195, 6, true);
+            docP.text(title, marginX + 3, currentY + 4.5);
+            currentY += 6;
+
+            docP.setFont("helvetica", "normal");
+            const splitText = docP.splitTextToSize(content || "Sin registros en el sistema.", 185);
+            const boxHeight = (splitText.length * 5) + 5;
+            drawRect(marginX, currentY, 195, boxHeight);
+            docP.text(splitText, marginX + 3, currentY + 5);
+            currentY += boxHeight;
+        };
+
+        renderSection("MOTIVO DE CONSULTA", c.anam.mot);
+        renderSection("ENFERMEDAD ACTUAL", c.anam.enf);
+        
+        // --- 5. EXAMEN MENTAL (DIBUJO DE REJILLA) ---
+        renderSection("EXAMEN DEL ESTADO MENTAL", 
+            `PORTE Y ACTITUD: ${c.mental.por}\n` +
+            `PENSAMIENTO: ${c.mental.pen}\n` +
+            `AFECTO: ${c.mental.afe}\n` +
+            `JUICIO Y RACIOCINIO: ${c.mental.jui}\n` +
+            `RIESGO: ${c.mental.rie}`
+        );
+
+        // --- 6. IMPRESIÓN DIAGNÓSTICA (TABLA CIE-10) ---
+        docP.setFont("helvetica", "bold");
+        drawRect(marginX, currentY, 195, 6, true);
+        docP.text("IMPRESIÓN DIAGNÓSTICA (CIE-10)", marginX + 3, currentY + 4.5);
+        currentY += 6;
+        
+        const cieContent = c.cie.map(x => `[${x.cod}] ${x.desc}`).join('\n');
+        const cieText = docP.splitTextToSize(cieContent, 185);
+        const cieHeight = (cieText.length * 5) + 5;
+        drawRect(marginX, currentY, 195, cieHeight);
+        docP.text(cieText, marginX + 3, currentY + 5);
+        currentY += cieHeight;
+
+        renderSection("PLAN DE MANEJO Y RECOMENDACIONES", c.plan);
+
+        // --- 7. ANEXO FOTOGRÁFICO Y FIRMAS ---
+        if (currentY > 220) { docP.addPage(); currentY = 20; }
+
+        if (d.foto) {
+            docP.setFont("helvetica", "bold");
+            docP.text("ANEXO: REGISTRO FOTOGRÁFICO DE EVIDENCIA", marginX, currentY + 5);
+            docP.addImage(d.foto, 'JPEG', marginX, currentY + 8, 45, 35);
+            currentY += 50;
+        }
+
+        const footerY = 260;
+        docP.line(marginX, footerY, marginX + 70, footerY);
+        docP.setFontSize(9);
+        docP.text("FIRMA DEL PROFESIONAL TRATANTE", marginX, footerY + 5);
+        docP.text(descCl(d.autor), marginX, footerY + 10);
+        docP.text(`R.M. / T.P: ${descCl(d.tp)}`, marginX, footerY + 15);
+
+        docP.setFontSize(7);
+        docP.setTextColor(100);
+        docP.text(`Documento generado electrónicamente. Hash de Seguridad: ${d.hash}`, 105, 275, { align: "center" });
+
+        // --- GUARDADO FINAL ---
+        docP.save(`HC_FOLIO_${c.folio}_${pac.nombre.replace(/ /g, "_")}.pdf`);
+
+    } catch (error) {
+        console.error("Error en Dibujo PDF:", error);
+        alert("Fallo en el motor de dibujo del reporte.");
+    }
+};
 
     window.exportarForenseJSON = async (id) => {
         const d = (await getDoc(doc(db, "evoluciones_psicologicas", id))).data();
