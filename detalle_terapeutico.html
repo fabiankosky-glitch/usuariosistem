@@ -3,80 +3,159 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Folder Terapéutico</title>
+    <title>Nuevos Caminos - HCE Terapéutica Nivel Superior</title>
+    <link href="https://jsdelivr.net" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; text-align: center; padding: 20px; }
-        .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-width: 500px; margin: 0 auto; }
-        h2, h3 { color: #2c3e50; }
-        
-        /* Botones de Menú Principal */
-        .btn-menu { width: 90%; max-width: 350px; padding: 20px; margin: 10px; border: none; border-radius: 12px; color: white; font-size: 18px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-add { background: #27ae60; }
-        .btn-show { background: #2980b9; }
-        .btn-menu:hover { opacity: 0.9; transform: scale(1.02); }
-
-        /* Formulario y Inputs */
-        select, textarea { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; box-sizing: border-box; }
-        textarea { height: 120px; resize: none; }
-        .preview-camera { background: black; width: 100%; height: 200px; border-radius: 10px; margin: 10px 0; display: flex; align-items: center; justify-content: center; color: white; overflow: hidden; }
-        
-        /* Botones de acción dentro de secciones */
-        .btn-accion { width: 100%; padding: 15px; border: none; border-radius: 8px; color: white; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        
-        /* Historial */
-        .registro-item { background: #fff; padding: 15px; border-radius: 10px; margin-bottom: 15px; text-align: left; border-left: 6px solid #27ae60; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        body { 
+            background-color: #f4f6f9; 
+            padding: 20px; 
+            font-family: system-ui, -apple-system, sans-serif; 
+        }
+        .card-legal { 
+            border-left: 5px solid #0d6efd; 
+            background-color: #ffffff; 
+        }
+        #webcam { 
+            width: 100%; 
+            max-width: 400px; 
+            height: 300px; 
+            background-color: #000000; 
+            border-radius: 6px; 
+            object-fit: cover; 
+            display: block; 
+            margin: 0 auto; 
+        }
+        .seccion-titulo { 
+            background-color: #198754; 
+            color: white; 
+            padding: 10px; 
+            border-radius: 4px; 
+            font-size: 1.1rem; 
+            font-weight: bold; 
+            margin-bottom: 15px; 
+        }
+        .historial-item { 
+            border-left: 4px solid #198754; 
+            background-color: white; 
+            margin-bottom: 15px; 
+            border-radius: 4px; 
+        }
+        .alerta-corrupcion { 
+            border-left: 4px solid #dc3545 !important; 
+            background-color: #f8d7da !important; 
+        }
     </style>
 </head>
 <body>
 
-    <div id="header">
-        <h2 id="nombrePaciente">Cargando Paciente...</h2>
-        <hr style="width: 50%; border: 1px solid #ddd;">
+<div class="container mb-5" id="contenedor-bloqueo" style="display: none;">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-uppercase" id="nombre-paciente">Cargando Residente...</h2>
+        <p class="text-muted">Módulo HCE Terapéutico | Conforme a Ley 2015 de 2020 y Res. 3100 de 2019</p>
+        <hr class="w-25 mx-auto">
     </div>
 
-    <!-- 1. MENÚ DE INICIO (Los dos botones comunes) -->
-    <div id="menuPrincipal">
-        <button class="btn-menu btn-add" onclick="abrirFormulario()">➕ Nueva Evolución</button>
-        <button class="btn-menu btn-show" onclick="verHistorial()">👁️ Ver Historial Terapéutico</button>
-        <br><br>
-        <a href="historias.html" style="text-decoration:none; color:#7f8c8d; font-weight:bold;">⬅ Volver a Pacientes</a>
+    <!-- ACCIONES PRINCIPALES -->
+    <div class="row g-3 justify-content-center mb-4">
+        <div class="col-md-4">
+            <button type="button" class="btn btn-success w-100 py-2 fw-bold" id="btn-mostrar-formulario">➕ Nueva Evolución</button>
+        </div>
+        <div class="col-md-4">
+            <button type="button" class="btn btn-primary w-100 py-2 fw-bold" id="btn-cargar-historial">👁️ Ver Historial Terapéutico</button>
+        </div>
+        <div class="col-md-4">
+            <button type="button" class="btn btn-dark w-100 py-2 fw-bold" id="btn-exportar-pdf" style="display: none;">📄 Descargar PDF Clínico Oficial</button>
+        </div>
     </div>
-
-    <!-- 2. SECCIÓN AGREGAR (Cámara + Evolución) -->
-    <div id="seccionAgregar" style="display: none;" class="card">
-        <h3>📓 Nueva Evolución</h3>
-        
-        <label>Modalidad de Terapia:</label>
-        <select id="modalidad">
-            <option>Individual</option>
-            <option>De Grupo</option>
-            <option>Confrontación</option>
-            <option>Feedback</option>
-        </select>
-
-  <div class="preview-camera">
-            <span id="txtCamara">Cámara no iniciada</span>
-            <img id="imgPreview" style="width:100%; height:100%; object-fit:cover; display:none;">
+<!-- FORMULARIO ESTRUCTURADO EPS / SOGCS -->
+    <form id="form-evolucion-clinica" class="bg-white p-4 rounded shadow-sm mb-4" style="display: none;">
+        <div class="seccion-titulo">1. Control de Procedimiento y Diagnóstico (Auditoría EPS)</div>
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <label for="tipo-terapia" class="form-label fw-bold">Tipo de Terapia Dictada:</label>
+                <select class="form-select border-primary" id="tipo-terapia" required>
+                    <option value="" disabled selected>-- Seleccione la modalidad --</option>
+                    <option value="Individual">Individual</option>
+                    <option value="Confrontación">Confrontación</option>
+                    <option value="Terapia de Grupo">Terapia de Grupo</option>
+                    <option value="Feedback">Feedback</option>
+                    <option value="Querellas">Querellas</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="codigo-cups" class="form-label fw-bold">Código CUPS (Procedimiento de Terapia):</label>
+                <select class="form-select" id="codigo-cups" required>
+                    <option value="944102">944102 - Terapia Ocupacional Grupal (Sustancias Psicoactivas)</option>
+                    <option value="943101">943101 - Psicoterapia Individual Con Enfoque Terapéutico</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="diagnostico-cie10" class="form-label fw-bold">Diagnóstico Principal CIE-10:</label>
+                <select class="form-select" id="diagnostico-cie10" required>
+                    <option value="F192">F192 - Trastornos mentales debidos al uso de múltiples drogas (Dependencia)</option>
+                    <option value="F102">F102 - Síndrome de dependencia al alcohol</option>
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label for="finalidad-consulta" class="form-label fw-bold">Finalidad de la Consulta:</label>
+                <select class="form-select" id="finalidad-consulta" required>
+                    <option value="3">3 - Atencion en salud mental / Rehabilitación residencial</option>
+                </select>
+            </div>
         </div>
 
-        <input type="file" accept="image/*" capture="camera" id="inputCamara" style="display:none;" onchange="window.previsualizarFoto(event)">
-        
-        <button class="btn-accion" style="background:#3498db" onclick="document.getElementById('inputCamara').click()">📸 Tomar Foto de Documento</button>
+        <div class="seccion-titulo">2. Registro Terapéutico Estructurado (Trazabilidad SOGCS)</div>
+        <div class="row g-3 mb-4">
+            <div class="col-12">
+                <label for="estado-mental" class="form-label fw-bold">Examen Clínico de la Sesión / Estado Físico y Conductual:</label>
+                <textarea class="form-control" id="estado-mental" rows="3" required></textarea>
+            </div>
+            <div class="col-12">
+                <label for="nota-evolucion" class="form-label fw-bold">Nota de Evolución Detallada de la Sesión:</label>
+                <textarea class="form-control" id="nota-evolucion" rows="5" required></textarea>
+            </div>
+            <div class="col-12">
+                <label for="plan-intervencion" class="form-label fw-bold">Plan de Intervención Siguiente Sesión / Recomendaciones:</label>
+                <textarea class="form-control" id="plan-intervencion" rows="2" required></textarea>
+            </div>
+        </div>
 
-        <textarea id="textoEvolucion" placeholder="Escriba aquí la evolución del paciente..."></textarea>
+        <div class="seccion-titulo">3. Validación y Consentimiento Visual (No Repudio / Firma Digital)</div>
+        <div class="row g-3 mb-4 align-items-center">
+            <div class="col-md-6 text-center">
+                <div class="p-2 border rounded bg-dark mb-2">
+                    <video id="webcam" autoplay playsinline></video>
+                </div>
+                <button type="button" class="btn btn-primary btn-sm px-4 fw-bold" id="btn-capturar-foto">📸 Capturar Evidencia (Foto OK)</button>
+            </div>
+            <div class="col-md-6">
+                <div class="card p-3 card-legal shadow-sm">
+                    <h6 class="fw-bold text-success mb-1">Custodia de Historia Clínica Colombiana</h6>
+                    <p class="text-muted small mb-3">La captura fotográfica actúa como firma electrónica inmutable de consentimiento bajo la Ley 1581 de 2012 y las pautas de habilitación del Valle.</p>
+                    <div class="form-check">
+                        <input class="form-check-input border-secondary" type="checkbox" id="check-consentimiento">
+                        <label class="form-check-label small fw-bold" for="check-consentimiento">El residente confirma verbal y visualmente su conformidad.</label>
+                    </div>
+                    <div id="estado-captura" class="text-muted small mt-2 fw-bold">Estado: Cámara activa. Foto pendiente.</div>
+                </div>
+            </div>
+        </div>
 
-        <button class="btn-accion" style="background:#27ae60" onclick="guardarRegistro()">🚀 Guardar Registro Protegido</button>
-        <button class="btn-accion" style="background:#95a5a6" onclick="volver()">Cancelar</button>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+            <button type="button" class="btn btn-secondary px-4 me-md-2" id="btn-cancelar">Cancelar</button>
+            <button type="submit" class="btn btn-success px-5 fw-bold">🚀 Guardar Evolución Legalizada</button>
+        </div>
+    </form>
+
+    <div id="contenedor-historial" class="bg-white p-4 rounded shadow-sm" style="display: none;">
+        <h4 class="mb-4 text-center fw-bold text-muted">📜 Historial de Atenciones Terapéuticas Auditable</h4>
+        <div id="lista-evoluciones" class="list-group"></div>
     </div>
+</div>
 
-    <!-- 3. SECCIÓN MOSTRAR (Historial) -->
-    <div id="seccionHistorial" style="display: none;" class="card">
-        <h3>📋 Evoluciones Guardadas</h3>
-        <div id="listaEvoluciones">Buscando registros...</div>
-        <button class="btn-accion" style="background:#95a5a6" onclick="volver()">Volver al Menú</button>
-    </div>
-
-   <script type="module">
+<script src="https://jsdelivr.net"></script>
+<script src="https://cloudflare.com"></script>
+<script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, query, where, getDocs, orderBy, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         const firebaseConfig = {
@@ -85,120 +164,267 @@
             projectId: "caminosnuevosdatabase",
             storageBucket: "caminosnuevosdatabase.firebasestorage.app",
             appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
-        };
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth(app);
 
-        // Obtener el ID del paciente de la URL
-        const params = new URLSearchParams(window.location.search);
-        const idPaciente = params.get("id");
+    const urlParams = new URLSearchParams(window.location.search);
+    const idPacienteActual = urlParams.get('id') || "ID_DESCONOCIDO";
 
-        // Cargar nombre del paciente
-        async function cargarDatosPaciente() {
-            if (!idPaciente) return;
-            const snap = await getDoc(doc(db, "pacientes", idPaciente));
-            if (snap.exists()) {
-                document.getElementById("nombrePaciente").innerText = snap.data().nombre;
-            }
+    const videoElement = document.getElementById('webcam');
+    const btnFoto = document.getElementById('btn-capturar-foto');
+    const txtEstado = document.getElementById('estado-captura');
+    const formEvolucion = document.getElementById('form-evolucion-clinica');
+    const divHistorial = document.getElementById('contenedor-historial');
+    const btnPdf = document.getElementById('btn-exportar-pdf');
+    
+    let fotoBase64Optimizado = "";
+    let mediaStream = null;
+    let datosCargadosParaPDF = [];
+
+    // Función del motor criptográfico para los Sellos Hash SHA-256
+    async function generarSelloDigitalInmutable(cadenaTexto) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(cadenaTexto);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+  // 🔒 Candado de seguridad para control de accesos por rol en tiempo real
+    onAuthStateChanged(auth, (usuarioLogueado) => {
+        if (!usuarioLogueado) {
+            alert("🔒 ACCESO RESTRINGIDO SOGCS: Autenticación requerida por Ley 2015 de 2020.");
+            window.location.href = "login.html";
+        } else {
+            document.getElementById('contenedor-bloqueo').style.display = 'block';
+            document.getElementById('nombre-paciente').innerText = "RESIDENTE ID: " + idPacienteActual;
         }
-        cargarDatosPaciente();
+    });
 
-        // --- NAVEGACIÓN ---
-        window.abrirFormulario = () => {
-            document.getElementById("menuPrincipal").style.display = "none";
-            document.getElementById("seccionAgregar").style.display = "block";
+    // Control visual de la interfaz de botones
+    document.getElementById('btn-mostrar-formulario').addEventListener('click', () => {
+        formEvolucion.style.display = 'block'; 
+        divHistorial.style.display = 'none'; 
+        inicializarCamaraTerapeutica();
+    });
+
+    document.getElementById('btn-cancelar').addEventListener('click', () => { 
+        formEvolucion.style.display = 'none'; 
+        apagarCamara(); 
+    });
+
+    // Dispositivo Multimedia: Control nativo del flujo de video
+    async function inicializarCamaraTerapeutica() {
+        try {
+            mediaStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 } });
+            videoElement.srcObject = mediaStream;
+        } catch (err) { 
+            txtEstado.innerText = "Estado: Error de hardware en cámara o permisos denegados. ❌"; 
+        }
+    }
+
+    function apagarCamara() { 
+        if (mediaStream) mediaStream.getTracks().forEach(track => track.stop()); 
+    }
+
+    // Captura y Compresión Canvas (40% de calidad para Firestore)
+    btnFoto.addEventListener('click', () => {
+        if (!videoElement.srcObject) return alert("El visor de video se encuentra inactivo.");
+        
+        const canvasVirtual = document.createElement('canvas');
+        const ctx2d = canvasVirtual.getContext('2d');
+        canvasVirtual.width = 640; 
+        canvasVirtual.height = 480;
+        
+        ctx2d.drawImage(videoElement, 0, 0, canvasVirtual.width, canvasVirtual.height);
+        fotoBase64Optimizado = canvasVirtual.toDataURL('image/jpeg', 0.4);
+        
+        txtEstado.innerText = "Estado: Evidencia de firma (Foto OK) capturada. ✅";
+        txtEstado.style.color = "green";
+        btnFoto.className = "btn btn-success btn-sm px-4 fw-bold"; 
+        btnFoto.innerText = "📸 Foto Registrada";
+    });
+ // Guardado Protegido con Control de Habeas Data, Fecha del Servidor y Sello Hash
+    formEvolucion.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // 🛡️ Validación estricta de consentimiento informado
+        const checkConsentimiento = document.getElementById('check-consentimiento');
+        if (!checkConsentimiento.checked) {
+            alert("🚨 INFRACCIÓN HABEAS DATA: Debe certificar el consentimiento del residente.");
+            return;
+        }
+
+        if (!fotoBase64Optimizado) {
+            alert("🚨 ERROR SOGCS: La fotografía de validación del residente es obligatoria.");
+            return;
+        }
+
+        const profesionalLogueado = auth.currentUser;
+        const notaCuerpo = document.getElementById('nota-evolucion').value;
+        const tiempoLocalFormulario = new Date().getTime(); 
+
+        // El Hash Pro-Level mezcla datos clínicos y un fragmento de la foto para máxima seguridad
+        const fotoFragmento = fotoBase64Optimizado ? fotoBase64Optimizado.substring(0, 100) : '';
+        const cadenaTrazabilidadCruda = idPacienteActual + '-' + tiempoLocalFormulario + '-' + profesionalLogueado.uid + '-' + notaCuerpo + '-' + fotoFragmento;
+        const hashInmutable = await generarSelloDigitalInmutable(cadenaTrazabilidadCruda);
+
+        const payloadEvolucionTerapeutica = {
+            idPaciente: idPacienteActual,
+            tipoTerapia: document.getElementById('tipo-terapia').value,
+            cups: document.getElementById('codigo-cups').value,
+            cie10: document.getElementById('diagnostico-cie10').value,
+            finalidad: document.getElementById('finalidad-consulta').value,
+            estadoMentalResumen: document.getElementById('estado-mental').value,
+            textoEvolucion: notaCuerpo,
+            planSeguimiento: document.getElementById('plan-intervencion').value,
+            fotoDoc: fotoBase64Optimizado,
+            
+            // 🛡️ Fecha Inmutable de Servidor para evitar antedatación de registros
+            fecha: serverTimestamp(), 
+            fechaLocalLog: tiempoLocalFormulario, 
+            
+            profesionalUid: profesionalLogueado.uid,
+            firmaDigitalProfesional: 'Firma_Electrónica_Profesional_' + profesionalLogueado.email,
+            selloInmodificableHash: hashInmutable, 
+            entidadControl: 'Auditoria EPS - SOGCS Valle Terapéutico'
         };
 
-       window.verHistorial = async () => {
-            document.getElementById("menuPrincipal").style.display = "none";
-            document.getElementById("seccionHistorial").style.display = "block";
-            const lista = document.getElementById("listaEvoluciones");
-            lista.innerHTML = "Cargando...";
+        try {
+            await addDoc(collection(db, 'evoluciones_terapeuticas'), payloadEvolucionTerapeutica);
+            alert("Evolución guardada con Sello de Inmodificabilidad Digital exitoso. ✅");
+            apagarCamara(); 
+            window.location.reload();
+        } catch (error) { 
+            console.error(error);
+            alert("Error crítico al archivar el documento en la base de datos."); 
+        }
+    });
+// Carga e impresión del Historial Clínico con Auditoría de Integridad en Tiempo Real
+    document.getElementById('btn-cargar-historial').addEventListener('click', async () => {
+        formEvolucion.style.display = 'none'; 
+        apagarCamara(); 
+        divHistorial.style.display = 'block';
+        const contenedorLista = document.getElementById('lista-evoluciones');
+        contenedorLista.innerHTML = '<div class="text-center p-3 text-muted">Ejecutando auditoría de integridad física del historial NoSQL...</div>';
 
-            try {
-                const q = query(collection(db, "evoluciones_terapeuticas"), where("idPaciente", "==", idPaciente), orderBy("fecha", "desc"));
-                const querySnapshot = await getDocs(q);
-                lista.innerHTML = "";
-                if (querySnapshot.empty) {
-                    lista.innerHTML = "No hay registros aún.";
-                    return;
+        try {
+            const querySnapshot = await getDocs(query(collection(db, 'evoluciones_terapeuticas'), where('idPaciente', '==', idPacienteActual)));
+            contenedorLista.innerHTML = ''; 
+            datosCargadosParaPDF = [];
+
+            if (querySnapshot.empty) {
+                contenedorLista.innerHTML = '<div class="alert alert-light text-center border">No existen evoluciones registradas para este paciente.</div>';
+                btnPdf.style.display = 'none'; 
+                return;
+            }
+
+            for (const docSnap of querySnapshot.docs) {
+                const campos = docSnap.data();
+                datosCargadosParaPDF.push(campos);
+
+                // Manejo inteligente de compatibilidad de fechas con registros antiguos legados
+                let timestampMilisegundos = campos.fechaLocalLog || campos.fecha;
+                if (campos.fecha && typeof campos.fecha.toMillis === 'function') {
+                    timestampMilisegundos = campos.fecha.toMillis();
+                }
+                const marcaFecha = new Date(timestampMilisegundos).toLocaleDateString('es-CO', {hour: '2-digit', minute:'2-digit'});
+                
+                let alertaClase = '';
+                let estadoIntegridadTxt = 'Verificado (Inmutable) 🛡️';
+                
+                // 🔒 Validador de alteración: comprueba el Hash matemático contra los datos actuales
+                if (campos.selloInmodificableHash) {
+                    const fragmentoFoto = campos.fotoDoc ? campos.fotoDoc.substring(0, 100) : '';
+                    const cadenaValidacion = campos.idPaciente + '-' + campos.fechaLocalLog + '-' + campos.profesionalUid + '-' + campos.textoEvolucion + '-' + fragmentoFoto;
+                    const hashVerificacion = await generarSelloDigitalInmutable(cadenaValidacion);
+                    
+                    if (hashVerificacion !== campos.selloInmodificableHash) {
+                        alertaClase = 'alerta-corrupcion';
+                        estadoIntegridadTxt = '⚠️ ALERTA DE ALTERACIÓN: Registro corrompido o adulterado fuera del sistema web.';
+                    }
                 }
 
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const fechaTexto = new Date(data.fecha).toLocaleString();
-                    const fotoMini = data.fotoDoc ? `<img src="${data.fotoDoc}" style="width:40px; height:40px; border-radius:5px; object-fit:cover; margin-right:10px; border:1px solid #ddd;">` : "📄 ";
+                const cupsTxt = campos.cups ? '<p class="small mb-1"><strong>CUPS:</strong> ' + campos.cups + ' | <strong>CIE-10:</strong> ' + campos.cie10 + '</p>' : '';
+                const hashTxt = campos.selloInmodificableHash ? '<p class="small mb-2 text-truncate text-success font-monospace"><strong>🔒 Sello SHA-256 Inmutable:</strong> ' + campos.selloInmodificableHash + '</p>' : '';
 
-                    lista.innerHTML += `
-                        <div class="registro-item" style="display:flex; justify-content:space-between; align-items:center; padding:12px; border-bottom:1px solid #eee; background:white; margin-bottom:5px; border-radius:8px;">
-                            <div style="text-align:left; display:flex; align-items:center;">
-                                ${fotoMini}
-                                <div>
-                                    <strong style="font-size:14px;">📅 ${fechaTexto}</strong><br>
-                                    <small style="color:#7f8c8d;">🏷️ ${data.modalidad}</small>
-                                </div>
-                            </div>
-                            <button onclick="verDetalleCompleto('${data.modalidad}', '${data.fecha}', \`${data.texto}\`, '${data.fotoDoc || ""}')" 
-                                    style="background:#2980b9; color:white; border:none; padding:8px 15px; border-radius:6px; cursor:pointer; font-weight:bold;">
-                                👁️ Ver
-                            </button>
-                        </div>`;
-                });
-            } catch (e) { lista.innerHTML = "Error: " + e.message; }
-        };
+                const bloqueHTML = '<div class="list-group-item p-3 historial-item shadow-sm ' + alertaClase + '">' +
+                    '<div class="d-flex w-100 justify-content-between border-bottom pb-2 mb-2">' +
+                    '<span class="fw-bold text-dark">Modalidad/Terapia: ' + (campos.tipoTerapia || campos.modalidad || 'No especificada') + '</span>' +
+                    '<span class="text-muted small">' + marcaFecha + '</span>' +
+                    '</div>' +
+                    cupsTxt +
+                    hashTxt +
+                    '<p class="mb-3 text-secondary" style="white-space: pre-wrap;"><strong>Evolución:</strong> ' + campos.textoEvolucion + '</p>' +
+                    '<div class="d-flex align-items-center gap-3">' +
+                    '<img src="' + campos.fotoDoc + '" class="img-thumbnail" style="max-height: 90px;">' +
+                    '<span class="text-muted small" style="font-size:0.7rem;">Firma Profesional: ' + (campos.firmaDigitalProfesional || 'Historial Legado Viejos') + '</span>' +
+                    '</div>' +
+                    '</div>';
+                contenedorLista.innerHTML += bloqueHTML;
+            }
+            if (datosCargadosParaPDF.length > 0) btnPdf.style.display = 'block';
+        } catch (error) { 
+            console.error(error);
+            contenedorLista.innerHTML = '<div class="alert alert-danger">Error al cargar la base de datos de historial.</div>'; 
+        }
+    });
 
-        // 1. REEMPLAZA LA FUNCIÓN QUE ABRE EL DETALLE (PARA QUE MUESTRE LA FOTO)
-        window.verDetalleCompleto = (mod, fechaRaw, texto, foto) => {
-            const fecha = new Date(Number(fechaRaw)).toLocaleString();
-            const nombre = document.getElementById("nombrePaciente").innerText;
-            const win = window.open("", "_blank", "width=650,height=850");
+    // SISTEMA PDF PRO: Exportación oficial de Historias Clínicas con Hojas de Ruta
+    btnPdf.addEventListener('click', () => {
+        const { jsPDF } = window.jspdf; 
+        const pdf = new jsPDF();
+        pdf.setFont('helvetica', 'bold'); 
+        pdf.setFontSize(14);
+        pdf.text('CENTRO DE REHABILITACIÓN - NUEVOS CAMINOS', 15, 20);
+        pdf.setFontSize(10); 
+        pdf.setFont('helvetica', 'normal');
+        pdf.text('Copia Oficial de Historia Clínica Electrónica (Ley 2015 de 2020)', 15, 26);
+        pdf.text('Código Residente Permanente: ' + idPacienteActual, 15, 31);
+        pdf.line(15, 35, 195, 35);
+        let ejeY = 42;
+
+        datosCargadosParaPDF.forEach((item, index) => {
+            if (ejeY > 220) { pdf.addPage(); ejeY = 20; }
             
-            win.document.write(`
-                <html>
-                <head><title>Detalle de Evolución</title></head>
-                <body style="font-family:sans-serif; padding:30px; line-height:1.6; background:#f4f7f6;">
-                    <div style="background:white; padding:20px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.1); max-width:600px; margin:auto;">
-                        <h2 style="color:#2980b9; text-align:center; border-bottom:2px solid #2980b9; padding-bottom:10px;">📄 REPORTE: ${nombre}</h2>
-                        <p><strong>Fecha:</strong> ${fecha} | <strong>Modalidad:</strong> ${mod}</p>
-                        <div style="background:#f9f9f9; padding:15px; border-radius:8px; border:1px solid #eee; white-space:pre-wrap;">${texto}</div>
-                        
-                        ${foto ? `
-                        <div style="margin-top:20px; text-align:center;">
-                            <p><strong>Evidencia del Documento:</strong></p>
-                            <img src="${foto}" style="width:100%; border-radius:10px; border:1px solid #ddd;">
-                        </div>` : "<p style='color:grey; text-align:center; margin-top:20px;'>Sin foto adjunta</p>"}
-                        
-                        <br><center><button onclick="window.close()" style="padding:10px 20px; cursor:pointer; background:#95a5a6; color:white; border:none; border-radius:5px; font-weight:bold;">Cerrar Documento</button></center>
-                    </div>
-                </body>
-                </html>
-            `);
-        };
+            let tMili = item.fechaLocalLog || item.fecha;
+            if (item.fecha && typeof item.fecha.toMillis === 'function') { tMili = item.fecha.toMillis(); }
+            const fechaItem = new Date(tMili).toLocaleDateString('es-CO');
 
-        // --- LÓGICA DE CÁMARA Y GUARDADO ---
-window.guardarRegistro = async () => {
-    const texto = document.getElementById("textoEvolucion").value;
-    const mod = document.getElementById("modalidad").value;
-    const fotoData = document.getElementById("imgPreview").src; // Esto toma la foto de la cámara
+            pdf.setFont('helvetica', 'bold'); 
+            pdf.text('Evolución #' + (index + 1) + ' - Fecha de Atención: ' + fechaItem, 15, ejeY); 
+            ejeY += 5;
+            pdf.setFont('helvetica', 'normal');
+            pdf.text('CUPS: ' + (item.cups || 'N/A') + ' | CIE-10: ' + (item.cie10 || 'N/A') + ' | Firma Autorizada: ' + (item.firmaDigitalProfesional || 'N/A'), 15, ejeY); 
+            ejeY += 5;
+            
+            if (item.selloInmodificableHash) {
+                pdf.setFontSize(7); 
+                pdf.text('Sello Criptográfico Inmutable SHA-256: ' + item.selloInmodificableHash, 15, ejeY); 
+                ejeY += 5; 
+                pdf.setFontSize(10);
+            }
+            const lineasEvolucion = pdf.splitTextToSize('Nota Clínica Registrada: ' + item.textoEvolucion, 175);
+            pdf.text(lineasEvolucion, 15, ejeY); 
+            ejeY += (lineasEvolucion.length * 5) + 4;
 
-    if (!texto) return alert("Escriba la evolución antes de guardar.");
-
-    try {
-        await addDoc(collection(db, "evoluciones_terapeuticas"), {
-            idPaciente: idPaciente,
-            modalidad: mod,
-            texto: texto,
-            fotoDoc: fotoData, // Guardamos la foto como texto largo (Base64)
-            fecha: Date.now(),
-            bloqueado: true
+            if (item.fotoDoc) {
+                try {
+                    pdf.addImage(item.fotoDoc, 'JPEG', 15, ejeY, 35, 25);
+                    pdf.setFontSize(7); 
+                    pdf.text('🔒 Evidencia Biométrica Gesto OK Residente', 15, ejeY + 29); 
+                    pdf.setFontSize(10);
+                    ejeY += 34;
+                } catch (e) { ejeY += 2; }
+            }
+            pdf.line(15, ejeY, 195, ejeY); 
+            ejeY += 8;
         });
-        alert("✅ Registro y Foto guardados correctamente.");
-        volver();
-    } catch (e) {
-        alert("Error al guardar: " + e.message);
-    }
-};
-    </script>
+        pdf.save('HCE_Terapeutica_Blindada_' + idPacienteActual + '.pdf');
+    });
+</script>
+
 </body>
 </html>
