@@ -245,19 +245,19 @@
     }
 
     // Intercambio visual de los botones del formulario
-    const btnMostrarForm = document.getElementById('btn-mostrar-formulario');
-    if (btnMostrarForm) {
-        btnMostrarForm.addEventListener('click', () => {
-            const form = document.getElementById('formEvolucion');
-            if (form) {
-                form.style.display = form.style.display === 'none' ? 'block' : 'none';
-            }
-        });
-    }
+const btnMostrarForm = document.getElementById('btn-mostrar-formulario');
+if (btnMostrarForm) {
+    btnMostrarForm.addEventListener('click', () => {
+        const form = document.getElementById('formEvolucion');
+        if (form) {
+            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+        }
+    });
+}
 
-    function inicializarCamaraTerapeutica() {
-        console.log("Controlador multimedia listo.");
-    }
+function inicializarCamaraTerapeutica() {
+    console.log("Controlador multimedia listo.");
+}
 </script>
 </body>
 </html>
