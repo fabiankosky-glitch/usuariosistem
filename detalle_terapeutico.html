@@ -5,14 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Módulo HCE Terapéutico - Sistema SOGCS</title>
     
-    <!-- Librerías de Estilos CSS (Bootstrap) -->
-    <link href="https://cloudflare.com" rel="stylesheet">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.0/font/bootstrap-icons.min.css" rel="stylesheet">
     
-    <!-- Librerías de Firebase de forma Global (SDK Compat v10) -->
-<script src= https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js>
-<script src= https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js>
-<script src=https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js>
-
     <style>
         body {
             background-color: #f4f6f9;
@@ -32,6 +28,13 @@
             font-size: 0.9rem;
             padding: 6px 12px;
         }
+        .list-group-item {
+            border: 1px solid #dee2e6;
+        }
+        .spinner-border {
+            width: 20px;
+            height: 20px;
+        }
     </style>
 </head>
 <body>
@@ -49,7 +52,8 @@
                 </div>
             </div>
         </div>
-    <!-- Tarjeta Informativa del Paciente Seleccionado -->
+
+        <!-- Tarjeta Informativa del Paciente Seleccionado -->
         <div class="card card-clinical p-4">
             <h4 class="text-secondary border-bottom pb-2 mb-3">Datos del Paciente</h4>
             <div class="row g-3">
@@ -90,6 +94,7 @@
                 </div>
                 <div class="text-end">
                     <button type="submit" class="btn btn-primary px-4">Guardar Registro</button>
+                    <button type="button" class="btn btn-secondary px-4 ms-2" onclick="document.getElementById('formEvolucion').style.display='none'">Cancelar</button>
                 </div>
             </form>
         </div>
@@ -98,15 +103,23 @@
         <div class="card card-clinical p-4">
             <h4 class="text-info border-bottom pb-2 mb-3">Historial de Evoluciones Terapéuticas</h4>
             <div id="divHistorial" class="list-group">
-                <!-- Se inyecta de forma dinámica por JavaScript -->
-                <p class="text-muted text-center py-3">No hay registros cargados para este residente.</p>
+                <p class="text-muted text-center py-3">Cargando registros...</p>
             </div>
         </div>
 
-    </div> <!-- Cierre del div contenedor-bloqueo --> 
-        <script>
-        // 1. CONFIGURACIÓN DE TU BASE DE DATOS (CONSERVA TUS CREDENCIALES)
-                const firebaseConfig = {
+    </div> <!-- Cierre del div contenedor-bloqueo -->
+
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Firebase SDK (v10 Compat) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // 1. CONFIGURACIÓN DE TU BASE DE DATOS
+        const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
             authDomain: "caminosnuevosdatabase.firebaseapp.com",
             projectId: "caminosnuevosdatabase",
@@ -114,150 +127,192 @@
             appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
         };
 
-    // Inicializar servicios globales de Firebase
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
 
-    // Variables globales de control
-    let idPacienteActual = "";
-    let mediaStream = null;
-    let datosCargadosParaPDF = [];
+        // Variables globales de control
+        let idPacienteActual = "";
+        let mediaStream = null;
+        let datosCargadosParaPDF = [];
 
-    // Motor Criptográfico para Sellos SHA-256
-    async function generarSelloDigitalInmutable(cadenaTexto) {
-        const encoder = new TextEncoder();
-        const data = encoder.encode(cadenaTexto);
-        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-        const hashArray = Array.from(new Uint8Array(hashBuffer));
-        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
-
-    // 2. CONTROL DE PERSISTENCIA Y VALIDACIÓN DE ACCESO
-    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-      .then(() => {
-          firebase.auth().onAuthStateChanged((usuarioLogueado) => {
-              if (!usuarioLogueado) {
-                  alert("⚠️ ACCESO RESTRINGIDO SOGCS: Autenticación requerida por Ley 2015 de 2020.");
-                  window.location.href = "login.html";
-              } else {
-                  console.log("Sesión activa:", usuarioLogueado.email);
-                  document.getElementById('contenedor-bloqueo').style.display = 'block';
-                  procesarFlujoPaciente();
-              }
-          });
-      })
-      .catch((error) => {
-          console.error("Error en persistencia:", error);
-      });
-
-    // 3. CAPTURA DE ID DE LA URL Y CARGA DE DATOS PRINCIPALES
-    function procesarFlujoPaciente() {
-        const urlParams = new URLSearchParams(window.location.search);
-        idPacienteActual = urlParams.get('id');
-
-        if (!idPacienteActual) {
-            alert("Error: ID de paciente ausente en la URL.");
-            return;
+        // Motor Criptográfico para Sellos SHA-256
+        async function generarSelloDigitalInmutable(cadenaTexto) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(cadenaTexto);
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-if (document.getElementById('nombre-paciente')) {
-    document.getElementById('nombre-paciente').innerText = "RESIDENTE ID: " + idPacienteActual;
-}
+        // 2. CONTROL DE PERSISTENCIA Y VALIDACIÓN DE ACCESO
+        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+            .then(() => {
+                auth.onAuthStateChanged((usuarioLogueado) => {
+                    if (!usuarioLogueado) {
+                        console.warn("⚠️ Usuario no autenticado");
+                        alert("⚠️ ACCESO RESTRINGIDO SOGCS: Autenticación requerida por Ley 2015 de 2020.");
+                        window.location.href = "login.html";
+                    } else {
+                        console.log("✅ Sesión activa:", usuarioLogueado.email);
+                        document.getElementById('contenedor-bloqueo').style.display = 'block';
+                        procesarFlujoPaciente();
+                    }
+                });
+            })
+            .catch((error) => {
+                console.error("❌ Error en persistencia:", error);
+            });
 
-        db.collection("pacientes").doc(idPacienteActual).get()
-          .then((docSnap) => {
-              if (docSnap.exists) {
-                  const datos = docSnap.data();
-                  if (document.getElementById('paciente-cedula')) document.getElementById('paciente-cedula').value = datos.cedula || '';
-                  if (document.getElementById('paciente-nombre')) document.getElementById('paciente-nombre').value = datos.nombre || '';
-                  if (document.getElementById('paciente-edad')) document.getElementById('paciente-edad').value = datos.edad || '';
-                  if (document.getElementById('paciente-sexo')) document.getElementById('paciente-sexo').value = datos.sexo || '';
-                  
-                  cargarHistorialSubcoleccion();
-              }
-          })
-          .catch((err) => console.error("Error al traer paciente:", err));
-    }
+        // 3. CAPTURA DE ID DE LA URL Y CARGA DE DATOS PRINCIPALES
+        function procesarFlujoPaciente() {
+            const urlParams = new URLSearchParams(window.location.search);
+            idPacienteActual = urlParams.get('id');
 
-    // 4. LEER HISTORIAL DE EVOLUCIONES DESDE LA SUBCOLECCIÓN TERAPÉUTICA
-    function cargarHistorialSubcoleccion() {
-        const divHistorial = document.getElementById('divHistorial');
-        if (!divHistorial) return;
+            if (!idPacienteActual) {
+                alert("❌ Error: ID de paciente ausente en la URL.");
+                console.error("No se encontró parámetro 'id' en la URL");
+                return;
+            }
 
-        db.collection("pacientes").doc(idPacienteActual).collection("evoluciones_terapeuticas")
-          .orderBy("timestamp", "desc").get()
-          .then((querySnapshot) => {
-              divHistorial.innerHTML = "";
-              
-              if (querySnapshot.empty) {
-                  divHistorial.innerHTML = `<p class="text-muted text-center py-3">No hay evoluciones terapéuticas registradas.</p>`;
-                  return;
-              }
+            console.log("📋 ID del paciente:", idPacienteActual);
 
-              querySnapshot.forEach((doc) => {
-                  const registro = doc.data();
-                  const fechaCorta = registro.timestamp ? new Date(registro.timestamp).toLocaleDateString() : 'N/A';
-                  
-                  const itemHTML = `
-                      <div class="list-group-item list-group-item-action mb-2 border rounded">
-                          <div class="d-flex w-100 justify-content-between">
-                              <h6 class="mb-1 text-primary">Evolución Médica Terapéutica</h6>
-                              <small class="text-muted">${fechaCorta}</small>
-                          </div>
-                          <p class="mb-1 text-dark text-break">${registro.evolucion || ''}</p>
-                          <small class="text-muted d-block text-truncate">Sello Hash: ${registro.hash || 'N/A'}</small>
-                      </div>`;
-                  divHistorial.innerHTML += itemHTML;
-              });
-          })
-          .catch((err) => console.error("Error al cargar historial:", err));
-    }
+            const nombreBadge = document.getElementById('nombre-paciente');
+            if (nombreBadge) {
+                nombreBadge.innerText = "RESIDENTE ID: " + idPacienteActual;
+            }
 
-    // 5. EVENTO PARA GUARDAR NUEVAS EVOLUCIONES
-    const formRegistro = document.getElementById('formulario-registro-terapeutico');
-    if (formRegistro) {
-        formRegistro.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const campoTexto = document.getElementById('campo-evolucion-texto');
-            if (!campoTexto) return;
+            // Cargar datos del paciente
+            db.collection("pacientes").doc(idPacienteActual).get()
+                .then((docSnap) => {
+                    if (docSnap.exists) {
+                        const datos = docSnap.data();
+                        console.log("✅ Datos del paciente cargados:", datos);
+                        
+                        const cedulaInput = document.getElementById('paciente-cedula');
+                        const nombreInput = document.getElementById('paciente-nombre');
+                        const edadInput = document.getElementById('paciente-edad');
+                        const sexoInput = document.getElementById('paciente-sexo');
 
-            const textoEvolucion = campoTexto.value;
-            const nuevoTimestamp = Date.now();
-            const hashResultante = await generarSelloDigitalInmutable(textoEvolucion + nuevoTimestamp);
-
-            const objetoGuardado = {
-                evolucion: textoEvolucion,
-                timestamp: nuevoTimestamp,
-                hash: hashResultante
-            };
-
-            db.collection("pacientes").doc(idPacienteActual).collection("evoluciones_terapeuticas").add(objetoGuardado)
-              .then(() => {
-                  alert("✅ Registro guardado con éxito.");
-                  campoTexto.value = "";
-                  if (document.getElementById('formEvolucion')) {
-                      document.getElementById('formEvolucion').style.display = 'none';
-                  }
-                  cargarHistorialSubcoleccion();
-              })
-              .catch((err) => alert("Error al guardar: " + err));
-        });
-    }
-
-    // Intercambio visual de los botones del formulario
-const btnMostrarForm = document.getElementById('btn-mostrar-formulario');
-if (btnMostrarForm) {
-    btnMostrarForm.addEventListener('click', () => {
-        const form = document.getElementById('formEvolucion');
-        if (form) {
-            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+                        if (cedulaInput) cedulaInput.value = datos.cedula || '';
+                        if (nombreInput) nombreInput.value = datos.nombre || '';
+                        if (edadInput) edadInput.value = datos.edad || '';
+                        if (sexoInput) sexoInput.value = datos.sexo || '';
+                        
+                        cargarHistorialSubcoleccion();
+                    } else {
+                        console.warn("⚠️ Paciente no encontrado en la base de datos");
+                        alert("Paciente no encontrado.");
+                        cargarHistorialSubcoleccion(); // Cargar historial igual
+                    }
+                })
+                .catch((err) => {
+                    console.error("❌ Error al traer paciente:", err);
+                    cargarHistorialSubcoleccion(); // Intentar cargar historial de todas formas
+                });
         }
-    });
-}
 
-function inicializarCamaraTerapeutica() {
-    console.log("Controlador multimedia listo.");
-}
-</script>
+        // 4. LEER HISTORIAL DE EVOLUCIONES DESDE LA SUBCOLECCIÓN TERAPÉUTICA
+        function cargarHistorialSubcoleccion() {
+            const divHistorial = document.getElementById('divHistorial');
+            if (!divHistorial) return;
+
+            divHistorial.innerHTML = '<p class="text-muted text-center py-3"><span class="spinner-border spinner-border-sm me-2"></span>Cargando historial...</p>';
+
+            db.collection("pacientes").doc(idPacienteActual).collection("evoluciones_terapeuticas")
+                .orderBy("timestamp", "desc").get()
+                .then((querySnapshot) => {
+                    divHistorial.innerHTML = "";
+                    
+                    if (querySnapshot.empty) {
+                        console.info("ℹ️ No hay evoluciones registradas");
+                        divHistorial.innerHTML = '<p class="text-muted text-center py-3">No hay evoluciones terapéuticas registradas.</p>';
+                        return;
+                    }
+
+                    console.log(`✅ Se encontraron ${querySnapshot.size} registros`);
+
+                    querySnapshot.forEach((doc) => {
+                        const registro = doc.data();
+                        const fechaCorta = registro.timestamp ? new Date(registro.timestamp).toLocaleDateString('es-CO') : 'N/A';
+                        
+                        const itemHTML = `
+                            <div class="list-group-item list-group-item-action mb-2 border rounded">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1 text-primary">📋 Evolución Médica Terapéutica</h6>
+                                    <small class="text-muted">${fechaCorta}</small>
+                                </div>
+                                <p class="mb-1 text-dark text-break">${registro.evolucion || ''}</p>
+                                <small class="text-muted d-block text-truncate">🔒 Hash: ${(registro.hash || 'N/A').substring(0, 32)}...</small>
+                            </div>`;
+                        divHistorial.innerHTML += itemHTML;
+                    });
+                })
+                .catch((err) => {
+                    console.error("❌ Error al cargar historial:", err);
+                    divHistorial.innerHTML = `<div class="alert alert-danger">Error al cargar: ${err.message}</div>`;
+                });
+        }
+
+        // 5. EVENTO PARA GUARDAR NUEVAS EVOLUCIONES
+        const formRegistro = document.getElementById('formulario-registro-terapeutico');
+        if (formRegistro) {
+            formRegistro.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const campoTexto = document.getElementById('campo-evolucion-texto');
+                if (!campoTexto) return;
+
+                const textoEvolucion = campoTexto.value.trim();
+                if (!textoEvolucion) {
+                    alert("⚠️ Por favor ingrese el texto de la evolución.");
+                    return;
+                }
+
+                const nuevoTimestamp = Date.now();
+                const hashResultante = await generarSelloDigitalInmutable(textoEvolucion + nuevoTimestamp);
+
+                const objetoGuardado = {
+                    evolucion: textoEvolucion,
+                    timestamp: nuevoTimestamp,
+                    hash: hashResultante
+                };
+
+                console.log("💾 Guardando evolución...", objetoGuardado);
+
+                db.collection("pacientes").doc(idPacienteActual).collection("evoluciones_terapeuticas").add(objetoGuardado)
+                    .then(() => {
+                        console.log("✅ Registro guardado exitosamente");
+                        alert("✅ Registro guardado con éxito.");
+                        campoTexto.value = "";
+                        const formDiv = document.getElementById('formEvolucion');
+                        if (formDiv) {
+                            formDiv.style.display = 'none';
+                        }
+                        cargarHistorialSubcoleccion();
+                    })
+                    .catch((err) => {
+                        console.error("❌ Error al guardar:", err);
+                        alert("❌ Error al guardar: " + err.message);
+                    });
+            });
+        }
+
+        // 6. INTERCAMBIO VISUAL DE LOS BOTONES DEL FORMULARIO
+        const btnMostrarForm = document.getElementById('btn-mostrar-formulario');
+        if (btnMostrarForm) {
+            btnMostrarForm.addEventListener('click', () => {
+                const form = document.getElementById('formEvolucion');
+                if (form) {
+                    const isHidden = form.style.display === 'none';
+                    form.style.display = isHidden ? 'block' : 'none';
+                    console.log("Formulario " + (isHidden ? "mostrado" : "ocultado"));
+                }
+            });
+        }
+
+        console.log("✅ Script inicializado correctamente");
+    </script>
+
 </body>
 </html>
