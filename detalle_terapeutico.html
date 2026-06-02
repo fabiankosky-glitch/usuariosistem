@@ -160,9 +160,9 @@
             return;
         }
 
-        if (document.getElementById('nombre-paciente')) {
-            document.getElementById('nombre-paciente').innerText = "RESIDENTE ID: " + idPacienteActual;
-        }
+if (document.getElementById('nombre-paciente')) {
+    document.getElementById('nombre-paciente').innerText = "RESIDENTE ID: " + idPacienteActual;
+}
 
         db.collection("pacientes").doc(idPacienteActual).get()
           .then((docSnap) => {
