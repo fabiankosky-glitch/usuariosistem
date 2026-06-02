@@ -196,15 +196,15 @@
         return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
   // 🔒 Candado de seguridad para control de accesos por rol en tiempo real
-    onAuthStateChanged(auth, (usuarioLogueado) => {
-        if (!usuarioLogueado) {
-            alert("🔒 ACCESO RESTRINGIDO SOGCS: Autenticación requerida por Ley 2015 de 2020.");
-            window.location.href = "login.html";
-        } else {
-            document.getElementById('contenedor-bloqueo').style.display = 'block';
-            document.getElementById('nombre-paciente').innerText = "RESIDENTE ID: " + idPacienteActual;
-        }
-    });
+   firebase.auth().onAuthStateChanged((usuarioLogueado) => {
+    if (!usuarioLogueado) {
+        alert("⚠️ ACCESO RESTRINGIDO SOGCS: Autenticación requerida por Ley 2015 de 2020.");
+        window.location.href = "login.html";
+    } else {
+        document.getElementById('contenedor-bloqueo').style.display = 'block';
+        document.getElementById('nombre-paciente').innerText = "RESIDENTE ID: " + idPacienteActual;
+    }
+});
 
     // Control visual de la interfaz de botones
     document.getElementById('btn-mostrar-formulario').addEventListener('click', () => {
