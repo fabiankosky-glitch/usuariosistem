@@ -196,16 +196,22 @@
         return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
   // 🔒 Candado de seguridad para control de accesos por rol en tiempo real
-   firebase.auth().onAuthStateChanged((usuarioLogueado) => {
-    if (!usuarioLogueado) {
-        alert("⚠️ ACCESO RESTRINGIDO SOGCS: Autenticación requerida por Ley 2015 de 2020.");
-        window.location.href = "login.html";
-    } else {
-        document.getElementById('contenedor-bloqueo').style.display = 'block';
-        document.getElementById('nombre-paciente').innerText = "RESIDENTE ID: " + idPacienteActual;
-    }
-});
-
+firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+  .then(() => {
+      // Una vez asegurada la persistencia, se evalúa si el usuario está logueado
+      firebase.auth().onAuthStateChanged((usuarioLogueado) => {
+          if (!usuarioLogueado) {
+              alert("⚠️ ACCESO RESTRINGIDO SOGCS: Autenticación requerida por Ley 2015 de 2020.");
+              window.location.href = "login.html";
+          } else {
+              document.getElementById('contenedor-bloqueo').style.display = 'block';
+              document.getElementById('nombre-paciente').innerText = "RESIDENTE ID: " + idPacienteActual;
+          }
+      });
+  })
+  .catch((error) => {
+      console.error("Error en persistencia:", error);
+  });
     // Control visual de la interfaz de botones
     document.getElementById('btn-mostrar-formulario').addEventListener('click', () => {
         formEvolucion.style.display = 'block'; 
