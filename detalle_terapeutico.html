@@ -114,116 +114,115 @@
             appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
         };
 
-        // Inicializar servicios mediante la instancia global clásica
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+    // Inicializar servicios globales de Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
 
-        // Variables operativas del sistema
-        let idPacienteActual = "";
-        let mediaStream = null;
-        let datosCargadosParaPDF = [];
+    // Variables globales de control
+    let idPacienteActual = "";
+    let mediaStream = null;
+    let datosCargadosParaPDF = [];
 
-        // Función del motor criptográfico para los Sellos Hash SHA-256
-        async function generarSelloDigitalInmutable(cadenaTexto) {
-            const encoder = new TextEncoder();
-            const data = encoder.encode(cadenaTexto);
-            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    // Motor Criptográfico para Sellos SHA-256
+    async function generarSelloDigitalInmutable(cadenaTexto) {
+        const encoder = new TextEncoder();
+        const data = encoder.encode(cadenaTexto);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // 2. CONTROL DE PERSISTENCIA Y VALIDACIÓN DE ACCESO
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+      .then(() => {
+          firebase.auth().onAuthStateChanged((usuarioLogueado) => {
+              if (!usuarioLogueado) {
+                  alert("⚠️ ACCESO RESTRINGIDO SOGCS: Autenticación requerida por Ley 2015 de 2020.");
+                  window.location.href = "login.html";
+              } else {
+                  console.log("Sesión activa:", usuarioLogueado.email);
+                  document.getElementById('contenedor-bloqueo').style.display = 'block';
+                  procesarFlujoPaciente();
+              }
+          });
+      })
+      .catch((error) => {
+          console.error("Error en persistencia:", error);
+      });
+
+    // 3. CAPTURA DE ID DE LA URL Y CARGA DE DATOS PRINCIPALES
+    function procesarFlujoPaciente() {
+        const urlParams = new URLSearchParams(window.location.search);
+        idPacienteActual = urlParams.get('id');
+
+        if (!idPacienteActual) {
+            alert("Error: ID de paciente ausente en la URL.");
+            return;
         }
-            // 2. CANDADO DE SEGURIDAD PARA CONTROL DE ACCESOS POR ROL EN TIEMPO REAL
-        firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-          .then(() => {
-              // Una vez asegurada la persistencia, evaluamos el token del navegador
-              firebase.auth().onAuthStateChanged((usuarioLogueado) => {
-                  if (!usuarioLogueado) {
-                      alert("⚠️ ACCESO RESTRINGIDO SOGCS: Autenticación requerida por Ley 2015 de 2020.");
-                      window.location.href = "login.html";
-                  } else {
-                      console.log("Sesión autenticada correctamente para:", usuarioLogueado.email);
-                      document.getElementById('contenedor-bloqueo').style.display = 'block';
-                      
-                      // Ejecutar el flujo de lectura clínica desde la URL
-                      procesarFlujoPaciente();
-                  }
+
+        if (document.getElementById('nombre-paciente')) {
+            document.getElementById('nombre-paciente').innerText = "RESIDENTE ID: " + idPacienteActual;
+        }
+
+        db.collection("pacientes").doc(idPacienteActual).get()
+          .then((docSnap) => {
+              if (docSnap.exists) {
+                  const datos = docSnap.data();
+                  if (document.getElementById('paciente-cedula')) document.getElementById('paciente-cedula').value = datos.cedula || '';
+                  if (document.getElementById('paciente-nombre')) document.getElementById('paciente-nombre').value = datos.nombre || '';
+                  if (document.getElementById('paciente-edad')) document.getElementById('paciente-edad').value = datos.edad || '';
+                  if (document.getElementById('paciente-sexo')) document.getElementById('paciente-sexo').value = datos.sexo || '';
+                  
+                  cargarHistorialSubcoleccion();
+              }
+          })
+          .catch((err) => console.error("Error al traer paciente:", err));
+    }
+
+    // 4. LEER HISTORIAL DE EVOLUCIONES DESDE LA SUBCOLECCIÓN TERAPÉUTICA
+    function cargarHistorialSubcoleccion() {
+        const divHistorial = document.getElementById('divHistorial');
+        if (!divHistorial) return;
+
+        db.collection("pacientes").doc(idPacienteActual).collection("evoluciones_terapeuticas")
+          .orderBy("timestamp", "desc").get()
+          .then((querySnapshot) => {
+              divHistorial.innerHTML = "";
+              
+              if (querySnapshot.empty) {
+                  divHistorial.innerHTML = `<p class="text-muted text-center py-3">No hay evoluciones terapéuticas registradas.</p>`;
+                  return;
+              }
+
+              querySnapshot.forEach((doc) => {
+                  const registro = doc.data();
+                  const fechaCorta = registro.timestamp ? new Date(registro.timestamp).toLocaleDateString() : 'N/A';
+                  
+                  const itemHTML = `
+                      <div class="list-group-item list-group-item-action mb-2 border rounded">
+                          <div class="d-flex w-100 justify-content-between">
+                              <h6 class="mb-1 text-primary">Evolución Médica Terapéutica</h6>
+                              <small class="text-muted">${fechaCorta}</small>
+                          </div>
+                          <p class="mb-1 text-dark text-break">${registro.evolucion || ''}</p>
+                          <small class="text-muted d-block text-truncate">Sello Hash: ${registro.hash || 'N/A'}</small>
+                      </div>`;
+                  divHistorial.innerHTML += itemHTML;
               });
           })
-          .catch((error) => {
-              console.error("Error crítico en inicialización de persistencia:", error);
-          });
+          .catch((err) => console.error("Error al cargar historial:", err));
+    }
 
-        // 3. CAPTURA DEL ID DE LA URL Y LECTURA DE CLOUD FIRESTORE
-        function procesarFlujoPaciente() {
-            const urlParams = new URLSearchParams(window.location.search);
-            idPacienteActual = urlParams.get('id');
-
-            if (!idPacienteActual) {
-                alert("Error: No se ha detectado el ID del paciente en la dirección.");
-                return;
-            }
-
-            // Actualizar interfaz del encabezado
-            document.getElementById('nombre-paciente').innerText = "RESIDENTE ID: " + idPacienteActual;
-
-            // Consultar datos del paciente en la colección principal
-            db.collection("pacientes").doc(idPacienteActual).get()
-              .then((docSnap) => {
-                  if (docSnap.exists) {
-                      const datos = docSnap.data();
-                      document.getElementById('paciente-cedula').value = datos.cedula || 'N/A';
-                      document.getElementById('paciente-nombre').value = datos.nombre || 'Sin nombre';
-                      document.getElementById('paciente-edad').value = datos.edad || 'N/A';
-                      document.getElementById('paciente-sexo').value = datos.sexo || 'N/A';
-                      
-                      // Cargar el historial existente desde la subcolección terapéutica
-                      cargarHistorialSubcoleccion();
-                  } else {
-                      console.warn("El ID consultado no coincide con ningún documento.");
-                  }
-              })
-              .catch((err) => console.error("Error al leer paciente de Firestore:", err));
-        }
-
-        // 4. LEER SUBCOLECCIÓN DE EVOLUCIONES TERAPÉUTICAS
-        function cargarHistorialSubcoleccion() {
-            const divHistorial = document.getElementById('divHistorial');
-            
-            db.collection("pacientes").doc(idPacienteActual).collection("evoluciones_terapeuticas")
-              .orderBy("timestamp", "desc").get()
-              .then((querySnapshot) => {
-                  divHistorial.innerHTML = ""; // Limpiar panel de carga
-                  
-                  if (querySnapshot.empty) {
-                      divHistorial.innerHTML = `<p class="text-muted text-center py-3">No hay evoluciones terapéuticas registradas para este paciente.</p>`;
-                      return;
-                  }
-
-                  querySnapshot.forEach((doc) => {
-                      const registro = doc.data();
-                      const fechaCorta = registro.timestamp ? new Date(registro.timestamp).toLocaleDateString() : 'Fecha N/A';
-                      
-                      const itemHTML = `
-                          <div class="list-group-item list-group-item-action mb-2 border rounded">
-                              <div class="d-flex w-100 justify-content-between">
-                                  <h6 class="mb-1 text-primary">Evolución Médica Terapéutica</h6>
-                                  <small class="text-muted">${fechaCorta}</small>
-                              </div>
-                              <p class="mb-1 text-dark text-break">${registro.evolucion}</p>
-                              <small class="text-muted d-block text-truncate">Sello Digital SHA-256: ${registro.hash || 'N/A'}</small>
-                          </div>`;
-                      divHistorial.innerHTML += itemHTML;
-                  });
-              })
-              .catch((err) => console.error("Error al traer historial terapéutico:", err));
-        }
-
-        // 5. REGISTRO Y ENVÍO DE NUEVA EVOLUCIÓN CON SELLO INMUTABLE
-        document.getElementById('formulario-registro-terapeutico').addEventListener('submit', async (e) => {
+    // 5. EVENTO PARA GUARDAR NUEVAS EVOLUCIONES
+    const formRegistro = document.getElementById('formulario-registro-terapeutico');
+    if (formRegistro) {
+        formRegistro.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const textoEvolucion = document.getElementById('campo-evolucion-texto').value;
-            const nuevoTimestamp = Date.now();
+            const campoTexto = document.getElementById('campo-evolucion-texto');
+            if (!campoTexto) return;
 
-            // Generación automática del sello criptográfico para auditorías de ley
+            const textoEvolucion = campoTexto.value;
+            const nuevoTimestamp = Date.now();
             const hashResultante = await generarSelloDigitalInmutable(textoEvolucion + nuevoTimestamp);
 
             const objetoGuardado = {
@@ -232,26 +231,33 @@
                 hash: hashResultante
             };
 
-            // Guardar dentro de la subcolección del paciente activo
             db.collection("pacientes").doc(idPacienteActual).collection("evoluciones_terapeuticas").add(objetoGuardado)
               .then(() => {
-                  alert("✅ Registro clínico inyectado con éxito en el expediente del residente.");
-                  document.getElementById('campo-evolucion-texto').value = ""; // Limpiar campo
-                  document.getElementById('formEvolucion').style.display = 'none'; // Ocultar formulario
-                  cargarHistorialSubcoleccion(); // Recargar el listado en tiempo real
+                  alert("✅ Registro guardado con éxito.");
+                  campoTexto.value = "";
+                  if (document.getElementById('formEvolucion')) {
+                      document.getElementById('formEvolucion').style.display = 'none';
+                  }
+                  cargarHistorialSubcoleccion();
               })
-              .catch((err) => alert("Error al inyectar datos en Cloud Firestore: " + err));
-        }
-
-        // Control visual de la interfaz de botones
-        document.getElementById('btn-mostrar-formulario').addEventListener('click', () => {
-            const form = document.getElementById('formEvolucion');
-            form.style.display = form.style.display === 'none' ? 'block' : 'none';
+              .catch((err) => alert("Error al guardar: " + err));
         });
+    }
 
-        function inicializarCamaraTerapeutica() {
-            console.log("Inicializando controlador multimedia para firmas o registros fotográficos...");
-        }
-    </script>
+    // Intercambio visual de los botones del formulario
+    const btnMostrarForm = document.getElementById('btn-mostrar-formulario');
+    if (btnMostrarForm) {
+        btnMostrarForm.addEventListener('click', () => {
+            const form = document.getElementById('formEvolucion');
+            if (form) {
+                form.style.display = form.style.display === 'none' ? 'block' : 'none';
+            }
+        });
+    }
+
+    function inicializarCamaraTerapeutica() {
+        console.log("Controlador multimedia listo.");
+    }
+</script>
 </body>
 </html>
