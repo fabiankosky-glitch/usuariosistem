@@ -80,7 +80,7 @@
         <div class="row mb-3">
             <div class="col-12 text-end">
                 <button id="btn-mostrar-formulario" class="btn btn-success px-4 me-2">➕ Nueva Evolución</button>
-                <button id="btn-regresar" class="btn btn-outline-secondary" onclick="window.location.href='index.html'">Volver al Panel</button>
+                <button id="btn-regresar" class="btn btn-outline-secondary" onclick="window.location.href='historias.html'">Volver al Historial</button>
             </div>
         </div>
 
@@ -114,11 +114,21 @@
 
     <!-- Firebase SDK (v10 Compat) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
     <script>
-        // 1. CONFIGURACIÓN DE TU BASE DE DATOS
+        // ===== 1. VALIDACIÓN DE SEGURIDAD COHERENTE CON sessionStorage =====
+        console.log("🔐 Verificando autenticación...");
+        
+        if (sessionStorage.getItem('autenticado') !== 'true') {
+            console.warn("⚠️ Usuario no autenticado - Redirigiendo a login");
+            alert("⚠️ ACCESO RESTRINGIDO SOGCS: Autenticación requerida por Ley 2015 de 2020.");
+            window.location.href = "login.html";
+        } else {
+            console.log("✅ Usuario autenticado correctamente");
+        }
+
+        // ===== 2. CONFIGURACIÓN DE FIREBASE =====
         const firebaseConfig = {
             apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
             authDomain: "caminosnuevosdatabase.firebaseapp.com",
@@ -130,14 +140,15 @@
         // Inicializar Firebase
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const auth = firebase.auth();
 
-        // Variables globales de control
+        // ===== 3. VARIABLES GLOBALES =====
         let idPacienteActual = "";
-        let mediaStream = null;
         let datosCargadosParaPDF = [];
+        const rolActivo = sessionStorage.getItem('rolActivo');
 
-        // Motor Criptográfico para Sellos SHA-256
+        console.log("🔐 Rol activo:", rolActivo);
+
+        // ===== 4. MOTOR CRIPTOGRÁFICO =====
         async function generarSelloDigitalInmutable(cadenaTexto) {
             const encoder = new TextEncoder();
             const data = encoder.encode(cadenaTexto);
@@ -146,82 +157,66 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // 2. CONTROL DE PERSISTENCIA Y VALIDACIÓN DE ACCESO
-        auth.setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-            .then(() => {
-                auth.onAuthStateChanged((usuarioLogueado) => {
-                    if (!usuarioLogueado) {
-                        console.warn("⚠️ Usuario no autenticado");
-                        alert("⚠️ ACCESO RESTRINGIDO SOGCS: Autenticación requerida por Ley 2015 de 2020.");
-                        window.location.href = "login.html";
-                    } else {
-                        console.log("✅ Sesión activa:", usuarioLogueado.email);
-                        document.getElementById('contenedor-bloqueo').style.display = 'block';
-                        procesarFlujoPaciente();
-                    }
-                });
-            })
-            .catch((error) => {
-                console.error("❌ Error en persistencia:", error);
-            });
-
-        // 3. CAPTURA DE ID DE LA URL Y CARGA DE DATOS PRINCIPALES
-        function procesarFlujoPaciente() {
+        // ===== 5. FUNCIÓN PRINCIPAL DE CARGA =====
+        function inicializarSistema() {
+            console.log("🚀 Inicializando sistema...");
+            
+            // Mostrar el contenedor
+            document.getElementById('contenedor-bloqueo').style.display = 'block';
+            
+            // Obtener ID del paciente de la URL
             const urlParams = new URLSearchParams(window.location.search);
             idPacienteActual = urlParams.get('id');
 
             if (!idPacienteActual) {
-                alert("❌ Error: ID de paciente ausente en la URL.");
-                console.error("No se encontró parámetro 'id' en la URL");
+                console.error("❌ Error: ID de paciente ausente en la URL");
+                alert("❌ Error: ID de paciente ausente en la URL");
+                window.location.href = "historias.html";
                 return;
             }
 
             console.log("📋 ID del paciente:", idPacienteActual);
 
+            // Actualizar el badge
             const nombreBadge = document.getElementById('nombre-paciente');
             if (nombreBadge) {
                 nombreBadge.innerText = "RESIDENTE ID: " + idPacienteActual;
             }
 
             // Cargar datos del paciente
+            cargarDatosPaciente();
+            cargarHistorialSubcoleccion();
+        }
+
+        // ===== 6. CARGAR DATOS DEL PACIENTE =====
+        function cargarDatosPaciente() {
             db.collection("pacientes").doc(idPacienteActual).get()
                 .then((docSnap) => {
                     if (docSnap.exists) {
                         const datos = docSnap.data();
                         console.log("✅ Datos del paciente cargados:", datos);
                         
-                        const cedulaInput = document.getElementById('paciente-cedula');
-                        const nombreInput = document.getElementById('paciente-nombre');
-                        const edadInput = document.getElementById('paciente-edad');
-                        const sexoInput = document.getElementById('paciente-sexo');
-
-                        if (cedulaInput) cedulaInput.value = datos.cedula || '';
-                        if (nombreInput) nombreInput.value = datos.nombre || '';
-                        if (edadInput) edadInput.value = datos.edad || '';
-                        if (sexoInput) sexoInput.value = datos.sexo || '';
-                        
-                        cargarHistorialSubcoleccion();
+                        document.getElementById('paciente-cedula').value = datos.cedula || '';
+                        document.getElementById('paciente-nombre').value = datos.nombre || '';
+                        document.getElementById('paciente-edad').value = datos.edad || '';
+                        document.getElementById('paciente-sexo').value = datos.sexo || '';
                     } else {
-                        console.warn("⚠️ Paciente no encontrado en la base de datos");
-                        alert("Paciente no encontrado.");
-                        cargarHistorialSubcoleccion(); // Cargar historial igual
+                        console.warn("⚠️ Paciente no encontrado");
                     }
                 })
                 .catch((err) => {
-                    console.error("❌ Error al traer paciente:", err);
-                    cargarHistorialSubcoleccion(); // Intentar cargar historial de todas formas
+                    console.error("❌ Error al cargar paciente:", err);
                 });
         }
 
-        // 4. LEER HISTORIAL DE EVOLUCIONES DESDE LA SUBCOLECCIÓN TERAPÉUTICA
+        // ===== 7. CARGAR HISTORIAL DE EVOLUCIONES =====
         function cargarHistorialSubcoleccion() {
             const divHistorial = document.getElementById('divHistorial');
-            if (!divHistorial) return;
-
-            divHistorial.innerHTML = '<p class="text-muted text-center py-3"><span class="spinner-border spinner-border-sm me-2"></span>Cargando historial...</p>';
+            divHistorial.innerHTML = '<p class="text-muted text-center py-3"><span class="spinner-border spinner-border-sm me-2"></span>Cargando evoluciones...</p>';
 
             db.collection("pacientes").doc(idPacienteActual).collection("evoluciones_terapeuticas")
-                .orderBy("timestamp", "desc").get()
+                .orderBy("timestamp", "desc")
+                .get()
                 .then((querySnapshot) => {
                     divHistorial.innerHTML = "";
                     
@@ -231,7 +226,7 @@
                         return;
                     }
 
-                    console.log(`✅ Se encontraron ${querySnapshot.size} registros`);
+                    console.log(`✅ Se encontraron ${querySnapshot.size} evoluciones`);
 
                     querySnapshot.forEach((doc) => {
                         const registro = doc.data();
@@ -251,21 +246,20 @@
                 })
                 .catch((err) => {
                     console.error("❌ Error al cargar historial:", err);
-                    divHistorial.innerHTML = `<div class="alert alert-danger">Error al cargar: ${err.message}</div>`;
+                    divHistorial.innerHTML = `<div class="alert alert-danger">Error: ${err.message}</div>`;
                 });
         }
 
-        // 5. EVENTO PARA GUARDAR NUEVAS EVOLUCIONES
+        // ===== 8. GUARDAR NUEVA EVOLUCIÓN =====
         const formRegistro = document.getElementById('formulario-registro-terapeutico');
         if (formRegistro) {
             formRegistro.addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const campoTexto = document.getElementById('campo-evolucion-texto');
-                if (!campoTexto) return;
-
                 const textoEvolucion = campoTexto.value.trim();
+
                 if (!textoEvolucion) {
-                    alert("⚠️ Por favor ingrese el texto de la evolución.");
+                    alert("⚠️ Por favor ingrese el texto de la evolución");
                     return;
                 }
 
@@ -275,43 +269,41 @@
                 const objetoGuardado = {
                     evolucion: textoEvolucion,
                     timestamp: nuevoTimestamp,
-                    hash: hashResultante
+                    hash: hashResultante,
+                    profesional: rolActivo,
+                    createdAt: new Date().toISOString()
                 };
 
                 console.log("💾 Guardando evolución...", objetoGuardado);
 
-                db.collection("pacientes").doc(idPacienteActual).collection("evoluciones_terapeuticas").add(objetoGuardado)
+                db.collection("pacientes").doc(idPacienteActual).collection("evoluciones_terapeuticas")
+                    .add(objetoGuardado)
                     .then(() => {
-                        console.log("✅ Registro guardado exitosamente");
-                        alert("✅ Registro guardado con éxito.");
+                        console.log("✅ Evolución guardada exitosamente");
+                        alert("✅ Evolución guardada con éxito");
                         campoTexto.value = "";
-                        const formDiv = document.getElementById('formEvolucion');
-                        if (formDiv) {
-                            formDiv.style.display = 'none';
-                        }
+                        document.getElementById('formEvolucion').style.display = 'none';
                         cargarHistorialSubcoleccion();
                     })
                     .catch((err) => {
                         console.error("❌ Error al guardar:", err);
-                        alert("❌ Error al guardar: " + err.message);
+                        alert("❌ Error: " + err.message);
                     });
             });
         }
 
-        // 6. INTERCAMBIO VISUAL DE LOS BOTONES DEL FORMULARIO
+        // ===== 9. BOTÓN MOSTRAR/OCULTAR FORMULARIO =====
         const btnMostrarForm = document.getElementById('btn-mostrar-formulario');
         if (btnMostrarForm) {
             btnMostrarForm.addEventListener('click', () => {
                 const form = document.getElementById('formEvolucion');
-                if (form) {
-                    const isHidden = form.style.display === 'none';
-                    form.style.display = isHidden ? 'block' : 'none';
-                    console.log("Formulario " + (isHidden ? "mostrado" : "ocultado"));
-                }
+                form.style.display = form.style.display === 'none' ? 'block' : 'none';
             });
         }
 
-        console.log("✅ Script inicializado correctamente");
+        // ===== 10. INICIAR AL CARGAR LA PÁGINA =====
+        document.addEventListener('DOMContentLoaded', inicializarSistema);
+        console.log("✅ Script de detalle_terapeutico.html cargado correctamente");
     </script>
 
 </body>
