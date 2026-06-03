@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Gestión - Inicio</title>
+    
+    <!-- LIBRERÍAS GLOBALES COMPATIBLES DE FIREBASE COMPLETAS -->
+    <script src="https://gstatic.com"></script>
+    <script src="https://gstatic.com"></script>
+    <script src="https://gstatic.com"></script>
+
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; display: flex; flex-direction: column; align-items: center; }
         
@@ -72,36 +78,61 @@
 </div>
 
 <script>
-    // 1. VALIDACIÓN DE SEGURIDAD (Mano Dura)
-    // Si no está autenticado, lo devuelve al login inmediatamente
-    if (sessionStorage.getItem('autenticado') !== 'true') {
-        window.location.href = 'login.html';
-    }
+    // 1. CONFIGURACIÓN DE TU BASE DE DATOS DE FIREBASE
+    const firebaseConfig = {
+        apiKey: "AIzaSyB35423:web:f56b459ab4d57c79edc3ec",
+        authDomain: "://firebaseapp.com",
+        projectId: "caminosnuevosdatabase",
+        storageBucket: "://appspot.com",
+        messagingSenderId: "907500835423",
+        appId: "1:907500835423:web:f56b459ab4d57c79edc3ec"
+    };
 
-    // 2. LÓGICA DE ROLES (Ocultar botones)
-    const rol = sessionStorage.getItem('rolActivo');
+    // Inicializar servicios globales
+    firebase.initializeApp(firebaseConfig);
 
-    document.addEventListener("DOMContentLoaded", function() {
+    // 2. VALIDACIÓN DE SEGURIDAD REAL MEDIANTE FIREBASE AUTH
+    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+      .then(() => {
+          firebase.auth().onAuthStateChanged((usuarioLogueado) => {
+              if (!usuarioLogueado) {
+                  // Si no hay un token real de Firebase activo, expulsa al login
+                  window.location.href = 'login.html';
+              } else {
+                  console.log("Sesión de Firebase activa:", usuarioLogueado.email);
+                  procesarRolesSistema();
+              }
+          });
+      })
+      .catch((error) => {
+          console.error("Error al arrancar la persistencia:", error);
+      });
+
+    // 3. LÓGICA DE ROLES (Ocultar botones según tu configuración)
+    function procesarRolesSistema() {
+        const rol = sessionStorage.getItem('rolActivo');
+
         // Roles asistenciales: No ven Libros ni Administración
         if (rol === 'psicologia' || rol === 'terapeuta') {
-            document.getElementById('item-libros').style.display = 'none';
-            document.getElementById('item-admin').style.display = 'none';
-            
-            // Si el terapeuta tampoco debe registrar pacientes, descomenta la línea de abajo:
-            // document.getElementById('btn-registro').style.display = 'none';
+            if(document.getElementById('item-libros')) document.getElementById('item-libros').style.display = 'none';
+            if(document.getElementById('item-admin')) document.getElementById('item-admin').style.display = 'none';
         }
 
         // Director Terapéutico: No ve Administración del sistema
         if (rol === 'director_terapeutico') {
-            document.getElementById('item-admin').style.display = 'none';
+            if(document.getElementById('item-admin')) document.getElementById('item-admin').style.display = 'none';
         }
-    });
+    }
 
-    // 3. FUNCIÓN DE CERRAR SESIÓN
+    // 4. FUNCIÓN DE CERRAR SESIÓN COMPLETA (Limpia sessionStorage y Firebase Auth)
     document.getElementById('logout').addEventListener('click', function() {
         if(confirm("¿Seguro que desea cerrar la sesión actual?")) {
-            sessionStorage.clear(); // Limpia toda la seguridad
-            window.location.href = 'login.html'; // Expulsa a la puerta
+            firebase.auth().signOut().then(() => {
+                sessionStorage.clear(); // Limpia toda la seguridad manual
+                window.location.href = 'login.html'; // Redirección
+            }).catch((err) => {
+                alert("Error al destruir la sesión: " + err);
+            });
         }
     });
 </script>
