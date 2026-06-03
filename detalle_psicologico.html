@@ -13,7 +13,7 @@
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: #333; margin: 0; padding: 20px; font-size: 12px; }
         .container { max-width: 1350px; margin: auto; background: white; padding: 40px; border-radius: 30px; box-shadow: 0 20px 60px rgba(0,0,0,0.5); }
         .header-app { border-bottom: 4px solid var(--primary); padding-bottom: 20px; margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
-        .btn-principal { background: var(--primary); color: white; padding: 20px; border: none; border-radius: 15px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: uppercase; width: 100%; box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+        .btn-principal { background: var(--primary); color: white; padding: 20px; border: none; border-radius: 15px; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; text-transform: none; }
         .btn-principal:hover { transform: translateY(-3px); background: #1a4a8d; }
         #areaRegistro { display: none; background: #fdfdfd; padding: 30px; border-radius: 25px; border: 2px solid #eee; margin-top: 30px; animation: slideUp 0.5s ease; }
         .seccion-clinica { background: white; padding: 25px; border-radius: 15px; border-left: 8px solid var(--primary); margin-bottom: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); text-align: left; }
@@ -176,24 +176,24 @@
         };
     };
 
-    async function iniciarCam() { try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }); document.getElementById('video').srcObject = stream; } catch(e){console.log("Cam off");} }
-    window.tomarFoto = () => { const v = document.getElementById('video'), c = document.getElementById('canvas'); c.width = v.videoWidth; c.height = v.videoHeight; c.getContext('2d').drawImage(v,0,0); fotoB64 = c.toDataURL('image/jpeg', 0.6); document.getElementById('imgPreview').src = fotoB64; document.getElementById('imgPreview').style.display='block'; v.style.display='none'; };
+    async function iniciarCam() { try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }); document.getElementById('video').srcObject = stream; } catch(e){console.error(e);} }
+    window.tomarFoto = () => { const v = document.getElementById('video'), c = document.getElementById('canvas'); c.width = v.videoWidth; c.height = v.videoHeight; c.getContext('2d').drawImage(v,0,0); fotoB64 = c.toDataURL('image/jpeg'); document.getElementById('imgPreview').src = fotoB64; document.getElementById('imgPreview').style.display='block'; };
     
     window.addCie = () => { 
         const s = document.getElementById('selectCie'), [c, d] = s.value.split('|'); if(!c) return;
         diagCie.push({ cod: c, desc: d }); 
-        document.getElementById('displayCie').innerHTML = diagCie.map(x => `<span style="background:var(--primary); color:white; padding:5px 12px; margin:3px; border-radius:50px; display:inline-block; font-size:10px;">${x.cod} - ${x.desc}</span>`).join(' '); 
+        document.getElementById('displayCie').innerHTML = diagCie.map(x => `<span style="background:var(--primary); color:white; padding:5px 12px; margin:3px; border-radius:50px; display:inline-block;">${x.cod} - ${x.desc}</span>`).join('');
         s.value = ""; 
     };
 
     window.guardarTodoDefinitivo = async () => {
         const hce = {
-            vits: { p: document.getElementById('vP').value, i: document.getElementById('vI').value, ta: document.getElementById('vTA').value },
+            vits: { p: document.getElementById('vP').value, t: document.getElementById('vT').value, i: document.getElementById('vI').value, ta: document.getElementById('vTA').value },
             anam: { mot: document.getElementById('fMot').value, enf: document.getElementById('fEnf').value },
             mental: { por: document.getElementById('mPor').value, pen: document.getElementById('mPen').value, afe: document.getElementById('mAfe').value, jui: document.getElementById('mJui').value, rie: document.getElementById('mRie').value },
             cie: diagCie, plan: document.getElementById('fPla').value, folio: nFolio
         };
-        await addDoc(collection(db, "evoluciones_psicologicas"), { idPaciente, dataHCE: cifrar(JSON.stringify(hce)), foto: fotoB64, autor: cifrar(sessionStorage.getItem("pNom")), tp: cifrar(sessionStorage.getItem("pTP")), fecha: new Date().toLocaleString(), timestamp: serverTimestamp(), hash: btoa(hce.anam.mot + Date.now()).substring(0,16), aclaratorias: [] });
+        await addDoc(collection(db, "evoluciones_psicologicas"), { idPaciente, dataHCE: cifrar(JSON.stringify(hce)), foto: fotoB64, autor: cifrar(sessionStorage.getItem("pNom")), tp: cifrar(sessionStorage.getItem("pTP")), fecha: new Date().toLocaleString(), hash: Math.random().toString(36).substring(7) });
         location.reload();
     };
 
@@ -233,33 +233,57 @@
 window.generarReporteEstructural = async (id) => {
     try {
         const dSnap = await getDoc(doc(db, "evoluciones_psicologicas", id));
+        if(!dSnap.exists()) { alert("Documento no encontrado"); return; }
+        
         const d = dSnap.data();
         const pSnap = await getDoc(doc(db, "pacientes", idPaciente));
-        const pac = pSnap.data();
-        const c = JSON.parse(descCl(d.dataHCE));
+        if(!pSnap.exists()) { alert("Datos del paciente no encontrados"); return; }
         
-        const { jsPDF } = window.jspdf;
-        const docP = new jsPDF('p', 'mm', 'letter'); // Formato Carta
+        const pac = pSnap.data();
+        
+        // Validar y parsear datos HCE
+        let c = {};
+        try {
+            const descryptedData = descCl(d.dataHCE);
+            if(!descryptedData) throw new Error("No se pudo desencriptar");
+            c = JSON.parse(descryptedData);
+        } catch(e) {
+            console.error("Error al parsear HCE:", e);
+            c = { 
+                vits: { p: '--', t: '--', i: '--', ta: '--' }, 
+                anam: { mot: 'Sin datos', enf: 'Sin datos' }, 
+                mental: { por: '', pen: '', afe: '', jui: '', rie: '' },
+                cie: [],
+                plan: 'Sin datos'
+            };
+        }
 
+        const { jsPDF } = window.jspdf;
+        const docP = new jsPDF('p', 'mm', 'letter');
+        
         // --- CONFIGURACIÓN DE ESTILOS ---
-        const black = [0, 0, 0];
         const gray = [240, 240, 240];
         const marginX = 10;
         let currentY = 10;
+        const maxWidth = 195;
 
         const drawRect = (x, y, w, h, fill = false) => {
             if(fill) docP.setFillColor(gray[0], gray[1], gray[2]);
             docP.rect(x, y, w, h, fill ? 'FD' : 'S');
         };
 
-        // --- 1. ENCABEZADO TRIPARTITO (DISEÑO EXACTO) ---
-        drawRect(marginX, currentY, 195, 25);
-        docP.line(55, currentY, 55, currentY + 25); // Divisor Logo
-        docP.line(150, currentY, 150, currentY + 25); // Divisor Calidad
+        const addPageIfNeeded = (minHeight) => {
+            if(currentY + minHeight > 270) { docP.addPage(); currentY = 10; }
+        };
+
+        // --- 1. ENCABEZADO ---
+        drawRect(marginX, currentY, maxWidth, 25);
+        docP.line(55, currentY, 55, currentY + 25);
+        docP.line(150, currentY, 150, currentY + 25);
 
         docP.setFont("helvetica", "bold");
         docP.setFontSize(8);
-        docP.text("FUNDACIÓN NUEVOS CAMINOS", 32.5, currentY + 12, { align: "center" }); // Espacio para Logo
+        docP.text("FUNDACIÓN NUEVOS CAMINOS", 32.5, currentY + 12, { align: "center" });
         
         docP.setFontSize(11);
         docP.text("HISTORIA CLÍNICA INTEGRAL", 102.5, currentY + 10, { align: "center" });
@@ -273,110 +297,157 @@ window.generarReporteEstructural = async (id) => {
         docP.text("VIGENCIA: 2 AÑOS", 152, currentY + 17);
         docP.text(`FOLIO No: ${c.folio || '1'}`, 152, currentY + 22);
 
-        currentY += 25;
+        currentY += 28;
 
-        // --- 2. DATOS DE IDENTIFICACIÓN (BLOQUE TABULAR) ---
-        drawRect(marginX, currentY, 195, 15, true);
+        // --- 2. DATOS DE IDENTIFICACIÓN ---
+        drawRect(marginX, currentY, maxWidth, 15, true);
         docP.setFontSize(9);
-        docP.text(`APELLIDOS Y NOMBRES: ${pac.nombre.toUpperCase()}`, marginX + 3, currentY + 6);
-        docP.text(`DOCUMENTO DE IDENTIDAD: ${pac.cedula}`, marginX + 3, currentY + 11);
-        docP.text(`FECHA DE ATENCIÓN: ${d.fecha}`, 130, currentY + 6);
+        docP.text(`APELLIDOS Y NOMBRES: ${(pac.nombre || 'N/A').toUpperCase()}`, marginX + 3, currentY + 6);
+        docP.text(`DOCUMENTO DE IDENTIDAD: ${pac.cedula || 'N/A'}`, marginX + 3, currentY + 11);
+        docP.text(`FECHA DE ATENCIÓN: ${d.fecha || new Date().toLocaleString()}`, 130, currentY + 6);
         docP.text(`EDAD: ${pac.edad || '--'} AÑOS`, 130, currentY + 11);
 
-        currentY += 15;
+        currentY += 18;
 
-        // --- 3. SIGNOS VITALES (FILA TÉCNICA) ---
-        drawRect(marginX, currentY, 195, 10);
+        // --- 3. SIGNOS VITALES ---
+        addPageIfNeeded(15);
+        drawRect(marginX, currentY, maxWidth, 10);
         docP.line(marginX + 40, currentY, marginX + 40, currentY + 10);
         docP.line(marginX + 80, currentY, marginX + 80, currentY + 10);
         docP.line(marginX + 120, currentY, marginX + 120, currentY + 10);
         docP.line(marginX + 160, currentY, marginX + 160, currentY + 10);
 
         docP.setFontSize(8);
-        docP.text(`PESO: ${c.vits.p} kg`, marginX + 2, currentY + 6);
+        docP.text(`PESO: ${c.vits.p || '--'} kg`, marginX + 2, currentY + 6);
         docP.text(`TALLA: ${c.vits.t || '--'} cm`, marginX + 42, currentY + 6);
-        docP.text(`IMC: ${c.vits.i}`, marginX + 82, currentY + 6);
-        docP.text(`T.A: ${c.vits.ta}`, marginX + 122, currentY + 6);
+        docP.text(`IMC: ${c.vits.i || '--'}`, marginX + 82, currentY + 6);
+        docP.text(`T.A: ${c.vits.ta || '--'}`, marginX + 122, currentY + 6);
         docP.text(`FC/FR: ${c.vits.fc || '--'}`, marginX + 162, currentY + 6);
 
-        currentY += 10;
+        currentY += 12;
 
-        // --- 4. SECCIONES DE TEXTO (DIBUJO DE CUADROS DINÁMICOS) ---
+        // --- 4. SECCIONES DE TEXTO ---
         const renderSection = (title, content) => {
+            addPageIfNeeded(12);
             docP.setFont("helvetica", "bold");
-            drawRect(marginX, currentY, 195, 6, true);
+            drawRect(marginX, currentY, maxWidth, 6, true);
+            docP.setFontSize(9);
             docP.text(title, marginX + 3, currentY + 4.5);
             currentY += 6;
 
             docP.setFont("helvetica", "normal");
-            const splitText = docP.splitTextToSize(content || "Sin registros en el sistema.", 185);
-            const boxHeight = (splitText.length * 5) + 5;
-            drawRect(marginX, currentY, 195, boxHeight);
-            docP.text(splitText, marginX + 3, currentY + 5);
-            currentY += boxHeight;
+            docP.setFontSize(8);
+            const safeContent = String(content || "Sin registros en el sistema.");
+            const splitText = docP.splitTextToSize(safeContent, maxWidth - 6);
+            const boxHeight = Math.max(10, (splitText.length * 4.5) + 5);
+            drawRect(marginX, currentY, maxWidth, boxHeight);
+            docP.text(splitText, marginX + 3, currentY + 4);
+            currentY += boxHeight + 2;
         };
 
-        renderSection("MOTIVO DE CONSULTA", c.anam.mot);
-        renderSection("ENFERMEDAD ACTUAL", c.anam.enf);
+        renderSection("MOTIVO DE CONSULTA", c.anam?.mot || "");
+        renderSection("ENFERMEDAD ACTUAL", c.anam?.enf || "");
         
-        // --- 5. EXAMEN MENTAL (DIBUJO DE REJILLA) ---
-        renderSection("EXAMEN DEL ESTADO MENTAL", 
-            `PORTE Y ACTITUD: ${c.mental.por}\n` +
-            `PENSAMIENTO: ${c.mental.pen}\n` +
-            `AFECTO: ${c.mental.afe}\n` +
-            `JUICIO Y RACIOCINIO: ${c.mental.jui}\n` +
-            `RIESGO: ${c.mental.rie}`
-        );
+        // --- 5. EXAMEN MENTAL ---
+        const mentalText = `PORTE Y ACTITUD: ${c.mental?.por || ''}\nPENSAMIENTO: ${c.mental?.pen || ''}\nAFECTO: ${c.mental?.afe || ''}\nJUICIO Y RACIOCINIO: ${c.mental?.jui || ''}\nRIESGO: ${c.mental?.rie || ''}`;
+        renderSection("EXAMEN DEL ESTADO MENTAL", mentalText);
 
-        // --- 6. IMPRESIÓN DIAGNÓSTICA (TABLA CIE-10) ---
+        // --- 6. DIAGNÓSTICOS CIE-10 ---
+        addPageIfNeeded(15);
         docP.setFont("helvetica", "bold");
-        drawRect(marginX, currentY, 195, 6, true);
+        drawRect(marginX, currentY, maxWidth, 6, true);
+        docP.setFontSize(9);
         docP.text("IMPRESIÓN DIAGNÓSTICA (CIE-10)", marginX + 3, currentY + 4.5);
         currentY += 6;
         
-        const cieContent = c.cie.map(x => `[${x.cod}] ${x.desc}`).join('\n');
-        const cieText = docP.splitTextToSize(cieContent, 185);
-        const cieHeight = (cieText.length * 5) + 5;
-        drawRect(marginX, currentY, 195, cieHeight);
-        docP.text(cieText, marginX + 3, currentY + 5);
-        currentY += cieHeight;
+        const cieContent = c.cie && c.cie.length > 0 ? c.cie.map(x => `[${x.cod}] ${x.desc}`).join('\n') : "Sin diagnósticos registrados";
+        docP.setFont("helvetica", "normal");
+        docP.setFontSize(8);
+        const cieText = docP.splitTextToSize(cieContent, maxWidth - 6);
+        const cieHeight = Math.max(10, (cieText.length * 4.5) + 5);
+        drawRect(marginX, currentY, maxWidth, cieHeight);
+        docP.text(cieText, marginX + 3, currentY + 4);
+        currentY += cieHeight + 2;
 
-        renderSection("PLAN DE MANEJO Y RECOMENDACIONES", c.plan);
+        renderSection("PLAN DE MANEJO Y RECOMENDACIONES", c.plan || "");
 
-        // --- 7. ANEXO FOTOGRÁFICO Y FIRMAS ---
-        if (currentY > 220) { docP.addPage(); currentY = 20; }
-
-        if (d.foto) {
+        // --- 7. NOTAS ACLARATORIAS ---
+        if(d.aclaratorias && d.aclaratorias.length > 0) {
+            addPageIfNeeded(20);
             docP.setFont("helvetica", "bold");
-            docP.text("ANEXO: REGISTRO FOTOGRÁFICO DE EVIDENCIA", marginX, currentY + 5);
-            docP.addImage(d.foto, 'JPEG', marginX, currentY + 8, 45, 35);
-            currentY += 50;
+            drawRect(marginX, currentY, maxWidth, 6, true);
+            docP.setFontSize(9);
+            docP.text("NOTAS ACLARATORIAS Y ACTUALIZACIONES", marginX + 3, currentY + 4.5);
+            currentY += 6;
+
+            docP.setFont("helvetica", "normal");
+            docP.setFontSize(7);
+            
+            let notasTexto = "";
+            d.aclaratorias.forEach((nota, idx) => {
+                const notaDescifrada = descCl(nota.texto) || nota.texto;
+                notasTexto += `[${idx + 1}] Fecha: ${nota.fecha}\n${notaDescifrada}\n\n`;
+            });
+            
+            const notasLines = docP.splitTextToSize(notasTexto, maxWidth - 6);
+            const notasHeight = Math.max(15, (notasLines.length * 4) + 5);
+            drawRect(marginX, currentY, maxWidth, notasHeight);
+            docP.text(notasLines, marginX + 3, currentY + 4);
+            currentY += notasHeight + 2;
         }
 
-        const footerY = 260;
+        // --- 8. ANEXO FOTOGRÁFICO ---
+        addPageIfNeeded(50);
+        if (d.foto) {
+            try {
+                docP.setFont("helvetica", "bold");
+                docP.setFontSize(9);
+                docP.text("ANEXO: REGISTRO FOTOGRÁFICO DE EVIDENCIA", marginX, currentY + 5);
+                docP.addImage(d.foto, 'JPEG', marginX, currentY + 8, 45, 35);
+                currentY += 50;
+            } catch(imgErr) {
+                console.warn("Error al agregar imagen:", imgErr);
+            }
+        }
+
+        // --- 9. FIRMAS ---
+        addPageIfNeeded(25);
+        const footerY = currentY + 20;
         docP.line(marginX, footerY, marginX + 70, footerY);
+        docP.setFont("helvetica", "normal");
         docP.setFontSize(9);
         docP.text("FIRMA DEL PROFESIONAL TRATANTE", marginX, footerY + 5);
-        docP.text(descCl(d.autor), marginX, footerY + 10);
-        docP.text(`R.M. / T.P: ${descCl(d.tp)}`, marginX, footerY + 15);
+        docP.text(descCl(d.autor || "") || "N/A", marginX, footerY + 10);
+        docP.text(`R.M. / T.P: ${descCl(d.tp || "") || "N/A"}`, marginX, footerY + 15);
 
         docP.setFontSize(7);
         docP.setTextColor(100);
-        docP.text(`Documento generado electrónicamente. Hash de Seguridad: ${d.hash}`, 105, 275, { align: "center" });
+        docP.text(`Documento generado electrónicamente. Hash: ${d.hash || 'N/A'}`, 105, 275, { align: "center" });
 
-        // --- GUARDADO FINAL ---
-        docP.save(`HC_FOLIO_${c.folio}_${pac.nombre.replace(/ /g, "_")}.pdf`);
+        // --- GUARDAR PDF ---
+        const nombreArchivo = `HC_FOLIO_${c.folio || '1'}_${(pac.nombre || 'paciente').replace(/ /g, "_")}.pdf`;
+        docP.save(nombreArchivo);
+        alert("✅ PDF generado correctamente: " + nombreArchivo);
 
     } catch (error) {
-        console.error("Error en Dibujo PDF:", error);
-        alert("Fallo en el motor de dibujo del reporte.");
+        console.error("Error en generación de PDF:", error);
+        alert("❌ Error al generar el PDF. Verifique los datos e intente nuevamente.\nDetalles: " + error.message);
     }
 };
 
     window.exportarForenseJSON = async (id) => {
-        const d = (await getDoc(doc(db, "evoluciones_psicologicas", id))).data();
-        const blob = new Blob([JSON.stringify(d, null, 2)], {type: "application/json"});
-        const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = `EXPEDIENTE_${id}.json`; a.click();
+        try {
+            const d = (await getDoc(doc(db, "evoluciones_psicologicas", id))).data();
+            const blob = new Blob([JSON.stringify(d, null, 2)], {type: "application/json"});
+            const url = URL.createObjectURL(blob); 
+            const a = document.createElement("a"); 
+            a.href = url; 
+            a.download = `EXPEDIENTE_${id}.json`; 
+            a.click();
+        } catch(err) {
+            console.error("Error exportando JSON:", err);
+            alert("Error al exportar JSON");
+        }
     };
 
     window.ejecutarAclarar = (id) => { 
@@ -385,7 +456,16 @@ window.generarReporteEstructural = async (id) => {
     };
 
     window.cerrarModal = () => document.getElementById('modalMaestro').style.display='none';
-    const pRef = await getDoc(doc(db, "pacientes", idPaciente)); if(pRef.exists()) document.getElementById('nombrePaciente').innerText = pRef.data().nombre.toUpperCase();
+    
+    // Cargar nombre del paciente
+    (async () => {
+        try {
+            const pRef = await getDoc(doc(db, "pacientes", idPaciente)); 
+            if(pRef.exists()) document.getElementById('nombrePaciente').innerText = pRef.data().nombre.toUpperCase();
+        } catch(e) {
+            console.error("Error cargando paciente:", e);
+        }
+    })();
 </script>
 </body>
 </html>
