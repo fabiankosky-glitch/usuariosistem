@@ -83,6 +83,8 @@
                 mensaje = "❌ Credenciales inválidas para el rol seleccionado.";
             } else if (error.code === 'auth/invalid-credential') {
                 mensaje = "❌ Contraseña o usuario incorrectos.";
+            } else if (error.code === 'auth/operation-not-allowed') {
+                mensaje = "❌ El inicio de sesión con contraseña está deshabilitado en Firebase. Actívalo en la Consola (Authentication > Sign-in method).";
             }
             alert(mensaje);
         }
