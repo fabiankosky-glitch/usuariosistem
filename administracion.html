@@ -86,26 +86,44 @@
     </div>
 </div>
 
-<script>
-    const LLAVE_MAESTRA = "ADMIN2024*"; // Tu clave de acceso
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    function verificarAcceso() {
-        const input = document.getElementById("passMaster").value;
-        if (input === LLAVE_MAESTRA) {
-            document.getElementById("modalClave").style.display = "none";
-            const panel = document.getElementById("panelMaestro");
-            panel.style.display = "block";
-            setTimeout(() => { panel.style.filter = "blur(0px)"; }, 50);
+    const firebaseConfig = {
+        apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+        authDomain: "caminosnuevosdatabase.firebaseapp.com",
+        projectId: "caminosnuevosdatabase",
+        storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+        appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.verificarAcceso = () => {
+        const pass = document.getElementById("passMaster").value;
+        const rol = sessionStorage.getItem('rolActivo');
+        const autenticado = sessionStorage.getItem('autenticado');
+
+        // Validación de doble factor: Rol en sesión + Contraseña Maestra + Auth de Firebase
+        if (autenticado === 'true' && (rol === 'admin' || rol === 'directora_general') && pass === "ADMIN2024*") {
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    document.getElementById("modalClave").style.display = "none";
+                    const panel = document.getElementById("panelMaestro");
+                    panel.style.display = "block";
+                    setTimeout(() => { panel.style.filter = "blur(0px)"; }, 50);
+                } else {
+                    alert("Sesión de Firebase no detectada.");
+                    window.location.href = "login.html";
+                }
+            });
         } else {
-            alert("❌ Llave incorrecta");
-            document.getElementById("passMaster").value = "";
+            alert("❌ Acceso Denegado: No tiene permisos de alta gerencia.");
+            window.location.href = "index.html";
         }
-    }
-
-    // Enter para entrar
-    document.getElementById("passMaster").addEventListener("keyup", (e) => {
-        if (e.key === "Enter") verificarAcceso();
-    });
+    };
 </script>
 
 </body>

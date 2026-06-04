@@ -5,10 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema de Gestión - Inicio</title>
     
-    <!-- LIBRERÍAS GLOBALES COMPATIBLES DE FIREBASE COMPLETAS -->
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.1.3/firebase-auth.js"></script>
-
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; display: flex; flex-direction: column; align-items: center; }
         
@@ -76,59 +72,53 @@
     </div>
 </div>
 
-<script>
-    // 1. CONFIGURACIÓN DE TU BASE DE DATOS DE FIREBASE
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
     const firebaseConfig = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_AUTH_DOMAIN",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_STORAGE_BUCKET",
-        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-        appId: "YOUR_APP_ID"
+        apiKey: "AIzaSyC78y2m79f9764f-YTuPYfP",
+        authDomain: "caminosnuevosdatabase.firebaseapp.com",
+        projectId: "caminosnuevosdatabase",
+        storageBucket: "caminosnuevosdatabase.firebasestorage.app",
+        appId: "1:907500835423:web:f56b459ab4d57d92a81ea"
     };
 
-    // Inicializar servicios globales
-    firebase.initializeApp(firebaseConfig);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-    // 2. VALIDACIÓN DE SEGURIDAD REAL MEDIANTE FIREBASE AUTH
-    firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL)
-      .then(() => {
-          firebase.auth().onAuthStateChanged((user) => {
-              if (!user) {
-                  // Si no hay un token real de Firebase activo, expulsa al login
-                  window.location.href = 'login.html';
-              } else {
-                  console.log("Sesión de Firebase activa:", user.email);
-                  procesarRolesSistema();
-              }
-          });
-      })
-      .catch((error) => {
-          console.error("Error al arrancar la persistencia:", error);
-      });
+    // 1. VALIDACIÓN DE SEGURIDAD
+    setPersistence(auth, browserLocalPersistence)
+        .then(() => {
+            onAuthStateChanged(auth, (user) => {
+                if (!user) {
+                    window.location.href = 'login.html';
+                } else {
+                    console.log("Sesión activa:", user.email);
+                    procesarRolesSistema();
+                }
+            });
+        })
+        .catch((error) => console.error("Error de persistencia:", error));
 
-    // 3. LÓGICA DE ROLES (Ocultar botones según tu configuración)
+    // 2. LÓGICA DE ROLES
     function procesarRolesSistema() {
         const rol = sessionStorage.getItem('rolActivo');
-
-        // Roles asistenciales: No ven Libros ni Administración
         if (rol === 'psicologia' || rol === 'terapeuta') {
             if(document.getElementById('item-libros')) document.getElementById('item-libros').style.display = 'none';
             if(document.getElementById('item-admin')) document.getElementById('item-admin').style.display = 'none';
         }
-
-        // Director Terapéutico: No ve Administración del sistema
         if (rol === 'director_terapeutico') {
             if(document.getElementById('item-admin')) document.getElementById('item-admin').style.display = 'none';
         }
     }
 
-    // 4. FUNCIÓN DE CERRAR SESIÓN COMPLETA (Limpia sessionStorage y Firebase Auth)
+    // 3. CERRAR SESIÓN
     document.getElementById('logout').addEventListener('click', function() {
         if(confirm("¿Seguro que desea cerrar la sesión actual?")) {
-            firebase.auth().signOut().then(() => {
-                sessionStorage.clear(); // Limpia toda la seguridad manual
-                window.location.href = 'login.html'; // Redirección
+            signOut(auth).then(() => {
+                sessionStorage.clear();
+                window.location.href = 'login.html';
             }).catch((err) => {
                 alert("Error al destruir la sesión: " + err);
             });
