@@ -250,7 +250,7 @@ window.generarReporteEstructural = async (id) => {
         try {
             const descryptedData = descCl(d.dataHCE);
             if(!descryptedData) throw new Error("No se pudo desencriptar");
-            c = JSON.parse(descryptedData);
+            c = JSON.parse(descryptedData) || {};
         } catch(e) {
             console.error("Error al parsear HCE:", e);
             c = { 
