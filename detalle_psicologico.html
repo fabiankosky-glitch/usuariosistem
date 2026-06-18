@@ -139,7 +139,7 @@ const firebaseConfig = {
     const app = initializeApp(firebaseConfig);
     const db = getFirestore(app);
     const idPaciente = new URLSearchParams(window.location.search).get("id");
-    const LL_CL = "FundacionNuevosCaminos2024*USC", LL_AD = "ADMIN2024*";
+    const LL_CL = "FundacionNuevosCaminos2024*USC", LL_AD = "admin2024";
 
     let diagCie = [], fotoB64 = "", stream = null, nFolio = 0;
 
