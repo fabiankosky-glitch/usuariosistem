@@ -111,7 +111,7 @@ const firebaseConfig = {
         const autenticado = sessionStorage.getItem('autenticado');
 
         // Validación de doble factor: Rol en sesión + Contraseña Maestra + Auth de Firebase
-        if (autenticado === 'true' && (rol === 'admin' || rol === 'directora_general') && pass === "ADMIN2024*") {
+        if (autenticado === 'true' && (rol === 'admin' || rol === 'directora_general') && pass === "admin2024") {
             onAuthStateChanged(auth, (user) => {
                 if (user) {
                     document.getElementById("modalClave").style.display = "none";
