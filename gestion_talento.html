@@ -240,11 +240,13 @@
     // Envolvemos la carga inicial en la verificación de autenticación
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            user.getIdTokenResult(true).then(async (idTokenResult) => {
+            // Forzar la actualización del token para obtener los claims más recientes
+            user.getIdTokenResult(true).then(async (idTokenResult) => { 
                 if (idTokenResult.claims.admin === true) {
-                    // Cargar la tabla solo si es admin
+                    console.log("Acceso concedido: El usuario es administrador.");
                     const snap = await getDocs(query(collection(db, "talento_humano_cifrado"), orderBy("timestamp", "desc")));
                     let h = "";
+                    const tabla = document.getElementById("tablaPersonal");
                     snap.forEach(docSnap => {
                         const d = docSnap.data();
                         const color = d.estado === "HABILITADO" ? "var(--accent)" : "var(--danger)";
@@ -261,12 +263,16 @@
                             </td>
                         </tr>`;
                     });
-                    document.getElementById("tablaPersonal").innerHTML = h;
+                    if (tabla) tabla.innerHTML = h;
                 } else {
+                    // Si el usuario está logueado pero no es admin, se le deniega el acceso y se le redirige.
+                    console.warn("Acceso denegado: El usuario no es administrador.");
+                    alert("❌ No tiene permisos para acceder a esta sección.");
                     window.location.href = 'index.html';
                 }
             });
         } else {
+            // Si no hay sesión, se redirige al login.
             window.location.href = 'login.html';
         }
     });

@@ -113,13 +113,9 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, getDoc, collection, addDoc, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        // ===== 1. VALIDACIÓN DE SEGURIDAD COHERENTE CON sessionStorage =====
-        if (sessionStorage.getItem('autenticado') !== 'true') {
-            window.location.href = "login.html";
-        }
+        import { db, auth } from './firebase-config.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { doc, getDoc, collection, addDoc, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         // ===== 2. CONFIGURACIÓN DE FIREBASE =====
 // Your web app's Firebase configuration
@@ -134,14 +130,9 @@ const firebaseConfig = {
   measurementId: "G-3N6B4PV2NC"
 };
 
-        // Inicializar Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
         // ===== 3. VARIABLES GLOBALES =====
         let idPacienteActual = "";
-        let datosCargadosParaPDF = [];
-        const rolActivo = sessionStorage.getItem('rolActivo');
+        let rolActivo = ""; // Se obtendrá de los claims de Firebase
 
         console.log("🔐 Rol activo:", rolActivo);
 
@@ -156,10 +147,7 @@ const firebaseConfig = {
 
         // ===== 5. FUNCIÓN PRINCIPAL DE CARGA =====
         function inicializarSistema() {
-            console.log("🚀 Inicializando sistema...");
-            
-            // Mostrar el contenedor
-            document.getElementById('contenedor-bloqueo').style.display = 'block';
+            console.log("🚀 Inicializando sistema para el paciente...");
             
             // Obtener ID del paciente de la URL
             const urlParams = new URLSearchParams(window.location.search);
@@ -298,8 +286,28 @@ const firebaseConfig = {
         }
 
         // ===== 10. INICIAR AL CARGAR LA PÁGINA =====
-        document.addEventListener('DOMContentLoaded', inicializarSistema);
-        console.log("✅ Script de detalle_terapeutico.html cargado correctamente");
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // El usuario ha iniciado sesión, procedemos a cargar todo.
+                document.getElementById('contenedor-bloqueo').style.display = 'block';
+
+                user.getIdTokenResult().then((idTokenResult) => {
+                    const claims = idTokenResult.claims;
+                    rolActivo = claims.rol || (claims.admin ? 'admin' : 'desconocido');
+                    console.log("✅ Usuario autenticado con rol:", rolActivo);
+
+                    // Si el rol es terapeuta, no puede ver el botón de nueva evolución (ejemplo)
+                    if (rolActivo === 'terapeuta') {
+                        // document.getElementById('btn-mostrar-formulario').style.display = 'none';
+                    }
+                    
+                    inicializarSistema();
+                });
+            } else {
+                // Si no hay usuario, se redirige al login de forma segura.
+                window.location.href = 'login.html';
+            }
+        });
     </script>
 
 </body>
