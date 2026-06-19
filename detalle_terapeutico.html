@@ -282,14 +282,19 @@
                 user.getIdTokenResult().then((idTokenResult) => {
                     const claims = idTokenResult.claims;
                     rolActivo = claims.rol || (claims.admin ? 'admin' : 'desconocido');
-                    console.log("✅ Usuario autenticado con rol:", rolActivo);
-
-                    // Si el rol es terapeuta, no puede ver el botón de nueva evolución (ejemplo)
-                    if (rolActivo === 'terapeuta') {
-                        // document.getElementById('btn-mostrar-formulario').style.display = 'none';
-                    }
                     
-                    inicializarSistema();
+                    // --- BARRERA DE SEGURIDAD ---
+                    // Roles que pueden acceder a esta sección
+                    const rolesPermitidos = ['terapeuta', 'director_terapeutico', 'directora_general', 'admin'];
+                    
+                    if (claims.admin === true || rolesPermitidos.includes(rolActivo)) {
+                        console.log("✅ Acceso concedido a Módulo Terapéutico. Rol:", rolActivo);
+                        inicializarSistema();
+                    } else {
+                        console.error("❌ Acceso Denegado. Rol no autorizado:", rolActivo);
+                        alert("❌ Acceso Denegado. No tiene los permisos necesarios para este módulo.");
+                        window.location.href = 'historias.html';
+                    }
                 });
             } else {
                 // Si no hay usuario, se redirige al login de forma segura.

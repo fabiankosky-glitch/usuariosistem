@@ -99,13 +99,16 @@
     // 2. LÓGICA DE ROLES
     function procesarRolesSistema(claims) {
         console.log("Claims del usuario:", claims); // Verás { rol: 'admin', admin: true }
-        // Si el usuario NO es admin, ocultamos el botón de Administración.
-        if (claims.admin !== true) {
+        
+        // Si el usuario es administrador, tiene acceso a todo. No hacemos nada.
+        if (claims.admin === true) {
+            console.log("Acceso de administrador total concedido.");
+        } else {
+            // Si NO es administrador, ocultamos los módulos correspondientes.
             if(document.getElementById('item-admin')) document.getElementById('item-admin').style.display = 'none';
-        }
-        // Lógica adicional para otros roles si es necesario
-        if (claims.rol === 'psicologia' || claims.rol === 'terapeuta') {
-            if(document.getElementById('item-libros')) document.getElementById('item-libros').style.display = 'none';
+            if (claims.rol === 'psicologia' || claims.rol === 'terapeuta') {
+                if(document.getElementById('item-libros')) document.getElementById('item-libros').style.display = 'none';
+            }
         }
     }
 

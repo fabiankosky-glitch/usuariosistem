@@ -158,7 +158,7 @@
         const claims = idTokenResult.claims;
 
         // Roles que pueden acceder a esta sección
-        const rolesPermitidos = ['psicologia', 'admin', 'directora_general'];
+        const rolesPermitidos = ['psicologia', 'admin', 'directora_general', 'director_terapeutico'];
 
         if (rolesPermitidos.includes(claims.rol) || claims.admin === true) {
             // El usuario tiene permiso, procede con la acción
@@ -464,14 +464,30 @@ window.generarReporteEstructural = async (id) => {
     // Verificación de sesión y carga inicial
     onAuthStateChanged(auth, async (user) => {
         if (user) {
-            try {
-                const pRef = await getDoc(doc(db, "pacientes", idPaciente)); 
-                if(pRef.exists()) {
-                    document.getElementById('nombrePaciente').innerText = pRef.data().nombre.toUpperCase();
+            // Obtener los claims del usuario para verificar permisos
+            user.getIdTokenResult(true).then(async (idTokenResult) => {
+                const claims = idTokenResult.claims;
+                // Roles que pueden acceder a esta sección
+                const rolesPermitidos = ['psicologia', 'admin', 'directora_general', 'director_terapeutico'];
+
+                if (rolesPermitidos.includes(claims.rol) || claims.admin === true) {
+                    // Acceso concedido, ahora cargar datos del paciente y el resto de la interfaz
+                    try {
+                        const pRef = await getDoc(doc(db, "pacientes", idPaciente)); 
+                        if(pRef.exists()) {
+                            document.getElementById('nombrePaciente').innerText = pRef.data().nombre.toUpperCase();
+                        }
+                        // Cargar historial y otras inicializaciones si es necesario
+                        // cargarHistorialUniversal(); // Si quieres que se cargue al inicio
+                    } catch(e) {
+                        console.error("Error cargando paciente:", e);
+                    }
+                } else {
+                    // Acceso denegado, redirigir a una página segura
+                    alert("❌ Acceso Denegado. No tiene los permisos necesarios para este módulo.");
+                    window.location.href = 'historias.html'; // Redirigir a una página de listado de pacientes
                 }
-            } catch(e) {
-                console.error("Error cargando paciente:", e);
-            }
+            }).catch(error => { console.error("Error al obtener claims:", error); window.location.href = 'login.html'; });
         } else {
             // Si no hay sesión, redirigir al login
             window.location.href = 'login.html';
