@@ -64,11 +64,7 @@
                 console.warn("Aviso: No se pudo registrar la auditoría, pero el acceso continúa.", auditError);
             }
 
-            // 3. Manejo de Sesión
-            // Guardamos el rol obtenido de los claims, no del dropdown
-            sessionStorage.setItem('rolActivo', rolDesdeClaims);
-            sessionStorage.setItem('autenticado', 'true');
-            
+            // 3. Redirección: La página de inicio se encargará de leer los roles desde el token.
             window.location.href = "index.html";
 
         } catch (error) {

@@ -83,24 +83,29 @@
         .then(() => {
             onAuthStateChanged(auth, (user) => {
                 if (!user) {
+                    // Si no hay sesión, redirigir al login.
                     window.location.href = 'login.html';
                 } else {
+                    // Si hay sesión, obtenemos los roles desde el token seguro.
                     console.log("Sesión activa:", user.email);
-                    procesarRolesSistema();
+                    user.getIdTokenResult().then((idTokenResult) => {
+                        procesarRolesSistema(idTokenResult.claims);
+                    });
                 }
             });
         })
         .catch((error) => console.error("Error de persistencia:", error));
 
     // 2. LÓGICA DE ROLES
-    function procesarRolesSistema() {
-        const rol = sessionStorage.getItem('rolActivo');
-        if (rol === 'psicologia' || rol === 'terapeuta') {
-            if(document.getElementById('item-libros')) document.getElementById('item-libros').style.display = 'none';
+    function procesarRolesSistema(claims) {
+        console.log("Claims del usuario:", claims); // Verás { rol: 'admin', admin: true }
+        // Si el usuario NO es admin, ocultamos el botón de Administración.
+        if (claims.admin !== true) {
             if(document.getElementById('item-admin')) document.getElementById('item-admin').style.display = 'none';
         }
-        if (rol === 'director_terapeutico') {
-            if(document.getElementById('item-admin')) document.getElementById('item-admin').style.display = 'none';
+        // Lógica adicional para otros roles si es necesario
+        if (claims.rol === 'psicologia' || claims.rol === 'terapeuta') {
+            if(document.getElementById('item-libros')) document.getElementById('item-libros').style.display = 'none';
         }
     }
 
@@ -108,7 +113,6 @@
     document.getElementById('logout').addEventListener('click', function() {
         if(confirm("¿Seguro que desea cerrar la sesión actual?")) {
             signOut(auth).then(() => {
-                sessionStorage.clear();
                 window.location.href = 'login.html';
             }).catch((err) => {
                 alert("Error al destruir la sesión: " + err);
