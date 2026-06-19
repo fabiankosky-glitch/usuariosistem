@@ -73,11 +73,9 @@
         // Importa solo las funciones que necesitas para operar con esos servicios
         import { doc, getDoc, updateDoc, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         
-        const params = new URLSearchParams(window.location.search);
- 
-        
         // CARGAR PACIENTE
         async function cargarPaciente() {
+            const idPaciente = new URLSearchParams(window.location.search).get("id");
             if (!idPaciente) return;
             const snap = await getDoc(doc(db, "pacientes", idPaciente));
             if (snap.exists()) {
@@ -98,6 +96,7 @@
 
         // CARGAR NOVEDADES
         async function cargarNovedades() {
+            const idPaciente = new URLSearchParams(window.location.search).get("id");
             const hist = document.getElementById("historialNovedades");
             try {
                 const q = query(collection(db, "novedades"), where("pacienteId", "==", idPaciente));
@@ -118,6 +117,7 @@
         // FUNCIÓN GLOBAL MOVER PACIENTE
         window.moverPaciente = async (nuevoEstado) => {
             // La validación de permisos ahora se hará con Reglas de Seguridad de Firestore (siguiente paso)
+            const idPaciente = new URLSearchParams(window.location.search).get("id");
             const motivo = prompt("Escriba el motivo legal del cambio:");
             if (!motivo) return;
 
@@ -148,6 +148,7 @@
         };
 
         window.irA = (tipo) => {
+            const idPaciente = new URLSearchParams(window.location.search).get("id");
             const archivos = { 'medico': 'detalle_clinico.html', 'terapeutico': 'detalle_terapeutico.html', 'psicologico': 'detalle_psicologico.html' };
             window.location.href = `${archivos[tipo]}?id=${idPaciente}`;
         };
