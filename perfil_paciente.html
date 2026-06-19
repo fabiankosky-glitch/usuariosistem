@@ -68,23 +68,14 @@
 
     <script type="module">
         // Importa los servicios ya inicializados desde el archivo central
-        import { db } from './firebase-config.js';
+        import { db, auth } from './firebase-config.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         // Importa solo las funciones que necesitas para operar con esos servicios
         import { doc, getDoc, updateDoc, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         
         const params = new URLSearchParams(window.location.search);
-        const idPaciente = params.get("id");
-        const rolActual = sessionStorage.getItem('rolActivo');
-
-        // SEGURIDAD INICIAL
-        if (sessionStorage.getItem('autenticado') !== 'true') { window.location.href = 'login.html'; }
-
-        // APLICAR RESTRICCIONES DE ROL
-        if (rolActual === 'terapeuta') {
-            document.getElementById('btn-psicologico').style.display = 'none';
-            document.getElementById('seccion-estados').style.display = 'none';
-        }
-
+ 
+        
         // CARGAR PACIENTE
         async function cargarPaciente() {
             if (!idPaciente) return;
@@ -126,14 +117,14 @@
 
         // FUNCIÓN GLOBAL MOVER PACIENTE
         window.moverPaciente = async (nuevoEstado) => {
-            if (rolActual === 'terapeuta') return alert("🚫 Sin permisos.");
+            // La validación de permisos ahora se hará con Reglas de Seguridad de Firestore (siguiente paso)
             const motivo = prompt("Escriba el motivo legal del cambio:");
             if (!motivo) return;
 
             if (confirm("¿Confirmar movimiento?")) {
                 try {
                     const nombreP = document.getElementById("nombrePaciente").innerText;
-                    const estadoAnt = document.getElementById("badgeEstado").innerText;
+                    const estadoAnt = document.getElementById("badgeEstado").innerText.toLowerCase();
 
                     // 1. Guardar Novedad
                     await addDoc(collection(db, "novedades"), {
@@ -141,8 +132,8 @@
                         pacienteNombre: nombreP,
                         estadoAnterior: estadoAnt,
                         estadoNuevo: nuevoEstado,
-                        motivoNovedad: motivo,
-                        usuarioResponsable: rolActual,
+                        motivoNovedad: motivo, // Idealmente, aquí iría el UID del usuario
+                        usuarioResponsable: auth.currentUser?.displayName || "Desconocido",
                         fechaHora: new Date().toLocaleString(),
                         timestamp: Date.now()
                     });
@@ -161,8 +152,26 @@
             window.location.href = `${archivos[tipo]}?id=${idPaciente}`;
         };
 
-        cargarPaciente();
-        cargarNovedades();
+        // --- LÓGICA DE ARRANQUE Y SEGURIDAD ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // El usuario ha iniciado sesión, procedemos a cargar todo.
+                cargarPaciente();
+                cargarNovedades();
+
+                // Obtenemos los claims para aplicar la lógica de la interfaz de forma segura.
+                user.getIdTokenResult().then((idTokenResult) => {
+                    const claims = idTokenResult.claims;
+                    if (claims.rol === 'terapeuta') {
+                        document.getElementById('btn-psicologico').style.display = 'none';
+                        document.getElementById('seccion-estados').style.display = 'none';
+                    }
+                });
+            } else {
+                // Si no hay usuario, se redirige al login de forma segura.
+                window.location.href = 'login.html';
+            }
+        });
     </script>
 </body>
 </html>

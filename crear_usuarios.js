@@ -9,11 +9,11 @@ admin.initializeApp({
 });
 
 const usuarios = [
-  { email: 'psicologia@caminosnuevos.com', password: 'psico2024', displayName: 'Psicología' },
-  { email: 'terapeuta@caminosnuevos.com', password: 'tera2024', displayName: 'Terapeuta' },
-  { email: 'director_terapeutico@caminosnuevos.com', password: 'dirtera2024', displayName: 'Director Terapéutico' },
-  { email: 'directora_general@caminosnuevos.com', password: 'dirgen2024', displayName: 'Directora General' },
-  { email: 'admin@caminosnuevos.com', password: 'admin2024', displayName: 'Administrador' }
+  { email: 'psicologia@caminosnuevos.com', password: 'psico2024', displayName: 'Psicología', claims: { rol: 'psicologia' } },
+  { email: 'terapeuta@caminosnuevos.com', password: 'tera2024', displayName: 'Terapeuta', claims: { rol: 'terapeuta' } },
+  { email: 'director_terapeutico@caminosnuevos.com', password: 'dirtera2024', displayName: 'Director Terapéutico', claims: { rol: 'director_terapeutico' } },
+  { email: 'directora_general@caminosnuevos.com', password: 'dirgen2024', displayName: 'Directora General', claims: { rol: 'directora_general', admin: true } },
+  { email: 'admin@caminosnuevos.com', password: 'admin2024', displayName: 'Administrador', claims: { rol: 'admin', admin: true } }
 ];
 
 async function crearUsuarios() {
@@ -28,6 +28,10 @@ async function crearUsuarios() {
         emailVerified: true
       });
       console.log(`✅ Usuario creado exitosamente: ${userRecord.email}`);
+
+      // Asignar los Custom Claims al usuario recién creado
+      await admin.auth().setCustomUserClaims(userRecord.uid, u.claims);
+      console.log(`   ✨ Claims asignados a ${u.email}:`, u.claims);
     } catch (error) {
       if (error.code === 'auth/email-already-exists') {
         console.log(`ℹ️ El usuario ${u.email} ya existe en el sistema.`);

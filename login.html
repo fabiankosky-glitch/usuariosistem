@@ -46,11 +46,16 @@
             const userCredential = await signInWithEmailAndPassword(auth, email, pass);
             const user = userCredential.user;
 
+            // OBTENER ROL DESDE EL TOKEN (LA FUENTE SEGURA)
+            const idTokenResult = await user.getIdTokenResult(true); // true fuerza la actualización
+            const rolDesdeClaims = idTokenResult.claims.rol || 'desconocido';
+
             // 2. Registro de Trazabilidad Seguro
             try {
                 await addDoc(collection(db, "auditoria"), {
                     uid: user.uid,
-                    usuario: rol,
+                    // Usamos el rol de los claims para la auditoría
+                    usuario: rolDesdeClaims,
                     accion: "Inicio de Sesión Exitoso",
                     fecha: serverTimestamp(),
                     dispositivo: navigator.userAgent
@@ -60,7 +65,8 @@
             }
 
             // 3. Manejo de Sesión
-            sessionStorage.setItem('rolActivo', rol);
+            // Guardamos el rol obtenido de los claims, no del dropdown
+            sessionStorage.setItem('rolActivo', rolDesdeClaims);
             sessionStorage.setItem('autenticado', 'true');
             
             window.location.href = "index.html";

@@ -123,29 +123,22 @@
 </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, where, getDocs, doc, getDoc, updateDoc, arrayUnion, serverTimestamp  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
- // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: "AIzaSyC78y2K4T9rMFMVsG_UQxTmPANzV7Yapf8",
-  authDomain: "caminosnuevosdatabase.firebaseapp.com",
-  projectId: "caminosnuevosdatabase",
-  storageBucket: "caminosnuevosdatabase.firebasestorage.app",
-  messagingSenderId: "907500835423",
-  appId: "1:907500835423:web:f50b459a84f5d7d92a81ea",
-  measurementId: "G-3N6B4PV2NC"
-};
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
+    // Importamos los servicios desde el archivo centralizado
+    import { db, auth } from './firebase-config.js';
+    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, query, where, getDocs, doc, getDoc, updateDoc, arrayUnion, serverTimestamp  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
     const idPaciente = new URLSearchParams(window.location.search).get("id");
-    const LL_CL = "FundacionNuevosCaminos2024*USC", LL_AD = "admin2024";
+    
+    // ¡IMPORTANTE! Las llaves de cifrado NUNCA deben estar en el código del cliente.
+    // La desencriptación debe ocurrir en un entorno seguro (backend) o los datos no deben estar cifrados de esta manera.
+    // Por ahora, las dejamos para que el código no se rompa, pero esto es un RIESGO DE SEGURIDAD CRÍTICO.
+    const LL_CL_INSEGURA = "FundacionNuevosCaminos2024*USC";
 
     let diagCie = [], fotoB64 = "", stream = null, nFolio = 0;
 
-    const cifrar = (t) => CryptoJS.AES.encrypt(t, LL_CL).toString();
-    const descCl = (h) => { try { return CryptoJS.AES.decrypt(h || "", LL_CL).toString(CryptoJS.enc.Utf8); } catch(e){return "";} };
-    const descAd = (h) => { try { return CryptoJS.AES.decrypt(h || "", LL_AD).toString(CryptoJS.enc.Utf8); } catch(e){return "";} };
+    const cifrar = (t) => CryptoJS.AES.encrypt(t, LL_CL_INSEGURA).toString();
+    const descCl = (h) => { try { return CryptoJS.AES.decrypt(h || "", LL_CL_INSEGURA).toString(CryptoJS.enc.Utf8); } catch(e){return "";} };
 
     // EXPOSICIÓN GLOBAL DE FUNCIONES REPARADAS
     window.calcIMC = () => {
@@ -153,31 +146,38 @@ const firebaseConfig = {
         if(p>0 && t>0) document.getElementById('vI').value = (p/(t*t)).toFixed(2);
     };
 
-    window.validarAcceso = (accion, docId = null) => {
-        document.getElementById('modalMaestro').style.display='block';
-        document.getElementById('btnModalOk').onclick = async () => {
-            const r = document.getElementById('rolP').value, p = document.getElementById('pinP').value;
-            const q = query(collection(db, "talento_humano_cifrado"));
-            const snap = await getDocs(q);
-            let prof = null;
-            snap.forEach(d => { const data = d.data(); if (data?.info?.pin && descAd(data.info.pin) === p && descAd(data.info.car) === r) prof = data; });
-            
-            if(prof && prof.estado !== "INACTIVO") {
-                cerrarModal();
-                sessionStorage.setItem("pNom", descAd(prof.info.n));
-                sessionStorage.setItem("pTP", descAd(prof.info.tp || "N/A"));
-                if(accion === 'registro') { 
-                    const sc = await getDocs(query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente)));
-                    nFolio = sc.size + 1;
-                    document.getElementById('numFolioVisual').innerText = "Folio No: " + nFolio;
-                    document.getElementById('areaRegistro').style.display='block'; iniciarCam();
-                }
-                if(accion === 'historial') cargarHistorialUniversal();
-                if(accion === 'pdf') generarReporteEstructural(docId);
-                if(accion === 'aclarar') ejecutarAclarar(docId);
-                if(accion === 'json') exportarForenseJSON(docId);
-            } else { alert("CREDENCIALES INVÁLIDAS"); }
-        };
+    // Lógica de acceso segura basada en Custom Claims de Firebase
+    window.validarAcceso = async (accion, docId = null) => {
+        const user = auth.currentUser;
+        if (!user) {
+            alert("Sesión no válida. Por favor, inicie sesión de nuevo.");
+            return window.location.href = 'login.html';
+        }
+
+        const idTokenResult = await user.getIdTokenResult(true);
+        const claims = idTokenResult.claims;
+
+        // Roles que pueden acceder a esta sección
+        const rolesPermitidos = ['psicologia', 'admin', 'directora_general'];
+
+        if (rolesPermitidos.includes(claims.rol) || claims.admin === true) {
+            // El usuario tiene permiso, procede con la acción
+            sessionStorage.setItem("pNom", user.displayName || "Profesional");
+            sessionStorage.setItem("pTP", "N/A"); // Este dato debería venir de los claims o perfil de usuario
+
+            if(accion === 'registro') { 
+                const sc = await getDocs(query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente)));
+                nFolio = sc.size + 1;
+                document.getElementById('numFolioVisual').innerText = "Folio No: " + nFolio;
+                document.getElementById('areaRegistro').style.display='block'; iniciarCam();
+            }
+            if(accion === 'historial') cargarHistorialUniversal();
+            if(accion === 'pdf') generarReporteEstructural(docId);
+            if(accion === 'aclarar') ejecutarAclarar(docId);
+            if(accion === 'json') exportarForenseJSON(docId);
+        } else {
+            alert("❌ Acceso Denegado. No tiene los permisos necesarios para esta acción.");
+        }
     };
 
     async function iniciarCam() { try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } }); document.getElementById('video').srcObject = stream; } catch(e){console.error(e);} }
@@ -461,15 +461,22 @@ window.generarReporteEstructural = async (id) => {
 
     window.cerrarModal = () => document.getElementById('modalMaestro').style.display='none';
     
-    // Cargar nombre del paciente
-    (async () => {
-        try {
-            const pRef = await getDoc(doc(db, "pacientes", idPaciente)); 
-            if(pRef.exists()) document.getElementById('nombrePaciente').innerText = pRef.data().nombre.toUpperCase();
-        } catch(e) {
-            console.error("Error cargando paciente:", e);
+    // Verificación de sesión y carga inicial
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            try {
+                const pRef = await getDoc(doc(db, "pacientes", idPaciente)); 
+                if(pRef.exists()) {
+                    document.getElementById('nombrePaciente').innerText = pRef.data().nombre.toUpperCase();
+                }
+            } catch(e) {
+                console.error("Error cargando paciente:", e);
+            }
+        } else {
+            // Si no hay sesión, redirigir al login
+            window.location.href = 'login.html';
         }
-    })();
+    });
 </script>
 </body>
 </html>
