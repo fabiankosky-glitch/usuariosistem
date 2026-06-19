@@ -222,8 +222,8 @@
         if (user) {
             user.getIdTokenResult().then((idTokenResult) => {
                 const claims = idTokenResult.claims;
-                // Solo los roles con permisos de alto nivel pueden ver este libro
-                if (claims.admin === true || claims.rol === 'directora_general' || claims.rol === 'director_terapeutico') {
+                // Solo los roles con permisos de alto nivel (admin, director/a) pueden ver este libro
+                if (claims.admin === true || claims.rol === 'directora_general' || claims.rol === 'director_terapeutico' || claims.rol === 'admin') {
                     console.log("✅ Acceso concedido a Libro Correcto. Rol:", claims.rol || 'admin');
                     
                     // Ahora que tenemos permiso, adjuntamos el listener
