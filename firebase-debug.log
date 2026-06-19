@@ -1,14 +1,16 @@
-[debug] [2026-06-18T18:22:05.957Z] ----------------------------------------------------------------------
-[debug] [2026-06-18T18:22:05.962Z] Command:       /nix/store/ws50yvm6vzlzf7jzz6n7xh4szddrack1-nodejs-20.19.1/bin/node /nix/store/gm9mcvzb17vv8cla08khrg29vxn3sq4r-firebase-tools-15.1.0/lib/node_modules/firebase-tools/lib/bin/firebase.js init hosting
-[debug] [2026-06-18T18:22:05.963Z] CLI Version:   15.1.0
-[debug] [2026-06-18T18:22:05.963Z] Platform:      linux
-[debug] [2026-06-18T18:22:05.963Z] Node Version:  v20.19.1
-[debug] [2026-06-18T18:22:05.963Z] Time:          Thu Jun 18 2026 18:22:05 GMT+0000 (Coordinated Universal Time)
-[debug] [2026-06-18T18:22:05.964Z] ----------------------------------------------------------------------
+[debug] [2026-06-19T01:51:05.652Z] ----------------------------------------------------------------------
+[debug] [2026-06-19T01:51:05.661Z] Command:       /nix/store/ws50yvm6vzlzf7jzz6n7xh4szddrack1-nodejs-20.19.1/bin/node /nix/store/gm9mcvzb17vv8cla08khrg29vxn3sq4r-firebase-tools-15.1.0/lib/node_modules/firebase-tools/lib/bin/firebase.js init hosting
+[debug] [2026-06-19T01:51:05.665Z] CLI Version:   15.1.0
+[debug] [2026-06-19T01:51:05.665Z] Platform:      linux
+[debug] [2026-06-19T01:51:05.665Z] Node Version:  v20.19.1
+[debug] [2026-06-19T01:51:05.666Z] Time:          Fri Jun 19 2026 01:51:05 GMT+0000 (Coordinated Universal Time)
+[debug] [2026-06-19T01:51:05.666Z] ----------------------------------------------------------------------
 [debug] 
-[debug] [2026-06-18T18:22:11.942Z] No OAuth tokens found
-[debug] [2026-06-18T18:22:11.943Z] No OAuth tokens found
-[error] Failed to fetch Firebase Project from current Studio Workspace: Unable to refresh auth: not yet authenticated.
+[debug] [2026-06-19T01:51:08.339Z] Checked if tokens are valid: true, expires at: 1781836919221
+[debug] [2026-06-19T01:51:08.339Z] Checked if tokens are valid: true, expires at: 1781836919221
+[debug] [2026-06-19T01:51:08.346Z] >>> [apiv2][query] GET https://monospace-pa.googleapis.com/v1/workspaces/usuariosistem-52932763 [none]
+[debug] [2026-06-19T01:51:09.101Z] <<< [apiv2][status] GET https://monospace-pa.googleapis.com/v1/workspaces/usuariosistem-52932763 200
+[debug] [2026-06-19T01:51:09.103Z] <<< [apiv2][body] GET https://monospace-pa.googleapis.com/v1/workspaces/usuariosistem-52932763 {"workspaceId":"usuariosistem-52932763","name":"usuariosistem","workspaceRedirectUrl":"firebase-usuariosistem-1780503987319.cluster-hlmk2l2htragyudeyf6f3tzsi6.cloudworkstations.dev","status":"WORKSPACE_STATUS_RUNNING","lastAccessDatetime":"2026-06-19T01:44:03.883421Z","workspaceTemplate":"WORKSPACE_TEMPLATE_BLANK_WEB","owner":"SELF","serviceAccountEmail":"msp-7242294399764244807@monospace-4.iam.gserviceaccount.com","gitRepoUrl":"https://github.com/fabiankosky-glitch/usuariosistem","enableNix":true,"ownerEmail":"fabiankosky@gmail.com","workstationAccessToken":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vd29ya3N0YXRpb25zIiwiYXVkIjoiZmlyZWJhc2UtdXN1YXJpb3Npc3RlbS0xNzgwNTAzOTg3MzE5LmNsdXN0ZXItaGxtazJsMmh0cmFneXVkZXlmNmYzdHpzaTYuY2xvdWR3b3Jrc3RhdGlvbnMuZGV2IiwiaWF0IjoxNzgxODMzODY5LCJleHAiOjE3ODE5MjAyNjh9.XgL2KL-RzfXGTtSTTKahn6s9zcCehFF44q2OLxwSDzW5_mqXAoEZvKDyAfMWkSzOH7SFGIOX8X2GyBkb78UJnq0mkhdpKV3dOk6nDAODU_efhXXAbR-XHHZiJ6SCS0kEeeEZsuOCtSh5kWbAm5KKZ73DGf8y71vm18SdMxE_qwPsCn6boB39zxtIppqKunoltxMpkC7OAYwSXkaNRrfyDsXTJNBs_Zmsxq-UIrSbmW3b9iKGggstJUvSzoszuCFhPdfz8mvi-Akx5lAd5Jk9iiPfrfb-fNOCC1vYPDOlcFdY8tzuuBEPkq5BH6_0HHkwzBY5JabyUqsSYz1wsaby9g","firebaseProjectId":"caminosnuevosdatabase"}
 [info] 
      ######## #### ########  ######## ########     ###     ######  ########
      ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
@@ -26,3 +28,18 @@ You're about to initialize a Firebase project in this directory:
 [info] First, let's associate this project directory with a Firebase project.
 [info] You can create multiple project aliases by running firebase use --add, 
 [info] 
+[debug] [2026-06-19T01:51:09.111Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform","https://www.googleapis.com/auth/userinfo.email"]
+[debug] [2026-06-19T01:51:09.112Z] > authorizing via signed-in user (fabiankosky@gmail.com)
+[debug] [2026-06-19T01:51:09.112Z] Checked if tokens are valid: true, expires at: 1781836919221
+[debug] [2026-06-19T01:51:09.113Z] Checked if tokens are valid: true, expires at: 1781836919221
+[debug] [2026-06-19T01:51:09.113Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/caminosnuevosdatabase [none]
+[debug] [2026-06-19T01:51:09.355Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/caminosnuevosdatabase 200
+[debug] [2026-06-19T01:51:09.357Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/caminosnuevosdatabase {"projectId":"caminosnuevosdatabase","projectNumber":"907500835423","displayName":"CAMINOSNUEVOSDATABASE","name":"projects/caminosnuevosdatabase","resources":{"hostingSite":"caminosnuevosdatabase"},"state":"ACTIVE","etag":"1_41f48cd7-9945-4349-a365-a8996369d1ce"}
+[info] i  Using project caminosnuevosdatabase (CAMINOSNUEVOSDATABASE) . 
+[info] 
+=== Hosting Setup
+[debug] [2026-06-19T01:51:09.380Z] Checked if tokens are valid: true, expires at: 1781836919221
+[debug] [2026-06-19T01:51:09.380Z] Checked if tokens are valid: true, expires at: 1781836919221
+[debug] [2026-06-19T01:51:09.380Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/caminosnuevosdatabase [none]
+[debug] [2026-06-19T01:51:09.573Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/caminosnuevosdatabase 200
+[debug] [2026-06-19T01:51:09.577Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/caminosnuevosdatabase {"projectId":"caminosnuevosdatabase","projectNumber":"907500835423","displayName":"CAMINOSNUEVOSDATABASE","name":"projects/caminosnuevosdatabase","resources":{"hostingSite":"caminosnuevosdatabase"},"state":"ACTIVE","etag":"1_41f48cd7-9945-4349-a365-a8996369d1ce"}

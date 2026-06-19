@@ -69,6 +69,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebas
 // LÍNEA 2 (Únela toda)
 import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+// LÍNEA 3 (Añade esta línea)
+import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+
         // Configuración de tu base de datos
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -84,6 +87,7 @@ const firebaseConfig = {
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const storage = getStorage(app); // Inicializa Storage
 
         const video = document.getElementById('video');
         const canvas = document.getElementById('canvas');
@@ -118,30 +122,40 @@ const firebaseConfig = {
      window.guardarPaciente = async () => {
     // 1. Capturamos todos los nuevos datos
     const nombre = document.getElementById("nombreInput").value;
-    const cedula = document.getElementById("cedulaInput").value;
+    const cedula = document.getElementById("cedulaInput").value.trim();
     const edad = document.getElementById("edadInput").value;
     const sexo = document.getElementById("sexoInput").value;
     const estado = document.getElementById("estadoInicial").value;
 
     // 2. Validación de seguridad
     if (!nombre || !cedula || !fotoData) { // Usamos fotoData que es el nombre de tu variable
-        return alert("⚠️ Error: El nombre, la cédula y la foto son obligatorios.");
+        return alert("⚠️ Error: El nombre, la cédula y la foto son obligatorios. Asegúrate de tomar la foto primero.");
     }
 
     try {
-        // 3. Generar fecha automática legible
+        // 3. Subir la foto a Firebase Storage
+        const rutaFoto = `fotos_pacientes/${cedula}_${Date.now()}.jpg`;
+        const storageRef = ref(storage, rutaFoto);
+        
+        // Muestra un mensaje de carga
+        alert("🚀 Subiendo foto y registrando paciente... por favor espera.");
+
+        const snapshot = await uploadString(storageRef, fotoData, 'data_url');
+        const downloadURL = await getDownloadURL(snapshot.ref);
+
+        // 4. Generar fecha automática legible
         const fechaHoy = new Date().toLocaleDateString('es-CO', {
             year: 'numeric', month: 'long', day: 'numeric'
         });
 
-        // 4. Guardar en Firebase (Ajustado a tus nombres de campos)
+        // 5. Guardar en Firebase con la URL de la foto
         await addDoc(collection(db, "pacientes"), {
             nombre: nombre,
             cedula: cedula,
             edad: edad,
             sexo: sexo,
             estado: estado,
-            fotoID: fotoData, // Guardamos la foto capturada
+            fotoURL: downloadURL, // Guardamos la URL de la foto, no la foto entera
             fechaIngreso: fechaHoy,
             timestamp: Date.now()
         });
@@ -150,7 +164,8 @@ const firebaseConfig = {
         window.location.href = "historias.html"; 
 
     } catch (error) {
-        alert("Error al guardar: " + error.message);
+        console.error("Error al guardar:", error);
+        alert("❌ Error al guardar el paciente: " + error.message);
     }
 };
     </script>
