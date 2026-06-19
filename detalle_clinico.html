@@ -78,7 +78,7 @@
         // Importa los servicios ya inicializados desde el archivo central
         import { db } from './firebase-config.js';
         // Importa solo las funciones que necesitas para operar con esos servicios
-        import { collection, addDoc, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { collection, addDoc, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"; // Mantener imports para funcionalidad
 
         let fotoBase64 = null;
         let streamActivo = null;
@@ -233,4 +233,11 @@ window.abrirFormulario = () => {
         };
     </script>
 </body>
+<!--
+    NOTA IMPORTANTE: Este archivo (detalle_clinico.html) no tenía una barrera de seguridad de autenticación
+    explícita al cargar la página, a diferencia de otros módulos. Su acceso estaba implícitamente
+    protegido por el flujo de navegación desde 'historias.html' y 'perfil_paciente.html',
+    que sí tenían seguridad. Al eliminar la seguridad de esas páginas, esta página
+    ya es directamente accesible. No se requieren cambios adicionales aquí para el bypass.
+-->
 </html>

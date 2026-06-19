@@ -154,25 +154,13 @@
         };
 
         // --- LÓGICA DE ARRANQUE Y SEGURIDAD ---
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // El usuario ha iniciado sesión, procedemos a cargar todo.
-                cargarPaciente();
-                cargarNovedades();
-
-                // Obtenemos los claims para aplicar la lógica de la interfaz de forma segura.
-                user.getIdTokenResult().then((idTokenResult) => {
-                    const claims = idTokenResult.claims;
-                    if (claims.rol === 'terapeuta') {
-                        document.getElementById('btn-psicologico').style.display = 'none';
-                        document.getElementById('seccion-estados').style.display = 'none';
-                    }
-                });
-            } else {
-                // Si no hay usuario, se redirige al login de forma segura.
-                window.location.href = 'login.html';
-            }
-        });
+        // SEGURIDAD ELIMINADA PARA DEMOSTRACIÓN: Acceso directo
+        console.log("✅ Acceso directo concedido a Perfil del Paciente (seguridad deshabilitada para demo).");
+        cargarPaciente();
+        cargarNovedades();
+        // Asegurar que todos los botones estén visibles (eliminar restricciones de rol)
+        document.getElementById('btn-psicologico').style.display = 'block';
+        document.getElementById('seccion-estados').style.display = 'block';
     </script>
 </body>
 </html>

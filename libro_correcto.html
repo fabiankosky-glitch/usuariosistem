@@ -218,32 +218,17 @@
     };
 
     // --- LÓGICA DE ARRANQUE Y SEGURIDAD ---
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            user.getIdTokenResult().then((idTokenResult) => {
-                const claims = idTokenResult.claims;
-                // Solo los roles con permisos de alto nivel (admin, director/a) pueden ver este libro
-                if (claims.admin === true || claims.rol === 'directora_general' || claims.rol === 'director_terapeutico' || claims.rol === 'admin') {
-                    console.log("✅ Acceso concedido a Libro Correcto. Rol:", claims.rol || 'admin');
-                    
-                    // Ahora que tenemos permiso, adjuntamos el listener
-                    onSnapshot(collection(db, "pacientes"), (snap) => {
-                        const contenedor = document.getElementById('listaPacientes');
-                        contenedor.innerHTML = "";
-                        snap.forEach(d => {
-                            const item = renderizarPaciente(d);
-                            if (item) contenedor.appendChild(item);
-                        });
-                    });
-
-                } else {
-                    alert("❌ Acceso Denegado. No tiene los permisos necesarios para este módulo.");
-                    window.location.href = 'index.html';
-                }
-            });
-        } else {
-            window.location.href = 'login.html';
-        }
+    // SEGURIDAD ELIMINADA PARA DEMOSTRACIÓN: Acceso directo
+    console.log("✅ Acceso directo concedido a Libro Correcto (seguridad deshabilitada para demo).");
+    
+    // Adjuntamos el listener directamente
+    onSnapshot(collection(db, "pacientes"), (snap) => {
+        const contenedor = document.getElementById('listaPacientes');
+        contenedor.innerHTML = "";
+        snap.forEach(d => {
+            const item = renderizarPaciente(d);
+            if (item) contenedor.appendChild(item);
+        });
     });
 </script>
 </body>

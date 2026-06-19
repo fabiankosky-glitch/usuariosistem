@@ -141,28 +141,18 @@
     const descCl = (h) => { try { return CryptoJS.AES.decrypt(h || "", LL_CL_INSEGURA).toString(CryptoJS.enc.Utf8); } catch(e){return "";} };
 
     // EXPOSICIÓN GLOBAL DE FUNCIONES REPARADAS
-    window.calcIMC = () => {
-        const p = document.getElementById('vP').value, t = document.getElementById('vT').value / 100;
-        if(p>0 && t>0) document.getElementById('vI').value = (p/(t*t)).toFixed(2);
-    };
-
     // Lógica de acceso segura basada en Custom Claims de Firebase
     window.validarAcceso = async (accion, docId = null) => {
-        const user = auth.currentUser;
-        if (!user) {
-            alert("Sesión no válida. Por favor, inicie sesión de nuevo.");
-            return window.location.href = 'login.html';
-        }
+        // SEGURIDAD ELIMINADA PARA DEMOSTRACIÓN: Siempre conceder acceso
+        console.log("✅ Acceso directo concedido a Módulo Psicológico (seguridad deshabilitada para demo).");
+        
+        // Simular un usuario y claims para que las funciones internas no fallen
+        // En un entorno sin seguridad, no hay un 'user' real de Firebase.
+        const userSimulado = { displayName: "Admin Demo", email: "admin_demo@caminosnuevos.com" };
+        const claimsSimulados = { rol: "admin_demo", admin: true };
 
-        const idTokenResult = await user.getIdTokenResult(true);
-        const claims = idTokenResult.claims;
-
-        // Roles que pueden acceder a esta sección
-        const rolesPermitidos = ['psicologia', 'admin', 'directora_general', 'director_terapeutico'];
-
-        if (rolesPermitidos.includes(claims.rol) || claims.admin === true) {
-            // El usuario tiene permiso, procede con la acción
-            sessionStorage.setItem("pNom", user.displayName || "Profesional");
+        { // Bloque de acceso directo
+            sessionStorage.setItem("pNom", userSimulado.displayName);
             sessionStorage.setItem("pTP", "N/A"); // Este dato debería venir de los claims o perfil de usuario
 
             if(accion === 'registro') { 
@@ -175,8 +165,6 @@
             if(accion === 'pdf') generarReporteEstructural(docId);
             if(accion === 'aclarar') ejecutarAclarar(docId);
             if(accion === 'json') exportarForenseJSON(docId);
-        } else {
-            alert("❌ Acceso Denegado. No tiene los permisos necesarios para esta acción.");
         }
     };
 
@@ -462,37 +450,17 @@ window.generarReporteEstructural = async (id) => {
     window.cerrarModal = () => document.getElementById('modalMaestro').style.display='none';
     
     // Verificación de sesión y carga inicial
-    onAuthStateChanged(auth, async (user) => {
-        if (user) {
-            // Obtener los claims del usuario para verificar permisos
-            user.getIdTokenResult(true).then(async (idTokenResult) => {
-                const claims = idTokenResult.claims;
-                // Roles que pueden acceder a esta sección
-                const rolesPermitidos = ['psicologia', 'admin', 'directora_general', 'director_terapeutico'];
-
-                if (rolesPermitidos.includes(claims.rol) || claims.admin === true) {
-                    // Acceso concedido, ahora cargar datos del paciente y el resto de la interfaz
-                    try {
-                        const pRef = await getDoc(doc(db, "pacientes", idPaciente)); 
-                        if(pRef.exists()) {
-                            document.getElementById('nombrePaciente').innerText = pRef.data().nombre.toUpperCase();
-                        }
-                        // Cargar historial y otras inicializaciones si es necesario
-                        // cargarHistorialUniversal(); // Si quieres que se cargue al inicio
-                    } catch(e) {
-                        console.error("Error cargando paciente:", e);
-                    }
-                } else {
-                    // Acceso denegado, redirigir a una página segura
-                    alert("❌ Acceso Denegado. No tiene los permisos necesarios para este módulo.");
-                    window.location.href = 'historias.html'; // Redirigir a una página de listado de pacientes
-                }
-            }).catch(error => { console.error("Error al obtener claims:", error); window.location.href = 'login.html'; });
-        } else {
-            // Si no hay sesión, redirigir al login
-            window.location.href = 'login.html';
+    // SEGURIDAD ELIMINADA PARA DEMOSTRACIÓN: Acceso directo
+    console.log("✅ Acceso directo concedido a Módulo Psicológico (seguridad deshabilitada para demo).");
+    // Cargar datos del paciente y el resto de la interfaz directamente
+    try {
+        const pRef = await getDoc(doc(db, "pacientes", idPaciente)); 
+        if(pRef.exists()) {
+            document.getElementById('nombrePaciente').innerText = pRef.data().nombre.toUpperCase();
         }
-    });
+    } catch(e) {
+        console.error("Error cargando paciente:", e);
+    }
 </script>
 </body>
 </html>

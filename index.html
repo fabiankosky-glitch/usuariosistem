@@ -73,54 +73,15 @@
 </div>
 
 <script type="module">
-    // Importa los servicios de Firebase desde tu archivo de configuración central
-    import { auth } from './firebase-config.js';
-    // Importa solo las funciones que necesitas de cada módulo
-    import { onAuthStateChanged, signOut, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    // SEGURIDAD ELIMINADA PARA DEMOSTRACIÓN: Acceso directo a todos los menús
+    console.log("✅ Acceso directo concedido a Menú Principal (seguridad deshabilitada para demo).");
+    // No se requiere autenticación ni procesamiento de roles.
+    // Todos los elementos del menú serán visibles por defecto.
 
-    // 1. VALIDACIÓN DE SEGURIDAD
-    setPersistence(auth, browserLocalPersistence)
-        .then(() => {
-            onAuthStateChanged(auth, (user) => {
-                if (!user) {
-                    // Si no hay sesión, redirigir al login.
-                    window.location.href = 'login.html';
-                } else {
-                    // Si hay sesión, obtenemos los roles desde el token seguro.
-                    console.log("Sesión activa:", user.email);
-                    user.getIdTokenResult().then((idTokenResult) => {
-                        procesarRolesSistema(idTokenResult.claims);
-                    });
-                }
-            });
-        })
-        .catch((error) => console.error("Error de persistencia:", error));
-
-    // 2. LÓGICA DE ROLES
-    function procesarRolesSistema(claims) {
-        console.log("Claims del usuario:", claims); // Verás { rol: 'admin', admin: true }
-        
-        // Si el usuario es administrador, tiene acceso a todo. No hacemos nada.
-        if (claims.admin === true) {
-            console.log("Acceso de administrador total concedido.");
-        } else {
-            // Si NO es administrador, ocultamos los módulos correspondientes.
-            if(document.getElementById('item-admin')) document.getElementById('item-admin').style.display = 'none';
-            if (claims.rol === 'psicologia' || claims.rol === 'terapeuta') {
-                if(document.getElementById('item-libros')) document.getElementById('item-libros').style.display = 'none';
-            }
-        }
-    }
-
-    // 3. CERRAR SESIÓN
+    // Para la demostración, el botón de cerrar sesión no hará nada o se puede eliminar.
     document.getElementById('logout').addEventListener('click', function() {
-        if(confirm("¿Seguro que desea cerrar la sesión actual?")) {
-            signOut(auth).then(() => {
-                window.location.href = 'login.html';
-            }).catch((err) => {
-                alert("Error al destruir la sesión: " + err);
-            });
-        }
+        alert("Cerrar sesión deshabilitado para la demostración.");
+        // Opcional: window.location.href = 'login.html'; si quieres que "simule" cerrar sesión
     });
 </script>
 

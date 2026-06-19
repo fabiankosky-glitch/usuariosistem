@@ -274,33 +274,12 @@
         }
 
         // ===== 10. INICIAR AL CARGAR LA PÁGINA =====
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // El usuario ha iniciado sesión, procedemos a cargar todo.
-                document.getElementById('contenedor-bloqueo').style.display = 'block';
-
-                user.getIdTokenResult().then((idTokenResult) => {
-                    const claims = idTokenResult.claims;
-                    rolActivo = claims.rol || (claims.admin ? 'admin' : 'desconocido');
-                    
-                    // --- BARRERA DE SEGURIDAD ---
-                    // Roles que pueden acceder a esta sección
-                    const rolesPermitidos = ['terapeuta', 'director_terapeutico', 'directora_general', 'admin'];
-                    
-                    if (claims.admin === true || rolesPermitidos.includes(rolActivo)) {
-                        console.log("✅ Acceso concedido a Módulo Terapéutico. Rol:", rolActivo);
-                        inicializarSistema();
-                    } else {
-                        console.error("❌ Acceso Denegado. Rol no autorizado:", rolActivo);
-                        alert("❌ Acceso Denegado. No tiene los permisos necesarios para este módulo.");
-                        window.location.href = 'historias.html';
-                    }
-                });
-            } else {
-                // Si no hay usuario, se redirige al login de forma segura.
-                window.location.href = 'login.html';
-            }
-        });
+        // SEGURIDAD ELIMINADA PARA DEMOSTRACIÓN: Acceso directo
+        console.log("✅ Acceso directo concedido a Módulo Terapéutico (seguridad deshabilitada para demo).");
+        document.getElementById('contenedor-bloqueo').style.display = 'block';
+        // Asignar un rol ficticio para que las funciones internas no fallen si lo esperan
+        rolActivo = 'admin_demo'; 
+        inicializarSistema();
     </script>
 
 </body>

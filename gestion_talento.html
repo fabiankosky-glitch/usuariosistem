@@ -202,15 +202,8 @@
     };
 
     window.verCredencial = async (id) => {
-        const user = auth.currentUser;
-        if (!user) return alert("Sesión no iniciada.");
-
-        const idTokenResult = await user.getIdTokenResult(true);
-        if (idTokenResult.claims.admin !== true) {
-            return alert("❌ Acceso Denegado: No tiene permisos de alta gerencia.");
-        }
-
-        // Si es admin, procede a mostrar la credencial
+        // SEGURIDAD ELIMINADA PARA DEMOSTRACIÓN: Acceso directo a ver credencial
+        console.log("✅ Acceso directo a ver Credencial (seguridad deshabilitada para demo).");
         try {
             const snap = await getDoc(doc(db, "talento_humano_cifrado", id));
             const d = snap.data().info;
@@ -238,44 +231,28 @@
     };
 
     // Envolvemos la carga inicial en la verificación de autenticación
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            // Forzar la actualización del token para obtener los claims más recientes
-            user.getIdTokenResult(true).then(async (idTokenResult) => { 
-                if (idTokenResult.claims.admin === true) {
-                    console.log("Acceso concedido: El usuario es administrador.");
-                    const snap = await getDocs(query(collection(db, "talento_humano_cifrado"), orderBy("timestamp", "desc")));
-                    let h = "";
-                    const tabla = document.getElementById("tablaPersonal");
-                    snap.forEach(docSnap => {
-                        const d = docSnap.data();
-                        const color = d.estado === "HABILITADO" ? "var(--accent)" : "var(--danger)";
-                        h += `<tr>
-                            <td><strong>${descifrar(d.info.n)}</strong><br><small>${descifrar(d.info.cc)}</small></td>
-                            <td>${descifrar(d.info.car)}</td>
-                            <td style="color:var(--danger); font-weight:bold;">${descifrar(d.info.pila)}</td>
-                            <td><span class="audit-badge">${d.hashIntegridad}</span></td>
-                            <td style="color:${color}; font-weight:bold;">${d.estado}</td>
-                            <td>
-                                <button class='btn-principal' style='background:#e67e22' onclick="verCredencial('${docSnap.id}')">🔑 KEY</button>
-                                <button class='btn-principal' style='background:#003366' onclick="alternarEstado('${docSnap.id}', '${d.estado}')">SW</button>
-                                <button class='btn-principal' style='background:#34495e' onclick="alert('Descifrando PDF...')">📄 PDF</button>
-                            </td>
-                        </tr>`;
-                    });
-                    if (tabla) tabla.innerHTML = h;
-                } else {
-                    // Si el usuario está logueado pero no es admin, se le deniega el acceso y se le redirige.
-                    console.warn("Acceso denegado: El usuario no es administrador.");
-                    alert("❌ No tiene permisos para acceder a esta sección.");
-                    window.location.href = 'index.html';
-                }
-            });
-        } else {
-            // Si no hay sesión, se redirige al login.
-            window.location.href = 'login.html';
-        }
+    // SEGURIDAD ELIMINADA PARA DEMOSTRACIÓN: Acceso directo
+    console.log("✅ Acceso directo concedido a Gestión de Talento Humano (seguridad deshabilitada para demo).");
+    const snap = await getDocs(query(collection(db, "talento_humano_cifrado"), orderBy("timestamp", "desc")));
+    let h = "";
+    const tabla = document.getElementById("tablaPersonal");
+    snap.forEach(docSnap => {
+        const d = docSnap.data();
+        const color = d.estado === "HABILITADO" ? "var(--accent)" : "var(--danger)";
+        h += `<tr>
+            <td><strong>${descifrar(d.info.n)}</strong><br><small>${descifrar(d.info.cc)}</small></td>
+            <td>${descifrar(d.info.car)}</td>
+            <td style="color:var(--danger); font-weight:bold;">${descifrar(d.info.pila)}</td>
+            <td><span class="audit-badge">${d.hashIntegridad}</span></td>
+            <td style="color:${color}; font-weight:bold;">${d.estado}</td>
+            <td>
+                <button class='btn-principal' style='background:#e67e22' onclick="verCredencial('${docSnap.id}')">🔑 KEY</button>
+                <button class='btn-principal' style='background:#003366' onclick="alternarEstado('${docSnap.id}', '${d.estado}')">SW</button>
+                <button class='btn-principal' style='background:#34495e' onclick="alert('Descifrando PDF...')">📄 PDF</button>
+            </td>
+        </tr>`;
     });
+    if (tabla) tabla.innerHTML = h;
 </script>
 </body>
 </html>
