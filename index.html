@@ -78,10 +78,8 @@
     // No se requiere autenticación ni procesamiento de roles.
     // Todos los elementos del menú serán visibles por defecto.
 
-    // Para la demostración, el botón de cerrar sesión no hará nada o se puede eliminar.
     document.getElementById('logout').addEventListener('click', function() {
-        alert("Cerrar sesión deshabilitado para la demostración.");
-        // Opcional: window.location.href = 'login.html'; si quieres que "simule" cerrar sesión
+        window.location.href = 'login.html';
     });
 </script>
 
