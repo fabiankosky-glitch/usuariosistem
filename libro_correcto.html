@@ -5,27 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistema Maestro RA22 - Camino</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- jsPDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #fdf6f0; /* Un tono crema claro como en la imagen */
+            background-color: #fdf6f0;
             margin: 0;
             padding: 20px;
             color: #333;
         }
-        header {
-            background-color: #2c3e50; /* Azul oscuro para la barra superior */
+        .header {
+            background-color: #2c3e50;
             padding: 10px 20px;
-            border-radius: 8px;
-            margin-bottom: 20px;
             display: flex;
-            justify-content: flex-start;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
         }
-        .back-button {
-            background-color: #3498db; /* Azul para el botón */
+        .header button {
+            background-color: #3498db;
             color: white;
             border: none;
             padding: 10px 15px;
@@ -33,252 +30,258 @@
             cursor: pointer;
             font-size: 16px;
         }
-        .back-button:hover {
+        .header button:hover {
             background-color: #2980b9;
         }
-        main {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        h1 {
+        .main-title {
             text-align: center;
-            color: #d35400; /* Naranja/marrón para el título */
-            margin-bottom: 30px;
+            margin: 20px 0;
+            color: #d35400; /* Naranja oscuro */
+        }
+        .main-title h2 {
             font-size: 24px;
             font-weight: bold;
         }
-        h1 i {
+        .main-title .fa-pills {
             margin-right: 10px;
         }
-        .patient-list {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        .patient-card {
-            background-color: white;
-            border: 1px solid #ddd;
-            border-radius: 12px; /* Bordes más redondeados */
-            margin-bottom: 15px;
+        .paciente-card {
+            background-color: #fff;
+            border: 2px solid #f39c12; /* Borde naranja */
+            border-radius: 10px;
+            margin-bottom: 20px;
             padding: 20px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            border-left: 5px solid #f39c12; /* Borde izquierdo naranja */
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
-        .patient-header {
+        .paciente-info {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             flex-wrap: wrap;
-            gap: 10px;
         }
-        .patient-info h2 {
-            margin: 0;
+        .paciente-details h3 {
+            margin: 0 0 5px 0;
             font-size: 22px;
-            color: #2c3e50; /* Nombre del paciente */
+            color: #2c3e50;
         }
-        .patient-info .status {
-            margin-top: 5px;
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 12px;
+        .paciente-status {
+            font-size: 14px;
             font-weight: bold;
+            color: #27ae60; /* Verde */
+        }
+        .paciente-status .dot {
+            height: 10px;
+            width: 10px;
+            background-color: #27ae60;
+            border-radius: 50%;
             display: inline-block;
+            margin-right: 5px;
         }
-        .patient-info .status.active {
-            background-color: #e8f5e9;
-            color: #2e7d32; /* Verde para PACIENTE ACTIVO */
-        }
-        .patient-actions {
+        .paciente-actions {
             display: flex;
             gap: 10px;
+            margin-top: 10px;
             flex-wrap: wrap;
         }
-        .btn {
+        .paciente-actions button {
             border: none;
-            padding: 8px 15px;
-            border-radius: 20px; /* Botones más redondeados */
-            cursor: pointer;
-            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 5px;
             color: white;
+            cursor: pointer;
             font-size: 12px;
-            display: inline-flex;
+            font-weight: bold;
+            display: flex;
             align-items: center;
             gap: 5px;
-            transition: transform 0.2s;
         }
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-        .btn-secondary { background-color: #95a5a6; } /* POR MEDICAR */
-        .btn-danger { background-color: #e74c3c; } /* MEDICADO */
-        .btn-success { background-color: #27ae60; } /* AGREGAR */
-        .btn-info { background-color: #3498db; } /* HISTORIAL */
-        .btn-dark { background-color: #34495e; } /* ULTIMO RA22 */
+        .btn-por-medicar { background-color: #bdc3c7; } /* Gris claro */
+        .btn-medicado { background-color: #e74c3c; } /* Rojo */
+        .btn-agregar { background-color: #2ecc71; } /* Verde */
+        .btn-historial { background-color: #3498db; } /* Azul */
+        .btn-ultimo-ra22 { background-color: #34495e; } /* Azul oscuro/gris */
 
-        .history-details {
-            background-color: #eaf6ff; /* Fondo azul claro para el historial */
-            border: 1px solid #bbdefb;
-            border-radius: 8px;
-            padding: 15px;
+        .historial-container {
+            display: none;
             margin-top: 20px;
+            padding: 15px;
+            background-color: #eaf5ff; /* Azul claro */
+            border: 1px solid #3498db; /* Borde azul */
+            border-radius: 8px;
         }
-        .history-details h3 {
-            margin: 0 0 10px 0;
-            color: #1e88e5; /* Azul más oscuro para el título del historial */
+        .historial-container.visible {
+            display: block;
+        }
+        .historial-header {
+            font-weight: bold;
             font-size: 18px;
+            margin-bottom: 10px;
+            color: #2980b9;
         }
-        .btn-close-history {
+        .historial-content {
+            font-size: 16px;
+        }
+        .historial-content ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        .historial-content li {
+            background: #fff;
+            padding: 8px;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+        .btn-cerrar-historial {
+            display: block;
+            margin: 10px auto 0;
             background: none;
             border: none;
             color: #3498db;
             cursor: pointer;
-            text-decoration: underline;
-            display: block;
-            margin-top: 10px;
-            text-align: center;
-            width: 100%;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
-    <header>
-        <button class="back-button" onclick="window.location.href='index.html'">← Volver al Menú</button>
-    </header>
-    <main>
-        <h1><i class="fa-solid fa-pills"></i> LIBRO CORRECTO: GESTIÓN INTEGRAL Y RA22</h1>
-        <div class="patient-list">
-            <!-- Patient Card: Carlos -->
-            <div class="patient-card">
-                <div class="patient-header">
-                    <div class="patient-info">
-                        <h2>Carlos</h2>
-                        <span class="status active">● PACIENTE ACTIVO</span>
+
+    <div class="header">
+        <button onclick="window.location.href='menu.html'">&larr; Volver al Menú</button>
+    </div>
+
+    <div class="main-title">
+        <h2><i class="fas fa-pills"></i> LIBRO CORRECTO: GESTIÓN INTEGRAL Y RA22</h2>
+    </div>
+
+    <div id="pacientes-lista">
+        <!-- Los pacientes se cargarán aquí dinámicamente -->
+    </div>
+
+    <script type="module">
+        import { db } from './firebase-config.js';
+        import { collection, getDocs, doc, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const pacientesLista = document.getElementById('pacientes-lista');
+
+        // Helper function to create patient card HTML
+        function createPatientCard(paciente, pacienteId) {
+            const isMedicated = paciente.medicadoHoy || false; // Assume a field 'medicadoHoy'
+            const medicadoBtnClass = isMedicated ? 'btn-medicado' : 'btn-por-medicar';
+            const medicadoBtnIcon = isMedicated ? 'fa-check-circle' : 'fa-clock';
+            const medicadoBtnText = isMedicated ? 'MEDICADO' : 'POR MEDICAR';
+
+            return `
+                <div class="paciente-card" id="paciente-${pacienteId}">
+                    <div class="paciente-info">
+                        <div class="paciente-details">
+                            <h3>${paciente.nombre}</h3>
+                            <div class="paciente-status"><span class="dot"></span>PACIENTE ACTIVO</div>
+                        </div>
+                        <div class="paciente-actions">
+                            <button id="med-btn-${pacienteId}" class="${medicadoBtnClass}" onclick="toggleMedicationStatus('${pacienteId}', ${!isMedicated})">
+                                <i class="fas ${medicadoBtnIcon}"></i> ${medicadoBtnText}
+                            </button>
+                            <button class="btn-agregar" onclick="location.href='libro_de_turno.html?id=${pacienteId}'"><i class="fas fa-plus"></i> AGREGAR</button>
+                            <button class="btn-historial" onclick="toggleHistorial('${pacienteId}')"><i class="fas fa-book-medical"></i> HISTORIAL</button>
+                            <button class="btn-ultimo-ra22" onclick="location.href='libro_de_turno.html?id=${pacienteId}'"><i class="fas fa-file-alt"></i> ULTIMO RA22</button>
+                        </div>
                     </div>
-                    <div class="patient-actions">
-                        <button class="btn btn-secondary">POR MEDICAR</button>
-                        <button class="btn btn-success">+ AGREGAR</button>
-                        <button class="btn btn-info">HISTORIAL</button>
-                        <button class="btn btn-dark" data-patient="Carlos">ULTIMO RA22</button>
-                    </div>
-                </div>
-                <div class="history-details" style="display: block;">
-                    <h3><i class="fa-solid fa-book-medical"></i> Historial de Tratamientos: Carlos</h3>
-                    <p>Cargando historial...</p>
-                    <button class="btn-close-history">Cerrar Historial</button>
-                </div>
-            </div>
-            <!-- Patient Card: sertralina -->
-            <div class="patient-card">
-                <div class="patient-header">
-                    <div class="patient-info">
-                        <h2>sertralina</h2>
-                        <span class="status active">● PACIENTE ACTIVO</span>
-                    </div>
-                    <div class="patient-actions">
-                        <button class="btn btn-danger">MEDICADO</button>
-                        <button class="btn btn-success">+ AGREGAR</button>
-                        <button class="btn btn-info">HISTORIAL</button>
-                        <button class="btn btn-dark" data-patient="sertralina">ULTIMO RA22</button>
-                    </div>
-                </div>
-            </div>
-            <!-- Patient Card: Andres -->
-            <div class="patient-card">
-                <div class="patient-header">
-                    <div class="patient-info">
-                        <h2>Andres</h2>
-                        <span class="status active">● PACIENTE ACTIVO</span>
-                    </div>
-                    <div class="patient-actions">
-                        <button class="btn btn-danger">MEDICADO</button>
-                        <button class="btn btn-success">+ AGREGAR</button>
-                        <button class="btn btn-info">HISTORIAL</button>
-                        <button class="btn btn-dark" data-patient="Andres">ULTIMO RA22</button>
+                    <div class="historial-container" id="historial-${pacienteId}">
+                        <div class="historial-header"><i class="fas fa-history"></i> Historial de Tratamientos: ${paciente.nombre}</div>
+                        <div class="historial-content">Cargando historial...</div>
+                        <button class="btn-cerrar-historial" onclick="toggleHistorial('${pacienteId}')">Cerrar Historial</button>
                     </div>
                 </div>
-            </div>
-        </div>
-    </main>
-    <script>
-        document.querySelectorAll('.btn-dark').forEach(button => {
-            button.addEventListener('click', function() {
-                generatePDF(this.dataset.patient);
-            });
-        });
-
-        function generatePDF(patientName) {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF({
-                orientation: 'landscape',
-                unit: 'pt',
-                format: 'letter'
-            });
-
-            doc.setFontSize(10);
-            doc.text("REGISTRO CONTROL DE ENTRADA Y SALIDA DE MEDICAMENTOS", doc.internal.pageSize.getWidth() / 2, 30, { align: 'center' });
-            doc.text(`Paciente: ${patientName}`, 40, 50);
-
-            const head = [
-                [
-                    { content: 'Fecha', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } },
-                    { content: 'Nombre del\nProducto', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } },
-                    { content: 'Unidad,\nPresentación,\nConcentración', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } },
-                    { content: 'Componente\nActivo', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } },
-                    { content: 'Registro\nInvima', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } },
-                    { content: 'No. de Lote', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } },
-                    { content: 'Fecha de\nVencimiento', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } },
-                    { content: 'Casa Matriz o\nFabricante', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } },
-                    { content: 'Proveedor', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } },
-                    { content: 'Entradas', colSpan: 3, styles: { halign: 'center' } },
-                    { content: 'Salidas', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } },
-                    { content: 'Saldo', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } },
-                    { content: 'Firma', rowSpan: 3, styles: { halign: 'center', valign: 'middle' } }
-                ],
-                [
-                    { content: 'Cantidad', rowSpan: 2, styles: { halign: 'center', valign: 'middle' } },
-                    { content: 'Presentación, Empaque,\nEtiquetas EN BUEN ESTADO', colSpan: 2, styles: { halign: 'center' } }
-                ],
-                [
-                    { content: 'SI', styles: { halign: 'center' } },
-                    { content: 'NO', styles: { halign: 'center' } }
-                ]
-            ];
-
-            const body = [
-                // Aquí irían los datos de la tabla, por ahora está vacío
-                ['2023-01-05', 'Medicamento X', 'Caja 100mg', 'Componente A', 'INV-123', 'LOTE-001', '2025-12-31', 'Fabricante Z', 'Proveedor Y', '10', 'X', '', '5', '5', ''],
-                // ... más filas de datos
-            ];
-
-            doc.autoTable({
-                head: head,
-                body: body,
-                startY: 60,
-                theme: 'grid',
-                styles: {
-                    fontSize: 7,
-                    cellPadding: 2,
-                    overflow: 'linebreak'
-                },
-                headStyles: {
-                    fillColor: [220, 220, 220],
-                    textColor: 0,
-                    fontStyle: 'bold'
-                }
-            });
-
-            // Footer
-            const pageCount = doc.internal.getNumberOfPages();
-            for (let i = 1; i <= pageCount; i++) {
-                doc.setPage(i);
-                doc.setFontSize(8);
-                doc.text(`Página ${i} de ${pageCount}`, doc.internal.pageSize.getWidth() - 60, doc.internal.pageSize.getHeight() - 20);
-                doc.text('RA-22 Versión: 1', 40, doc.internal.pageSize.getHeight() - 20);
-            }
-
-
-            doc.save(`RA22_${patientName.replace(/ /g, '_')}_${new Date().toISOString().slice(0,10)}.pdf`);
+            `;
         }
+        
+        // Function to load patients
+        async function cargarPacientes() {
+            pacientesLista.innerHTML = '<p style="text-align:center;">Cargando pacientes...</p>';
+            try {
+                const q = query(collection(db, "pacientes"), where("estado", "==", "activos"));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    pacientesLista.innerHTML = '<p style="text-align:center;">No hay pacientes activos en este momento.</p>';
+                    return;
+                }
+
+                pacientesLista.innerHTML = ''; // Clear loading message
+                querySnapshot.forEach(doc => {
+                    pacientesLista.innerHTML += createPatientCard(doc.data(), doc.id);
+                });
+            } catch (error) {
+                console.error("Error cargando pacientes: ", error);
+                pacientesLista.innerHTML = '<p style="text-align:center; color: red;">Error al cargar los pacientes.</p>';
+            }
+        }
+
+        // Function for Historial button
+        window.toggleHistorial = async (pacienteId) => {
+            const historialDiv = document.getElementById(`historial-${pacienteId}`);
+            if (!historialDiv) return;
+
+            const historialContent = historialDiv.querySelector('.historial-content');
+            const isVisible = historialDiv.classList.toggle('visible');
+
+            // Fetch data only if opening and not already loaded
+            if (isVisible && historialContent.innerHTML === 'Cargando historial...') {
+                try {
+                    // Assuming medication logs are in a 'medicamentos' collection
+                    const q = query(collection(db, "medicamentos"), where("pacienteId", "==", pacienteId));
+                    const querySnapshot = await getDocs(q);
+                    
+                    if (querySnapshot.empty) {
+                        historialContent.innerHTML = 'No hay historial de medicamentos para este paciente.';
+                    } else {
+                        let html = '<ul>';
+                        let registros = [];
+                        querySnapshot.forEach(doc => registros.push(doc.data()));
+                        // Sort by date, newest first
+                        registros.sort((a,b) => b.fecha - a.fecha);
+
+                        registros.forEach(data => {
+                            const fecha = new Date(data.fecha).toLocaleString('es-CO');
+                            html += `<li><strong>${fecha}:</strong> ${data.nombreProducto || 'N/A'} - Salida: ${data.salidas || 0}</li>`;
+                        });
+                        html += '</ul>';
+                        historialContent.innerHTML = html;
+                    }
+                } catch (e) {
+                    historialContent.innerHTML = 'Error al cargar el historial.';
+                    console.error("Error fetching history: ", e);
+                }
+            }
+        };
+
+        // Function for "POR MEDICAR / MEDICADO" button
+        window.toggleMedicationStatus = async (pacienteId, newStatus) => {
+            const pacienteRef = doc(db, "pacientes", pacienteId);
+            const medBtn = document.getElementById(`med-btn-${pacienteId}`);
+            
+            try {
+                // Update the patient's status in Firestore
+                await updateDoc(pacienteRef, {
+                    medicadoHoy: newStatus 
+                });
+
+                // Update the button UI
+                medBtn.classList.toggle('btn-por-medicar', !newStatus);
+                medBtn.classList.toggle('btn-medicado', newStatus);
+                medBtn.innerHTML = newStatus 
+                    ? `<i class="fas fa-check-circle"></i> MEDICADO` 
+                    : `<i class="fas fa-clock"></i> POR MEDICAR`;
+                // Update the onclick attribute for the next toggle
+                medBtn.setAttribute('onclick', `toggleMedicationStatus('${pacienteId}', ${!newStatus})`);
+
+            } catch (error) {
+                console.error("Error al actualizar estado:", error);
+                alert("No se pudo actualizar el estado. Revise la conexión.");
+            }
+        };
+
+        // Initial load
+        cargarPacientes();
     </script>
 </body>
 </html>

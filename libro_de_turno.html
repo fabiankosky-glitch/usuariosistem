@@ -1,212 +1,288 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Libro de Turno Digital - Caminos Nuevos</title>
+    <title>Libro de Turno - RA22</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; padding: 15px; margin: 0; }
-        .container { max-width: 750px; margin: auto; }
-        .card { background: white; border-radius: 15px; padding: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        h2, h3 { text-align: center; color: #2c3e50; margin-top: 0; }
-        .censo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        .censo-item { padding: 12px; border-radius: 10px; color: white; text-align: center; font-weight: bold; }
-        .resultado-casa { background: #2c3e50; color: white; padding: 12px; border-radius: 10px; text-align: center; margin: 15px 0; font-weight: bold; }
-        .seguridad-box { background: #fff5f5; padding: 15px; border-radius: 12px; border: 1px solid #feb2b2; }
-        label { display: block; font-weight: bold; margin-top: 12px; font-size: 13px; color: #c53030; }
-        textarea, input, select { width: 100%; padding: 12px; margin-top: 5px; border-radius: 8px; border: 1px solid #ccc; box-sizing: border-box; }
-        .btn-actualizar { background: #3498db; color: white; padding: 15px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 15px; }
-        .btn-guardar { background: #27ae60; color: white; padding: 18px; width: 100%; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; font-size: 16px; }
-        .monitor-item { background: white; border-left: 5px solid #3498db; padding: 12px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); overflow: hidden; }
-        .foto-monitor { width: 80px; height: 80px; object-fit: cover; border-radius: 8px; float: right; margin-left: 10px; border: 1px solid #ddd; }
-        .historial-item { background: #fff; padding: 15px; border-radius: 12px; margin-bottom: 10px; border-left: 8px solid #2c3e50; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
+        .header-container {
+            max-width: 1200px;
+            margin: 0 auto 20px auto;
+            padding: 10px;
+            background: white;
+            border: 1px solid #ccc;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: center;
+        }
+        .header-table td {
+            border: 1px solid #000;
+            padding: 5px;
+            vertical-align: middle;
+        }
+        .header-table .logo-cell {
+            width: 20%;
+            font-weight: bold;
+        }
+        .header-table .title-cell {
+            width: 60%;
+        }
+        .header-table .info-cell {
+            width: 20%;
+            text-align: left;
+            padding-left: 10px;
+            font-size: 12px;
+        }
+        .title-cell h3 { margin: 0; font-size: 16px; }
+        .title-cell p { margin: 0; font-size: 14px; }
+
+        .main-content {
+            max-width: 1200px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .filter-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        .filter-section label { font-weight: bold; margin-right: 10px; }
+        .filter-section select, .filter-section input {
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+        #tabla-container {
+            width: 100%;
+            overflow-x: auto; /* Para tablas anchas en móviles */
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        th { background-color: #f2f2f2; font-weight: bold; }
+        .btn-menu {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .btn-menu:hover { background: #0056b3; }
+        .firma-cell { height: 60px; } /* Espacio para la firma */
     </style>
 </head>
 <body>
 
-<div class="container">
-    <button onclick="location.href='index.html'" style="margin-bottom:15px; padding:10px; width:100%; border-radius:8px; border:none; background:#95a5a6; color:white; font-weight:bold;">🏠 Menú Principal</button>
-    
-    <div class="card">
-        <h2>📒 Libro de Turno Digital</h2>
-        <p id="fechaHoy" style="text-align:center; font-weight:bold; color:#7f8c8d;"></p>
-        
-        <div class="censo-grid">
-            <div class="censo-item" style="background:#27ae60;">🏠 Activos: <span id="cntActivos">0</span></div>
-            <div class="censo-item" style="background:#e67e22;">🚶 Fuera: <input type="number" id="inpFuera" value="0" oninput="window.calcularPresencia()" style="width:50px;"></div>
-        </div>
-        <div class="resultado-casa">📍 Total en Casa: <span id="cntEnCasa">0</span></div>
+    <a href="menu.html" class="btn-menu">&larr; Volver al Menú</a>
 
-        <div class="seguridad-box">
-            <h3>🔐 Seguridad e Inventario</h3>
-            <label>👥 Grupos Altos:</label><textarea id="gruposAltos"></textarea>
-            <label>🔔 Timbres:</label><textarea id="timbres"></textarea>
-            <label>🔑 Llaveros/Grilletes:</label><textarea id="llavero"></textarea>
-        </div>
+    <div class="header-container">
+        <table class="header-table">
+            <tr>
+                <td class="logo-cell" rowspan="2">
+                    CENTRO DE REHABILITACION<br>NUEVOS CAMINOS
+                </td>
+                <td class="title-cell">
+                    <h3>REGISTRO CONTROL DE ENTRADA Y SALIDA DE MEDICAMENTOS</h3>
+                </td>
+                <td class="info-cell">
+                    <strong>Código:</strong> RA-22
+                </td>
+            </tr>
+            <tr>
+                <td class="title-cell">
+                    <p id="info-paciente">Cargando paciente...</p>
+                </td>
+                <td class="info-cell">
+                    <strong>Versión:</strong> 1
+                </td>
+            </tr>
+        </table>
+    </div>
 
-        <div class="card" style="margin-top:20px; border: 2px dashed #3498db; background: #f0f7ff;">
-            <h3>📸 Registro de Actividad / Terapia</h3>
-            <select id="tipoEvento" onchange="window.prepararEvento()">
-                <option value="ninguno">-- Seleccionar --</option>
-                <option value="terapia">🧠 Terapia</option>
-                <option value="actividad">⚽ Actividad</option>
-            </select>
-            <div id="secDinamica" style="display:none; margin-top:15px;">
-                <label id="lblNombre">Nombre:</label><input type="text" id="nombreEvidencia">
-                <label>Asistencia y Novedades:</label><textarea id="asistenciaEvidencia"></textarea>
-                <label>Observaciones:</label><textarea id="obsEvidencia"></textarea>
-                <video id="videoEvidencia" autoplay playsinline style="width:100%; border-radius:10px; background:black; margin-top:10px;"></video>
-                <button type="button" class="btn-actualizar" onclick="window.tomarYSubir()">📸 Capturar y Subir</button>
-                <p id="statusCarga" style="text-align:center; font-size:12px; font-weight:bold;"></p>
+    <div class="main-content">
+        <div class="filter-section">
+            <div>
+                <label for="mesFiltro">Filtrar por Mes:</label>
+                <input type="month" id="mesFiltro">
             </div>
         </div>
 
-        <label>👤 Operador Responsable:</label><input type="text" id="opTurno">
-        <label>🚨 Novedades Generales:</label><textarea id="novedadesTxt" style="height:100px;"></textarea>
-        
-        <button id="btnActualizar" type="button" class="btn-actualizar">💾 ENVIAR AVANCE A JEFE</button>
-        <button id="btnGuardar" type="button" class="btn-guardar">🚀 CERRAR Y ARCHIVAR TURNO</button>
-
-        <div style="margin-top:30px; border-top: 3px solid #2c3e50; padding-top:20px;">
-            <h3>👩‍⚕️ Monitoreo en Vivo (Jefe)</h3>
-            <div id="lineaDeTiempoJefe" style="max-height:300px; overflow-y:auto; background:#eaeded; padding:15px; border-radius:10px;"></div>
-        </div>
-
-        <button id="btnVerHistorial" type="button" style="margin-top:20px; width:100%; padding:10px; border-radius:10px; border:none; background:#7f8c8d; color:white; font-weight:bold;">📂 VER ARCHIVO HISTÓRICO</button>
-        <div id="historial" style="display:none; margin-top:20px;">
-            <h3>📋 Turnos Anteriores</h3>
-            <div id="listaHistorial"></div>
+        <div id="tabla-container">
+            <!-- La tabla se generará dinámicamente aquí -->
         </div>
     </div>
-</div>
 
-   <script type="module">
-        // Importa los servicios ya inicializados desde el archivo central
+    <script type="module">
         import { db } from './firebase-config.js';
-        // Importa solo las funciones que necesitas para operar con esos servicios
-        import { collection, addDoc, onSnapshot, query, orderBy, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { collection, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    let totalActivos = 0;
-    const ID_ACTUAL = "T-" + new Date().toLocaleDateString().replace(/\//g, '-');
+        const pacienteId = new URLSearchParams(window.location.search).get('id');
 
-    document.getElementById("fechaHoy").innerText = new Date().toLocaleDateString();
+        async function cargarInfoPaciente() {
+            const infoPacienteEl = document.getElementById('info-paciente');
+            if (!pacienteId) {
+                infoPacienteEl.textContent = "ID de paciente no especificado.";
+                return;
+            }
 
-    // 1. CENSO
-    onSnapshot(collection(db, "pacientes"), (snap) => {
-        let cuenta = 0;
-        snap.forEach(d => { if((d.data().estado || "").toLowerCase().includes("activo")) cuenta++; });
-        totalActivos = cuenta;
-        document.getElementById("cntActivos").innerText = totalActivos;
-        window.calcularPresencia();
-    });
+            try {
+                const pacienteRef = doc(db, "pacientes", pacienteId);
+                const pacienteSnap = await getDoc(pacienteRef);
 
-    window.calcularPresencia = () => {
-        const f = parseInt(document.getElementById("inpFuera").value) || 0;
-        document.getElementById("cntEnCasa").innerText = totalActivos - f;
-    };
-
-    // 2. CÁMARA
-    window.prepararEvento = () => {
-        const t = document.getElementById("tipoEvento").value;
-        document.getElementById("secDinamica").style.display = (t === "ninguno") ? "none" : "block";
-        if(t !== "ninguno") {
-            navigator.mediaDevices.getUserMedia({video: {facingMode: "environment"}})
-            .then(s => { document.getElementById("videoEvidencia").srcObject = s; });
-        }
-    };
-
-    window.tomarYSubir = async () => {
-        const c = document.createElement("canvas");
-        const v = document.getElementById("videoEvidencia");
-        c.width = 600; c.height = v.videoHeight * (600 / v.videoWidth);
-        c.getContext("2d").drawImage(v, 0, 0, c.width, c.height);
-        try {
-            await addDoc(collection(db, "monitoreo_total"), {
-                idTurno: ID_ACTUAL, tipo: "foto",
-                subTipo: document.getElementById("tipoEvento").value,
-                nombre: document.getElementById("nombreEvidencia").value,
-                asistencia: document.getElementById("asistenciaEvidencia").value,
-                obs: document.getElementById("obsEvidencia").value,
-                foto: c.toDataURL("image/jpeg", 0.4),
-                timestamp: Date.now()
-            });
-            document.getElementById("statusCarga").innerText = "✅ Subido";
-        } catch (e) { alert("Error al subir foto"); }
-    };
-
-    // 3. NOVEDAD TEXTO
-    document.getElementById('btnActualizar').onclick = async () => {
-        try {
-            await addDoc(collection(db, "monitoreo_total"), {
-                idTurno: ID_ACTUAL, tipo: "texto",
-                operador: document.getElementById("opTurno").value,
-                texto: document.getElementById("novedadesTxt").value,
-                timestamp: Date.now()
-            });
-            alert("✅ Avance enviado");
-        } catch (e) { alert("Error"); }
-    };
-
-    // 4. MONITOR REAL TIME
-    onSnapshot(query(collection(db, "monitoreo_total"), where("idTurno", "==", ID_ACTUAL), orderBy("timestamp", "desc")), (snap) => {
-        const cont = document.getElementById("lineaDeTiempoJefe");
-        cont.innerHTML = "";
-        snap.forEach(doc => {
-            const d = doc.data();
-            const item = document.createElement("div");
-            item.className = "monitor-item";
-            item.innerHTML = d.tipo === "foto" ? 
-                `<img src="${d.foto}" class="foto-monitor"><b>${d.nombre}</b><br><small>${d.obs}</small>` :
-                `<b>${d.operador}:</b> <small>${d.texto}</small>`;
-            cont.appendChild(item);
-        });
-    });
-
-    // 5. BOTÓN GUARDAR (ARCHIVO)
-    document.getElementById('btnGuardar').onclick = async () => {
-        if(!confirm("¿Archivar turno?")) return;
-        await addDoc(collection(db, "archivo_turnos"), {
-            idTurno: ID_ACTUAL, fecha: new Date().toLocaleDateString(),
-            operador: document.getElementById("opTurno").value,
-            novedades: document.getElementById("novedadesTxt").value,
-            censo: document.getElementById("cntEnCasa").innerText,
-            creado: Date.now()
-        });
-        location.reload();
-    };
-
-    // 6. HISTORIAL (CORREGIDO)
-    document.getElementById('btnVerHistorial').onclick = () => {
-        const h = document.getElementById('historial');
-        h.style.display = h.style.display === "none" ? "block" : "none";
-    };
-
-    onSnapshot(query(collection(db, "archivo_turnos"), orderBy("creado", "desc")), (snap) => {
-        const list = document.getElementById("listaHistorial");
-        list.innerHTML = "";
-        snap.forEach(async (docArchive) => {
-            const d = docArchive.data();
-            const idT = d.idTurno;
-            const item = document.createElement("div");
-            item.className = "historial-item";
-            item.innerHTML = `<div onclick="this.nextElementSibling.style.display='block'">
-                <b>📅 ${d.fecha}</b> - Op: ${d.operador}<br><small>Click para ver todo ▼</small>
-            </div>
-            <div style="display:none; margin-top:10px; border-top:1px solid #eee;">
-                <p>Censo: ${d.censo} | Novedades: ${d.novedades}</p>
-                <div id="gal_hist_${idT}" style="display:grid; grid-template-columns:1fr 1fr; gap:5px;"></div>
-            </div>`;
-            list.appendChild(item);
-
-            const fotos = await getDocs(query(collection(db, "monitoreo_total"), where("idTurno", "==", idT)));
-            fotos.forEach(f => {
-                if(f.data().tipo === "foto") {
-                    document.getElementById(`gal_hist_${idT}`).innerHTML += 
-                    `<img src="${f.data().foto}" style="width:100%; border-radius:5px;">`;
+                if (pacienteSnap.exists()) {
+                    const pacienteData = pacienteSnap.data();
+                    infoPacienteEl.innerHTML = `<strong>${pacienteData.nombre.toUpperCase()}</strong> FOLIO: <strong>${pacienteData.cedula}</strong>`;
+                } else {
+                    infoPacienteEl.textContent = "Paciente no encontrado.";
                 }
+            } catch (error) {
+                console.error("Error al cargar datos del paciente:", error);
+                infoPacienteEl.textContent = "Error al cargar la información.";
+            }
+        }
+        
+        function generarTabla(registros) {
+            const container = document.getElementById('tabla-container');
+            if (registros.length === 0) {
+                container.innerHTML = "<p>No hay registros de medicamentos para el mes seleccionado.</p>";
+                return;
+            }
+
+            let html = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Nombre del Producto</th>
+                            <th>Unidad, Presentación, Concentración</th>
+                            <th>Componente Activo</th>
+                            <th>Registro Invima</th>
+                            <th>No. de Lote</th>
+                            <th>Fecha de Vencimiento</th>
+                            <th>Casa Matriz o Fabricante</th>
+                            <th>Proveedor</th>
+                            <th colspan="2">Entradas</th>
+                            <th>Salidas</th>
+                            <th>Saldo</th>
+                            <th>Firma</th>
+                        </tr>
+                        <tr>
+                            <th colspan="9"></th>
+                            <th>Presentación, Empaque, Etiquetas EN BUEN ESTADO</th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                         <tr>
+                            <th colspan="9"></th>
+                            <th>SI / NO</th>
+                            <th></th>
+                             <th></th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            registros.forEach(reg => {
+                 html += \`
+                    <tr>
+                        <td>\${new Date(reg.fecha).toLocaleDateString()}</td>
+                        <td>\${reg.nombreProducto || ''}</td>
+                        <td>\${reg.presentacion || ''}</td>
+                        <td>\${reg.componenteActivo || ''}</td>
+                        <td>\${reg.registroInvima || ''}</td>
+                        <td>\${reg.lote || ''}</td>
+                        <td>\${reg.fechaVencimiento ? new Date(reg.fechaVencimiento).toLocaleDateString() : ''}</td>
+                        <td>\${reg.fabricante || ''}</td>
+                        <td>\${reg.proveedor || ''}</td>
+                        <td>\${reg.buenEstado ? 'SI' : 'NO'}</td>
+                        <td>\${reg.entradas || ''}</td>
+                        <td>\${reg.salidas || ''}</td>
+                        <td>\${reg.saldo || ''}</td>
+                        <td class="firma-cell"></td>
+                    </tr>
+                \`;
             });
+
+            html += \`</tbody></table>\`;
+            container.innerHTML = html;
+        }
+
+        async function cargarRegistros(year, month) {
+            if (!pacienteId) return;
+
+            const startDate = new Date(year, month - 1, 1);
+            const endDate = new Date(year, month, 0, 23, 59, 59);
+
+            try {
+                const q = query(collection(db, "medicamentos"),
+                    where("pacienteId", "==", pacienteId),
+                    where("fecha", ">=", startDate.getTime()),
+                    where("fecha", "<=", endDate.getTime())
+                );
+                
+                const querySnapshot = await getDocs(q);
+                const registros = [];
+                querySnapshot.forEach((doc) => {
+                    registros.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Ordenar por fecha por si acaso
+                registros.sort((a, b) => a.fecha - b.fecha);
+                
+                generarTabla(registros);
+
+            } catch (error) {
+                console.error("Error cargando registros de medicamentos:", error);
+                document.getElementById('tabla-container').innerHTML = \`<p>Error al cargar los datos: \${error.message}</p>\`;
+            }
+        }
+        
+        document.getElementById('mesFiltro').addEventListener('change', (e) => {
+            const [year, month] = e.target.value.split('-').map(Number);
+            if(year && month) {
+                cargarRegistros(year, month);
+            }
         });
-    });
-</script>
+
+        function init() {
+            // Establecer el mes actual por defecto
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = (today.getMonth() + 1).toString().padStart(2, '0');
+            const monthInput = document.getElementById('mesFiltro');
+            monthInput.value = \`\${year}-\${month}\`;
+            
+            cargarInfoPaciente();
+            cargarRegistros(year, parseInt(month));
+        }
+
+        init();
+
+    </script>
 </body>
 </html>
