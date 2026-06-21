@@ -37,9 +37,11 @@
 </div>
 
 <script type="module">
-    // SEGURIDAD ELIMINADA PARA DEMOSTRACIÓN: Redirigir directamente a la página principal
-    console.log("✅ Redirigiendo directamente a index.html (seguridad de login deshabilitada para demo).");
-    window.location.href = "index.html";
+    document.getElementById('btnLogin').addEventListener('click', function() {
+        // For now, we will just redirect to the main page.
+        // Later we can add real authentication.
+        window.location.href = "index.html";
+    });
 </script>
 </body>
 </html>
