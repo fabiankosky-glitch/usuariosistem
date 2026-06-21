@@ -2,304 +2,114 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Maestro RA22 - Caminos Nuevos</title>
-    
-    <!-- LIBRERÍAS DE PDF (VERSIONES ULTRA ESTABLES) -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
-    
+    <title>Registro de Medicamentos</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #fdf2e9; padding: 15px; margin: 0; }
-        .container { max-width: 1100px; margin: auto; }
-        h2 { text-align: center; color: #d35400; text-transform: uppercase; font-size: 18px; margin-bottom: 20px; }
-        
-        .usuario-item { background: white; padding: 15px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-left: 8px solid #e67e22; }
-        .header-user { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
-        
-        .btn-group { display: flex; gap: 5px; flex-wrap: wrap; }
-        .btn-accion { padding: 8px 12px; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; font-size: 10px; color: white; transition: 0.3s; }
-        
-        .estado-si { background: #e74c3c; box-shadow: 0 0 8px rgba(231,76,60,0.4); }
-        .estado-no { background: #95a5a6; }
-        .btn-agregar { background: #27ae60; }
-        .btn-historial { background: #3498db; }
-        .btn-reporte { background: #2c3e50; }
-
-        /* CARPETAS */
-        .carpeta { display: none; background: #fff; padding: 20px; border-radius: 15px; margin-top: 15px; border: 2px solid; }
-        .c-registro { border-color: #27ae60; }
-        .c-historial { border-color: #3498db; background: #f0f7ff; }
-        .visible { display: block; }
-        
-        .bloque-med { background: #fef9f5; border: 1px solid #f39c12; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
-        .subtitulo { background: #d35400; color: white; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-bottom: 10px; display: inline-block; }
-        .grid-campos { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
-        label { font-size: 9px; font-weight: bold; color: #555; display: block; margin-bottom: 2px; text-transform: uppercase; }
-        input { width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ccc; box-sizing: border-box; font-size: 12px; }
-
-        /* MODAL VISTA PREVIA */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); overflow: auto; }
-        .modal-content { background: white; margin: 2% auto; padding: 20px; width: 98%; max-width: 1400px; border-radius: 15px; }
-        .tabla-previa { width: 100%; border-collapse: collapse; font-size: 8px; margin-top: 10px; text-align: center; }
-        .tabla-previa th { background: #d35400; color: white; padding: 5px; } .tabla-previa td { border: 1px solid #ddd; padding: 4px; }
-        
-        .tabla-h { width: 100%; border-collapse: collapse; font-size: 11px; background: white; }
-        .tabla-h th, .tabla-h td { border: 1px solid #3498db33; padding: 10px; text-align: left; }
-        .tabla-h th { background: #3498db; color: white; }
+        body { font-family: sans-serif; margin: 20px; }
+        .header-container { text-align: center; margin-bottom: 10px; }
+        .header-top { display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px; }
+        .header-box { border: 1px solid black; padding: 5px; }
+        table { width: 100%; border-collapse: collapse; font-size: 10px; }
+        th, td { border: 1px solid black; padding: 4px; text-align: center; vertical-align: middle; }
+        th { background-color: #f2f2f2; font-weight: bold; }
+        .footer { margin-top: 20px; display: flex; justify-content: space-between; text-align: center; font-size: 12px; }
+        .signature-box { width: 33%; }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <button style="width:100%; padding:12px; margin-bottom:15px; background:#2c3e50; color:white; border:none; border-radius:8px; cursor:pointer;" onclick="location.href='libros.html'">⬅ Volver al Menú</button>
-    <h2>💊 Libro Correcto: Gestión Integral y RA22</h2>
-    <div id="listaPacientes">Sincronizando con Caminos Nuevos...</div>
-</div>
-
-<!-- MODAL PARA VISTA PRELIMINAR -->
-<div id="modalVista" class="modal">
-    <div class="modal-content">
-        <h3 style="color:#d35400; margin:0; text-align:center;">👁️ VISTA PRELIMINAR RA22 (CONTROL HORIZONTAL)</h3>
-        <p id="infoP" style="font-size:11px; margin:10px 0; font-weight:bold; text-align:center;"></p>
-        <div style="overflow-x: auto;"><table id="tablaP" class="tabla-previa"></table></div>
-        <button class="btn-accion" id="btnDescargar" style="background:#e74c3c; width:100%; padding:18px; margin-top:15px; font-size:16px;">🖨️ CONFIRMAR E IMPRIMIR REPORTE RA22</button>
-        <button onclick="document.getElementById('modalVista').style.display='none'" style="width:100%; background:none; border:none; color:grey; padding:15px; cursor:pointer;">Cerrar Vista</button>
+    <div class="header-top">
+        <div><strong>CENTRO DE REHABILITACION<br>NUEVOS CAMINOS</strong></div>
+        <div class="header-container">
+            <h2 style="margin:0;">REGISTRO CONTROL DE ENTRADA Y SALIDA DE MEDICAMENTOS</h2>
+            <h3 style="margin:0;">FENIX ALBERTO RAMIRES FOLIO: 14.260.290</h3>
+        </div>
+        <div class="header-box">
+            <strong>Código:</strong> RA-22<br>
+            <strong>Versión:</strong> 1
+        </div>
     </div>
-</div>
 
-<script type="module">
-    import { db } from './firebase-config.js';
-    import { collection, onSnapshot, addDoc, updateDoc, doc, query, where, getDocs, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <table>
+        <thead>
+            <tr>
+                <th rowspan="3">Fecha</th>
+                <th rowspan="3">Nombre del<br>Producto</th>
+                <th rowspan="3">Unidad,<br>Presentación,<br>Concentración</th>
+                <th rowspan="3">Componente<br>Activo</th>
+                <th rowspan="3">Registro<br>Invima</th>
+                <th rowspan="3">No. de Lote</th>
+                <th rowspan="3">Fecha de<br>Vencimiento</th>
+                <th rowspan="3">Casa Matriz o<br>Fabricante</th>
+                <th rowspan="3">Proveedor</th>
+                <th colspan="3">Entradas</th>
+                <th rowspan="3">Salidas</th>
+                <th rowspan="3">Saldo</th>
+                <th rowspan="3">Firma</th>
+            </tr>
+            <tr>
+                <th rowspan="2">Cantidad</th>
+                <th colspan="2">Presentación, Empaque,<br>Etiquetas EN BUEN ESTADO</th>
+            </tr>
+            <tr>
+                <th>SI</th>
+                <th>NO</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+            </tr>
+        </tbody>
+    </table>
 
-    // --- RENDERIZADO Y LÓGICA DE LA PÁGINA ---
+    <div class="footer">
+        <div class="signature-box">
+            <p style="margin-top: 50px; border-top: 1px solid black; margin-left: 20px; margin-right: 20px;"></p>
+            <strong>ELABORO:</strong><br>
+            <strong>CARGO:</strong> ENCARGADO ENFERMERIA
+        </div>
+        <div class="signature-box">
+            <p style="margin-top: 50px; border-top: 1px solid black; margin-left: 20px; margin-right: 20px;"></p>
+            <strong>REVISO:</strong> JHON SALAZAR<br>
+            <strong>CARGO:</strong> DIRECTOR OPERATIVO
+        </div>
+        <div class="signature-box">
+            <p style="margin-top: 50px; border-top: 1px solid black; margin-left: 20px; margin-right: 20px;"></p>
+            <strong>APROBO:</strong><br>
+            <strong>CARGO:</strong>
+        </div>
+    </div>
 
-    function renderizarPaciente(d) {
-        const p = d.data();
-        if ((p.estado || "").toLowerCase().includes("activo")) {
-            const esM = p.medicado === "si";
-            const item = document.createElement('div');
-            item.className = "usuario-item";
-            item.innerHTML = `
-                <div class="header-user">
-                    <div><b>${p.nombre}</b><br><small style="color:#27ae60;">● PACIENTE ACTIVO</small></div>
-                    <div class="btn-group">
-                        <button class="btn-accion ${esM ? 'estado-si' : 'estado-no'}" style="cursor:default">${esM ? '💊 MEDICADO' : '⚪ POR MEDICAR'}</button>
-                        <button class="btn-accion btn-agregar" onclick="alternarCarpeta('reg_${d.id}')">➕ AGREGAR</button>
-                        <button class="btn-accion btn-historial" onclick="cargarHistorial('${d.id}', '${p.nombre}')">📜 HISTORIAL</button>
-                        <button class="btn-accion btn-reporte" onclick="verUltimoRA22('${p.nombre}')">📄 ULTIMO RA22</button>
-                    </div>
-                </div>
-                <div id="reg_${d.id}" class="carpeta c-registro">
-                    <div id="cont_meds_${d.id}">${generarBloqueHTML(d.id)}</div>
-                    <button style="width:100%; padding:10px; background:#e67e22; color:white; border:none; border-radius:8px; margin-bottom:10px; cursor:pointer;" onclick="agregarFila('${d.id}')">➕ AÑADIR OTRO MEDICAMENTO</button>
-                    <button class="btn-accion" style="background:#27ae60; width:100%; padding:15px; font-size:16px;" onclick="guardarTodo('${d.id}', '${p.nombre}')">💾 GUARDAR REGISTRO COMPLETO</button>
-                </div>
-                <div id="hist_${d.id}" class="carpeta c-historial">
-                    <h4 style="margin:0; color:#3498db;">📜 Historial de Tratamientos: ${p.nombre}</h4>
-                    <div id="tabla_h_${d.id}" style="overflow-x:auto; margin-top:10px;">Cargando historial...</div>
-                    <button onclick="document.getElementById('hist_${d.id}').style.display='none'" style="width:100%; margin-top:10px; background:none; border:none; color:#3498db; cursor:pointer;">Cerrar Historial</button>
-                </div>`;
-            return item;
-        }
-        return null;
-    }
-
-    function generarBloqueHTML(id) {
-        return `<div class="bloque-med">
-            <div class="subtitulo">DATOS TÉCNICOS Y SUMINISTRO</div>
-            <div class="grid-campos">
-                <div><label>Fec. Inicio:</label><input type="date" class="f_i" onchange="calcA('${id}')"></div>
-                <div><label>Producto:</label><input type="text" class="m_n"></div>
-                <div><label>Presentación:</label><input type="text" class="t_p"></div>
-                <div><label>Concentración:</label><input type="text" class="t_c"></div>
-                <div><label>Comp. Activo:</label><input type="text" class="t_a"></div>
-                <div><label>Reg. INVIMA:</label><input type="text" class="t_inv"></div>
-                <div><label>Lote:</label><input type="text" class="t_l"></div>
-                <div><label>Vence:</label><input type="date" class="t_v"></div>
-                <div><label>Casa Matriz:</label><input type="text" class="t_cas"></div>
-                <div><label>Proveedor:</label><input type="text" class="m_p"></div>
-                <div><label>Estado (Entrada):</label><input type="text" class="t_e" value="BUENO"></div>
-                <div><label>Cant. Inicial:</label><input type="number" class="t_ci" oninput="calcA('${id}')"></div>
-                <div><label>Dosis Diaria (Salida):</label><input type="number" class="t_s" oninput="calcA('${id}')"></div>
-                <div><label>Fec. Agotamiento:</label><input type="text" class="f_f" readonly style="background:#fff3cd; font-weight:bold;"></div>
-            </div>
-        </div>`;
-    }
-
-    window.calcA = (id) => {
-        document.querySelectorAll(`#cont_meds_${id} .bloque-med`).forEach(b => {
-            const fi = b.querySelector('.f_i').value, ci = parseInt(b.querySelector('.t_ci').value), sa = parseInt(b.querySelector('.t_s').value), ff = b.querySelector('.f_f');
-            if (fi && ci > 0 && sa > 0) {
-                let f = new Date(fi + "T12:00:00"); f.setDate(f.getDate() + (Math.floor(ci/sa) - 1));
-                ff.value = f.toLocaleDateString('es-CO');
-            } else { ff.value = ""; }
-        });
-    };
-
-    window.alternarCarpeta = (id) => {
-        const c = document.getElementById(id); const v = c.style.display === 'block';
-        document.querySelectorAll('.carpeta').forEach(car => car.style.display = 'none');
-        c.style.display = v ? 'none' : 'block';
-    };
-
-    window.agregarFila = (id) => {
-        const div = document.createElement('div'); div.innerHTML = generarBloqueHTML(id);
-        document.getElementById(`cont_meds_${id}`).appendChild(div);
-    };
-
-    window.guardarTodo = async (id, nombre) => {
-        const bloques = document.querySelectorAll(`#cont_meds_${id} .bloque-med`);
-        let ok = false;
-        for (let b of bloques) {
-            const med = b.querySelector('.m_n').value; if(!med) continue;
-            const data = {
-                paciente: nombre, producto: med, presentacion: b.querySelector('.t_p').value, concentracion: b.querySelector('.t_c').value, componente: b.querySelector('.t_a').value,
-                invima: b.querySelector('.t_inv').value, lote: b.querySelector('.t_l').value, vencimiento: b.querySelector('.t_v').value, casa: b.querySelector('.t_cas').value,
-                proveedor: b.querySelector('.m_p').value, estado: b.querySelector('.t_e').value, cant_ini: parseInt(b.querySelector('.t_ci').value) || 0,
-                salida: parseInt(b.querySelector('.t_s').value) || 0, fecha_ini: b.querySelector('.f_i').value, fecha_agotamiento: b.querySelector('.f_f').value,
-                creado: Date.now()
-            };
-            await addDoc(collection(db, "libro_correcto"), data);
-            ok = true;
-        }
-        if(ok) { await updateDoc(doc(db, "pacientes", id), { medicado: "si" }); alert("✅ Medicamentos registrados con éxito."); location.reload(); }
-    };
-
-    window.cargarHistorial = async (id, nombre) => {
-        window.alternarCarpeta(`hist_${id}`);
-        const q = query(collection(db, "libro_correcto"), where("paciente", "==", nombre), orderBy("creado", "desc"));
-        const snap = await getDocs(q);
-        let h = `<table class="tabla-h"><tr><th>Fecha Inicio</th><th>Producto</th><th>Agotamiento</th><th>Acción</th></tr>`;
-        snap.forEach((docSnap) => { 
-            const r = docSnap.data();
-            const rString = encodeURIComponent(JSON.stringify(r));
-            h += `<tr><td>${r.fecha_ini}</td><td>${r.producto}</td><td>${r.fecha_agotamiento}</td><td><button class="btn-accion" style="background:#2c3e50;" onclick="abrirReporteData('${rString}')">👁️ VER/IMPRIMIR</button></td></tr>`; 
-        });
-        document.getElementById(`tabla_h_${id}`).innerHTML = snap.empty ? "Sin registros." : h + "</table>";
-    };
-
-    window.verUltimoRA22 = async (nombre) => {
-        const q = query(collection(db, "libro_correcto"), where("paciente", "==", nombre), orderBy("creado", "desc"), limit(1));
-        const snap = await getDocs(q); if(snap.empty) return alert("No hay datos para generar reporte.");
-        abrirReporteData(encodeURIComponent(JSON.stringify(snap.docs[0].data())));
-    };
-
-    // --- LÓGICA DE GENERACIÓN DE PDF ---
-
-    window.abrirReporteData = (dataEncoded) => {
-        const r = JSON.parse(decodeURIComponent(dataEncoded));
-        const modal = document.getElementById('modalVista');
-        document.getElementById('infoP').innerText = `PACIENTE: ${r.paciente} | PRODUCTO: ${r.producto} | LOTE: ${r.lote}`;
-        
-        // Preparar datos para la tabla del modal (vista previa)
-        const filasPreview = [];
-        let c = parseInt(r.cant_ini) || 0;
-        let f = new Date(r.fecha_ini + "T12:00:00");
-
-        while(c > 0) {
-            let sa = parseInt(r.salida) || 1;
-            let fi = c - sa; if (fi < 0) { sa = c; fi = 0; }
-            const formattedDate = f.toLocaleDateString('es-CO');
-            filasPreview.push({ fecha: formattedDate, producto: r.producto, c_ini: c, salida: sa, c_fin: fi });
-            c = fi;
-            f.setDate(f.getDate() + 1);
-        }
-
-        // Renderizar tabla del modal
-        let headHTML = `<tr><th>Fecha</th><th>Producto</th><th>C.Ini</th><th>Salida</th><th>C.Fin</th></tr>`;
-        let bodyHTML = filasPreview.map(fila => `<tr><td>${fila.fecha}</td><td>${fila.producto}</td><td>${fila.c_ini}</td><td>${fila.salida}</td><td>${fila.c_fin}</td></tr>`).join('');
-        document.getElementById('tablaP').innerHTML = headHTML + bodyHTML;
-        modal.style.display = 'block';
-
-        // Lógica para descargar el PDF con el formato profesional
-        document.getElementById('btnDescargar').onclick = () => {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('l', 'mm', 'a4');
-
-            // --- Encabezado del PDF ---
-            doc.setFontSize(8); doc.setFont('helvetica', 'bold');
-            doc.text("CENTRO DE REHABILITACION\nNUEVOS CAMINOS", 14, 15);
-
-            doc.setFontSize(12); doc.setFont('helvetica', 'bold');
-            doc.text("REGISTRO CONTROL DE ENTRADA Y SALIDA DE MEDICAMENTOS", doc.internal.pageSize.getWidth() / 2, 15, { align: 'center' });
-            doc.setFontSize(10);
-            doc.text(`PACIENTE: ${r.paciente.toUpperCase()}`, doc.internal.pageSize.getWidth() / 2, 22, { align: 'center' });
-
-            doc.autoTable({
-                startY: 12, margin: { left: doc.internal.pageSize.getWidth() - 55 }, theme: 'plain',
-                styles: { fontSize: 9, cellPadding: 0.5, lineWidth: 0.2, lineColor: [0, 0, 0] },
-                body: [ [{ content: 'Código:', styles: { fontStyle: 'bold' } }, 'RA-22'], [{ content: 'Versión:', styles: { fontStyle: 'bold' } }, '1'] ]
-            });
-
-            // --- Preparar datos para la tabla principal ---
-            const bodyPDF = [];
-            const entradaRow = [
-                r.fecha_ini ? new Date(r.fecha_ini + "T12:00:00").toLocaleDateString('es-CO') : '',
-                r.producto, `${r.presentacion} ${r.concentracion}`,
-                r.componente, r.invima, r.lote, r.vencimiento ? new Date(r.vencimiento + "T12:00:00").toLocaleDateString('es-CO') : '',
-                r.casa, r.proveedor,
-                (r.estado || '').toLowerCase() === 'bueno' ? 'X' : '', (r.estado || '').toLowerCase() !== 'bueno' ? 'X' : '',
-                r.cant_ini, r.cant_ini, ''
-            ];
-            bodyPDF.push(entradaRow);
-
-            filasPreview.forEach(fila => {
-                const salidaRow = [ fila.fecha, '', '', '', '', '', '', '', '', '', '', fila.salida, fila.c_fin, '' ];
-                bodyPDF.push(salidaRow);
-            });
-            
-            // --- Renderizar tabla principal ---
-            doc.autoTable({
-                startY: 32,
-                head: [[
-                    { content: 'Fecha', rowSpan: 2, styles:{halign: 'center', valign: 'middle'}},
-                    { content: 'Nombre del Producto', rowSpan: 2, styles:{halign: 'center', valign: 'middle'} },
-                    { content: 'Unidad, Presentación, Concentración', rowSpan: 2, styles:{halign: 'center', valign: 'middle'} },
-                    { content: 'Componente Activo', rowSpan: 2, styles:{halign: 'center', valign: 'middle'} },
-                    { content: 'Registro Invima', rowSpan: 2, styles:{halign: 'center', valign: 'middle'} },
-                    { content: 'No. de Lote', rowSpan: 2, styles:{halign: 'center', valign: 'middle'} },
-                    { content: 'Fecha de Vencimiento', rowSpan: 2, styles:{halign: 'center', valign: 'middle'} },
-                    { content: 'Casa Matriz o Fabricante', rowSpan: 2, styles:{halign: 'center', valign: 'middle'} },
-                    { content: 'Proveedor', rowSpan: 2, styles:{halign: 'center', valign: 'middle'} },
-                    { content: 'Presentación, Empaque, Etiqueta, EN BUEN ESTADO', colSpan: 2, styles:{halign: 'center'} },
-                    { content: 'Salidas', rowSpan: 2, styles:{halign: 'center', valign: 'middle'} },
-                    { content: 'Saldo', rowSpan: 2, styles:{halign: 'center', valign: 'middle'} },
-                    { content: 'Firma', rowSpan: 2, styles:{halign: 'center', valign: 'middle'} },
-                ],['SI', 'NO']],
-                body: bodyPDF,
-                theme: 'grid',
-                styles: { fontSize: 6, cellPadding: 1 },
-                headStyles: { fillColor: [220, 220, 220], textColor: [0, 0, 0], fontStyle: 'bold', halign: 'center', lineWidth: 0.2, lineColor: [0,0,0] },
-                columnStyles: { 0:{cellWidth:15}, 1:{cellWidth:25}, 2:{cellWidth:30}, 3:{cellWidth:20}, 4:{cellWidth:15}, 5:{cellWidth:15}, 6:{cellWidth:15}, 7:{cellWidth:20}, 8:{cellWidth:20}, 9:{cellWidth:7}, 10:{cellWidth:7}, 11:{cellWidth:12}, 12:{cellWidth:12}, 13:{cellWidth:15} }
-            });
-
-            // --- Pie de página con Firmas ---
-            const finalY = doc.lastAutoTable.finalY;
-            doc.autoTable({
-                startY: finalY + 5,
-                theme: 'plain',
-                styles: { fontSize: 7, lineWidth: 0.2, lineColor: [0,0,0] },
-                body: [[
-                    { content: '\n\nELABORO:\nCARGO: ENCARGADO ENFERMERIA', styles: { halign: 'center' } },
-                    { content: '\n\nREVISO: JHON SALAZAR\nCARGO: DIRECTOR OPERATIVO', styles: { halign: 'center' } },
-                    { content: '\n\nAPROBO:\nCARGO:', styles: { halign: 'center' } },
-                ]]
-            });
-
-            doc.save(`RA22_${r.paciente}_${r.producto}.pdf`);
-        };
-    };
-
-    // --- LÓGICA DE ARRANQUE ---
-    onSnapshot(collection(db, "pacientes"), (snap) => {
-        const contenedor = document.getElementById('listaPacientes');
-        contenedor.innerHTML = "";
-        snap.forEach(d => {
-            const item = renderizarPaciente(d);
-            if (item) contenedor.appendChild(item);
-        });
-    });
-</script>
 </body>
 </html>
