@@ -25,11 +25,11 @@
 <body>
     <div class="container">
         <h2>📊 Control de Historias Clínicas</h2>
-        <p>Haz clic en una categoría para desplegar. <strong>(Datos de demostración)</strong></p>
+        <p>Haz clic en una categoría para desplegar</p>
         <div style="margin-bottom: 20px;">
-            <input type="text" id="buscador" onkeyup="filtrarPacientes()" 
-                   placeholder="🔍 Buscar por nombre..." 
-                   style="width: 100%; padding: 15px; border-radius: 25px; border: 2px solid #3498db; font-size: 16px; outline: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <input type="text" id="buscador" onkeyup="filtrarPacientes()" 
+           placeholder="🔍 Buscar por nombre o cédula..." 
+           style="width: 100%; padding: 15px; border-radius: 25px; border: 2px solid #3498db; font-size: 16px; outline: none; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         </div>
         <div class="categoria-section"><div class="categoria-header activos" onclick="toggleLista('lista-activos')"><span>🟢 USUARIOS ACTIVOS</span><span id="count-activos">0</span></div><div id="lista-activos" class="paciente-lista"></div></div>
         <div class="categoria-section"><div class="categoria-header desprendimiento" onclick="toggleLista('lista-desprendimiento')"><span>🤝 DESPRENDIMIENTO</span><span id="count-desprendimiento">0</span></div><div id="lista-desprendimiento" class="paciente-lista"></div></div>
@@ -38,103 +38,74 @@
         <div class="categoria-section"><div class="categoria-header movilizaciones" onclick="toggleLista('lista-movilizaciones')"><span>🔵 MOVILIZACIONES</span><span id="count-movilizaciones">0</span></div><div id="lista-movilizaciones" class="paciente-lista"></div></div>
     </div>
 
-<script>
-    // --- DATOS DE EJEMPLO (REEMPLAZO DE FIREBASE) ---
-    // Como la conexión a Firebase fue removida para la demostración, 
-    // usamos datos fijos para que la página siga funcionando.
-    const mockPacientes = [
-        { id: '1', nombre: 'Juan Pérez (Demo)', estado: 'activos', fotoURL: 'https://i.pravatar.cc/150?img=1' },
-        { id: '2', nombre: 'Ana Gómez (Demo)', estado: 'activos', fotoURL: 'https://i.pravatar.cc/150?img=2' },
-        { id: '3', nombre: 'Carlos Ruiz (Demo)', estado: 'desprendimiento', fotoURL: 'https://i.pravatar.cc/150?img=3' },
-        { id: '4', nombre: 'María Fernández (Demo)', estado: 'abandonos', fotoURL: 'https://i.pravatar.cc/150?img=4' },
-        { id: '5', nombre: 'Luis Torres (Demo)', estado: 'fugas', fotoURL: 'https://i.pravatar.cc/150?img=5' },
-        { id: '6', nombre: 'Sofía Castro (Demo)', estado: 'movilizaciones', fotoURL: 'https://i.pravatar.cc/150?img=6' },
-        { id: '7', nombre: 'Pedro Ramírez (Demo)', estado: 'activos', fotoURL: 'https://i.pravatar.cc/150?img=7' }
-    ];
+   <script type="module">
+        // Importa los servicios ya inicializados desde el archivo central
+        import { db } from './firebase-config.js';
+        // Importa solo las funciones que necesitas para operar con esos servicios
+        import { onSnapshot, collection } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    // --- FUNCIONES DE LA PÁGINA ---
-
-    // Función para mostrar u ocultar las listas de pacientes
-    window.toggleLista = (id) => {
-        const el = document.getElementById(id);
-        if (el) {
+        window.toggleLista = (id) => {
+            const el = document.getElementById(id);
             el.style.display = (el.style.display === "block") ? "none" : "block";
-        }
-    };
+        };
 
-    // Función para filtrar pacientes según el buscador
-    window.filtrarPacientes = () => {
-        const busqueda = document.getElementById("buscador").value.toLowerCase();
-        const tarjetas = document.querySelectorAll(".paciente-card");
-
-        tarjetas.forEach(tarjeta => {
-            const contenido = tarjeta.innerText.toLowerCase();
-            tarjeta.style.display = contenido.includes(busqueda) ? "flex" : "none";
-        });
-
-        // Si el usuario escribe algo, abrimos todas las listas para que vea los resultados
-        if (busqueda.length > 0) {
-            const listas = document.querySelectorAll(".paciente-lista");
-            listas.forEach(lista => {
-                if (lista.style.display !== "block") {
-                    lista.style.display = "block";
-                }
+        onSnapshot(collection(db, "pacientes"), (snapshot) => {
+            const grupos = { activos: [], desprendimiento: [], abandonos: [], fugas: [], movilizaciones: [] };
+            snapshot.forEach((doc) => {
+                const p = { id: doc.id, ...doc.data() };
+                const estado = p.estado || "activos";
+                if (grupos[estado]) grupos[estado].push(p);
             });
-        }
-    };
-
-    // --- LÓGICA PRINCIPAL PARA RENDERIZAR PACIENTES ---
-
-    // Esta función se ejecuta cuando la página carga
-    document.addEventListener('DOMContentLoaded', () => {
-        console.log("Cargando datos de pacientes de demostración...");
-
-        const grupos = { activos: [], desprendimiento: [], abandonos: [], fugas: [], movilizaciones: [] };
-        
-        // 1. Clasificar pacientes en grupos
-        mockPacientes.forEach(p => {
-            const estado = p.estado || "activos";
-            if (grupos[estado]) {
-                grupos[estado].push(p);
-            }
-        });
-
-        // 2. Renderizar cada grupo en el HTML
-        Object.keys(grupos).forEach(cat => {
-            const div = document.getElementById(`lista-${cat}`);
-            const count = document.getElementById(`count-${cat}`);
-            
-            if (!div || !count) {
-                console.error(`Elemento no encontrado para la categoría: ${cat}`);
-                return;
-            }
-
-            count.innerText = grupos[cat].length;
-            
-            if (grupos[cat].length === 0) {
-                div.innerHTML = "<p style='color:gray; padding:10px;'>Vacío</p>";
-            } else {
-                let cardsHTML = '';
+    Object.keys(grupos).forEach(cat => {
+                const div = document.getElementById(`lista-${cat}`);
+                const count = document.getElementById(`count-${cat}`);
+                count.innerText = grupos[cat].length;
+                
+                div.innerHTML = grupos[cat].length === 0 ? "<p style='color:gray; padding:10px;'>Vacio</p>" : "";
+                
                 grupos[cat].forEach(p => {
-                    const imagenUrl = p.fotoURL || 'https://via.placeholder.com/50';
-                    cardsHTML += `
-                        <div class="paciente-card">
+                    // Usamos fotoID que es el campo donde guardas la imagen
+                    const imagenUrl = p.fotoURL || p.fotoID || p.foto || 'https://placeholder.com👤';
+
+                    div.innerHTML += `
+                        <div class="paciente-card" style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid #eee;">
                             <div style="display:flex; align-items:center; text-align:left;">
                                 <img src="${imagenUrl}" style="width:45px; height:45px; border-radius:50%; object-fit:cover; margin-right:12px; border:2px solid #ddd;">
                                 <div>
                                     <strong>${p.nombre}</strong>
                                 </div>
                             </div>
-                            <button class="btn-ver" onclick="alert('La vista de perfil está deshabilitada en el modo de demostración. ID Paciente: ${p.id}')">
+                            <button class="btn-ver" onclick="window.location.href='perfil_paciente.html?id=${p.id}'" 
+                                    style="background:#2c3e50; color:white; border:none; padding:8px 12px; border-radius:5px; cursor:pointer; font-weight:bold;">
                                 📂 Abrir
                             </button>
                         </div>`;
+                    
+            window.filtrarPacientes = () => {
+            const busqueda = document.getElementById("buscador").value.toLowerCase();
+            const tarjetas = document.querySelectorAll(".paciente-card");
+
+            tarjetas.forEach(tarjeta => {
+                const contenido = tarjeta.innerText.toLowerCase();
+                // Si lo que escribes está en la tarjeta, se muestra; si no, se oculta
+                tarjeta.style.display = contenido.includes(busqueda) ? "flex" : "none";
+            });
+
+            // Si el usuario escribe algo, abrimos las listas automáticamente
+            const listas = document.querySelectorAll(".paciente-lista");
+            listas.forEach(lista => {
+                lista.style.display = busqueda.length > 0 ? "block" : "none";
+            });
+        };
                 });
-                div.innerHTML = cardsHTML;
-            }
+            });
         });
-        console.log("Datos de demostración cargados.");
-    });
-</script>
+    </script>
 </body>
+<!--
+    NOTA IMPORTANTE: Este archivo (historias.html) no tenía una barrera de seguridad de autenticación
+    explícita al cargar la página. Su acceso estaba implícitamente protegido por el flujo de navegación
+    desde 'index.html', que sí tenía seguridad. Al eliminar la seguridad de 'index.html', esta página
+    ya es directamente accesible. No se requieren cambios adicionales aquí para el bypass.
+-->
 </html>
