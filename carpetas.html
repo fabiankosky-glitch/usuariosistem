@@ -15,6 +15,16 @@
         .btn-f:hover { opacity: 0.9; }
         .avatar { border-radius: 50%; margin-right: 15px; object-fit: cover; background: #e0e0e0; border: 2px solid #3498db; }
     </style>
+    <script type="module">
+        import { auth } from './firebase-config.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
 </head>
 <body>
 
@@ -23,28 +33,25 @@
     <div id="listaPacientes">Cargando pacientes...</div>
 
     <script type="module">
-        // Se importa la configuración centralizada y segura de Firebase
         import { db } from './firebase-config.js';
         import { collection, getDocs, query, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         async function cargarPacientes() {
             const lista = document.getElementById("listaPacientes");
             try {
-                // He añadido "orderBy" para que salgan en orden alfabético
                 const q = query(collection(db, "pacientes"), orderBy("nombre", "asc"));
                 const querySnapshot = await getDocs(q);
                 
                 lista.innerHTML = ""; 
                 
                 if (querySnapshot.empty) {
-                    lista.innerHTML = "<p>No hay pacientes registrados aún.</p>";
+                    lista.innerHTML = "<p>No hay pacientes registrados aún.</p>';
                     return;
                 }
 
                 querySnapshot.forEach((doc) => {
                     const p = doc.data();
                     const id = doc.id;
-                    // Imagen por defecto si el paciente no tiene foto
                     const fotoUrl = p.foto && p.foto !== "" ? p.foto : "https://flaticon.com";
 
                     lista.innerHTML += `
@@ -69,12 +76,10 @@
             }
         }
 
-        // Función para abrir/cerrar las carpetas
         window.toggleF = (id) => {
             const d = document.getElementById('f-' + id);
             const isVisible = d.style.display === "flex";
             
-            // Opcional: Cerrar todas las demás antes de abrir la nueva
             document.querySelectorAll('.folders').forEach(f => f.style.display = "none");
             
             d.style.display = isVisible ? "none" : "flex";
@@ -82,11 +87,5 @@
 
         cargarPacientes();
     </script>
-<!--
-    NOTA IMPORTANTE: Este archivo (carpetas.html) no tenía una barrera de seguridad de autenticación
-    explícita al cargar la página. Su acceso estaba implícitamente protegido por el flujo de navegación
-    desde 'index.html', que sí tenía seguridad. Al eliminar la seguridad de 'index.html', esta página
-    ya es directamente accesible. No se requieren cambios adicionales aquí para el bypass.
--->
 </body>
 </html>

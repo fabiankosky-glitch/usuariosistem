@@ -36,6 +36,16 @@
             height: 20px;
         }
     </style>
+    <script type="module">
+        import { auth } from './firebase-config.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
 </head>
 <body>
 
@@ -80,7 +90,7 @@
         <div class="row mb-3">
             <div class="col-12 text-end">
                 <button id="btn-mostrar-formulario" class="btn btn-success px-4 me-2">➕ Nueva Evolución</button>
-                <button id="btn-regresar" class="btn btn-outline-secondary" onclick="window.location.href='historias.html'">Volver al Historial</button>
+                <button id="btn-regresar" class="btn btn-outline-secondary" onclick="window.location.href='carpetas.html'">Volver a Carpetas</button>
             </div>
         </div>
 
@@ -114,17 +124,13 @@
 
     <script type="module">
         import { db, auth } from './firebase-config.js';
-        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
         import { doc, getDoc, collection, addDoc, query, orderBy, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // ===== 2. CONFIGURACIÓN DE FIREBASE =====
-        // ===== 3. VARIABLES GLOBALES =====
         let idPacienteActual = "";
-        let rolActivo = ""; // Se obtendrá de los claims de Firebase
+        let rolActivo = "";
 
         console.log("🔐 Rol activo:", rolActivo);
 
-        // ===== 4. MOTOR CRIPTOGRÁFICO =====
         async function generarSelloDigitalInmutable(cadenaTexto) {
             const encoder = new TextEncoder();
             const data = encoder.encode(cadenaTexto);
@@ -133,35 +139,30 @@
             return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
         }
 
-        // ===== 5. FUNCIÓN PRINCIPAL DE CARGA =====
         function inicializarSistema() {
             console.log("🚀 Inicializando sistema para el paciente...");
             
-            // Obtener ID del paciente de la URL
             const urlParams = new URLSearchParams(window.location.search);
             idPacienteActual = urlParams.get('id');
 
             if (!idPacienteActual) {
                 console.error("❌ Error: ID de paciente ausente en la URL");
                 alert("❌ Error: ID de paciente ausente en la URL");
-                window.location.href = "historias.html";
+                window.location.href = "carpetas.html";
                 return;
             }
 
             console.log("📋 ID del paciente:", idPacienteActual);
 
-            // Actualizar el badge
             const nombreBadge = document.getElementById('nombre-paciente');
             if (nombreBadge) {
                 nombreBadge.innerText = "RESIDENTE ID: " + idPacienteActual;
             }
 
-            // Cargar datos del paciente
             cargarDatosPaciente();
             cargarHistorialSubcoleccion();
         }
 
-        // ===== 6. CARGAR DATOS DEL PACIENTE =====
         function cargarDatosPaciente() {
             getDoc(doc(db, "pacientes", idPacienteActual))
                 .then((docSnap) => {
@@ -182,7 +183,6 @@
                 });
         }
 
-        // ===== 7. CARGAR HISTORIAL DE EVOLUCIONES =====
         function cargarHistorialSubcoleccion() {
             const divHistorial = document.getElementById('divHistorial');
             divHistorial.innerHTML = '<p class="text-muted text-center py-3"><span class="spinner-border spinner-border-sm me-2"></span>Cargando evoluciones...</p>';
@@ -223,7 +223,6 @@
                 });
         }
 
-        // ===== 8. GUARDAR NUEVA EVOLUCIÓN =====
         const formRegistro = document.getElementById('formulario-registro-terapeutico');
         if (formRegistro) {
             formRegistro.addEventListener('submit', async (e) => {
@@ -264,7 +263,6 @@
             });
         }
 
-        // ===== 9. BOTÓN MOSTRAR/OCULTAR FORMULARIO =====
         const btnMostrarForm = document.getElementById('btn-mostrar-formulario');
         if (btnMostrarForm) {
             btnMostrarForm.addEventListener('click', () => {
@@ -273,11 +271,8 @@
             });
         }
 
-        // ===== 10. INICIAR AL CARGAR LA PÁGINA =====
-        // SEGURIDAD ELIMINADA PARA DEMOSTRACIÓN: Acceso directo
         console.log("✅ Acceso directo concedido a Módulo Terapéutico (seguridad deshabilitada para demo).");
         document.getElementById('contenedor-bloqueo').style.display = 'block';
-        // Asignar un rol ficticio para que las funciones internas no fallen si lo esperan
         rolActivo = 'admin_demo'; 
         inicializarSistema();
     </script>

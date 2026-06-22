@@ -1,0 +1,30 @@
+[debug] [2026-06-22T05:04:51.302Z] ----------------------------------------------------------------------
+[debug] [2026-06-22T05:04:51.306Z] Command:       /nix/store/ws50yvm6vzlzf7jzz6n7xh4szddrack1-nodejs-20.19.1/bin/node /nix/store/gm9mcvzb17vv8cla08khrg29vxn3sq4r-firebase-tools-15.1.0/lib/node_modules/firebase-tools/lib/bin/firebase.js login --reauth
+[debug] [2026-06-22T05:04:51.307Z] CLI Version:   15.1.0
+[debug] [2026-06-22T05:04:51.307Z] Platform:      linux
+[debug] [2026-06-22T05:04:51.308Z] Node Version:  v20.19.1
+[debug] [2026-06-22T05:04:51.308Z] Time:          Mon Jun 22 2026 05:04:51 GMT+0000 (Coordinated Universal Time)
+[debug] [2026-06-22T05:04:51.308Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-06-22T05:04:52.218Z] Checked if tokens are valid: true, expires at: 1782108104313
+[debug] [2026-06-22T05:04:52.218Z] Checked if tokens are valid: true, expires at: 1782108104313
+[debug] [2026-06-22T05:04:52.223Z] >>> [apiv2][query] GET https://monospace-pa.googleapis.com/v1/workspaces/usuariosistem-52932763 [none]
+[debug] [2026-06-22T05:04:53.054Z] <<< [apiv2][status] GET https://monospace-pa.googleapis.com/v1/workspaces/usuariosistem-52932763 200
+[debug] [2026-06-22T05:04:53.056Z] <<< [apiv2][body] GET https://monospace-pa.googleapis.com/v1/workspaces/usuariosistem-52932763 {"workspaceId":"usuariosistem-52932763","name":"usuariosistem","workspaceRedirectUrl":"firebase-usuariosistem-1780503987319.cluster-hlmk2l2htragyudeyf6f3tzsi6.cloudworkstations.dev","status":"WORKSPACE_STATUS_RUNNING","lastAccessDatetime":"2026-06-22T04:17:35.212064Z","workspaceTemplate":"WORKSPACE_TEMPLATE_BLANK_WEB","owner":"SELF","serviceAccountEmail":"msp-7242294399764244807@monospace-4.iam.gserviceaccount.com","gitRepoUrl":"https://github.com/fabiankosky-glitch/usuariosistem","enableNix":true,"ownerEmail":"fabiankosky@gmail.com","workstationAccessToken":"eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL2Nsb3VkLmdvb2dsZS5jb20vd29ya3N0YXRpb25zIiwiYXVkIjoiZmlyZWJhc2UtdXN1YXJpb3Npc3RlbS0xNzgwNTAzOTg3MzE5LmNsdXN0ZXItaGxtazJsMmh0cmFneXVkZXlmNmYzdHpzaTYuY2xvdWR3b3Jrc3RhdGlvbnMuZGV2IiwiaWF0IjoxNzgyMTA0NjkyLCJleHAiOjE3ODIxOTEwOTJ9.jfXTPuytXWB8qbLqZe0yPaMnDE9qCKDeUpGflhJOfIeqVdZShU6LG0f7nM8gMO5QklZOywjzsLy_c_p0UUxx84ybR12kHzrIu63efM_Z5TB5is-v83W0PonKQQy2NqBfiTZjzliWz9tUt1mBPhh2FMZ-IFPSCYIju4mxj7ORw3ag8Qo2XEcCZ3pGW3RavUV399lUnvr1wpPPQ48ateNNU8ZfpW24s2mygaKG7KZ7m7zAYBnsPxHiY2bDxqVe6fT-RVV7k6Rf0vXqgpGj58rWgUA5y3F5p8IWtzH9AbHjO6L1JgBJ2H-noRxdMg4RNPf7_7gsb9uzsE2K3SfpjC39UQ","firebaseProjectId":"caminosnuevosdatabase"}
+[debug] [2026-06-22T05:04:53.059Z] >>> [apiv2][query] POST https://auth.firebase.tools/attest [none]
+[debug] [2026-06-22T05:04:53.059Z] >>> [apiv2][body] POST https://auth.firebase.tools/attest {"session_id":"8628c95a-7a6d-4d5d-bfd5-8cc23411a7f8"}
+[debug] [2026-06-22T05:04:53.250Z] <<< [apiv2][status] POST https://auth.firebase.tools/attest 200
+[debug] [2026-06-22T05:04:53.251Z] <<< [apiv2][body] POST https://auth.firebase.tools/attest {"token":"9LfDZOgrRk2c33MHl9zG1r3ERyRDvoGTctMQXPgSvqw"}
+[info] 
+[info] To sign in to the Firebase CLI:
+[info] 
+[info] 1. Take note of your session ID:
+[info] 
+[info]    8628C
+[info] 
+[info] 2. Visit the URL below on any device and follow the instructions to get your code:
+[info] 
+[info]    https://auth.firebase.tools/login?code_challenge=tTxAWdpdkl5YDUEiM_ZC5tLf6IwlOU9ZJZaX5760uxQ&session=8628c95a-7a6d-4d5d-bfd5-8cc23411a7f8&attest=9LfDZOgrRk2c33MHl9zG1r3ERyRDvoGTctMQXPgSvqw
+[info] 
+[info] 3. Paste or enter the authorization code below once you have it:
+[info] 

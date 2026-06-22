@@ -29,6 +29,16 @@
         #imgPreview { width: 100%; max-width: 400px; border-radius: 20px; border: 4px solid var(--accent); display: none; margin: auto; }
         @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
     </style>
+    <script type="module">
+        import { auth } from './firebase-config.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
 </head>
 <body>
 
@@ -40,6 +50,7 @@
         </div>
         <div style="background:#d1e7dd; color:#0f5132; padding:12px 25px; border-radius:50px; font-weight:bold; font-size:11px;">🔒 SEGURIDAD NIVEL FORENSE ACTIVA</div>
     </div>
+    <a href="carpetas.html" style="text-decoration:none; color:#7f8c8d; font-weight:bold; display:block; margin-bottom: 20px; text-align:center;">⬅ Volver a Carpetas</a>
     
     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px;">
         <button class="btn-principal" onclick="validarAcceso('registro')">📂 Apertura de Folio Psiquiátrico</button>
@@ -123,16 +134,11 @@
 </div>
 
 <script type="module">
-    // Importamos los servicios desde el archivo centralizado
     import { db, auth } from './firebase-config.js';
-    import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, query, where, getDocs, doc, getDoc, updateDoc, arrayUnion, serverTimestamp  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const idPaciente = new URLSearchParams(window.location.search).get("id");
     
-    // ¡IMPORTANTE! Las llaves de cifrado NUNCA deben estar en el código del cliente.
-    // La desencriptación debe ocurrir en un entorno seguro (backend) o los datos no deben estar cifrados de esta manera.
-    // Por ahora, las dejamos para que el código no se rompa, pero esto es un RIESGO DE SEGURIDAD CRÍTICO.
     const LL_CL_INSEGURA = "FundacionNuevosCaminos2024*USC";
 
     let diagCie = [], fotoB64 = "", stream = null, nFolio = 0;
@@ -140,20 +146,15 @@
     const cifrar = (t) => CryptoJS.AES.encrypt(t, LL_CL_INSEGURA).toString();
     const descCl = (h) => { try { return CryptoJS.AES.decrypt(h || "", LL_CL_INSEGURA).toString(CryptoJS.enc.Utf8); } catch(e){return "";} };
 
-    // EXPOSICIÓN GLOBAL DE FUNCIONES REPARADAS
-    // Lógica de acceso segura basada en Custom Claims de Firebase
     window.validarAcceso = async (accion, docId = null) => {
-        // SEGURIDAD ELIMINADA PARA DEMOSTRACIÓN: Siempre conceder acceso
         console.log("✅ Acceso directo concedido a Módulo Psicológico (seguridad deshabilitada para demo).");
         
-        // Simular un usuario y claims para que las funciones internas no fallen
-        // En un entorno sin seguridad, no hay un 'user' real de Firebase.
         const userSimulado = { displayName: "Admin Demo", email: "admin_demo@caminosnuevos.com" };
         const claimsSimulados = { rol: "admin_demo", admin: true };
 
-        { // Bloque de acceso directo
+        { 
             sessionStorage.setItem("pNom", userSimulado.displayName);
-            sessionStorage.setItem("pTP", "N/A"); // Este dato debería venir de los claims o perfil de usuario
+            sessionStorage.setItem("pTP", "N/A");
 
             if(accion === 'registro') { 
                 const sc = await getDocs(query(collection(db, "evoluciones_psicologicas"), where("idPaciente", "==", idPaciente)));
@@ -233,7 +234,6 @@ window.generarReporteEstructural = async (id) => {
         
         const pac = pSnap.data();
         
-        // Validar y parsear datos HCE
         let c = {};
         try {
             const descryptedData = descCl(d.dataHCE);
@@ -253,7 +253,6 @@ window.generarReporteEstructural = async (id) => {
         const { jsPDF } = window.jspdf;
         const docP = new jsPDF('p', 'mm', 'letter');
         
-        // --- CONFIGURACIÓN DE ESTILOS ---
         const gray = [240, 240, 240];
         const marginX = 10;
         let currentY = 10;
@@ -268,7 +267,6 @@ window.generarReporteEstructural = async (id) => {
             if(currentY + minHeight > 270) { docP.addPage(); currentY = 10; }
         };
 
-        // --- 1. ENCABEZADO ---
         drawRect(marginX, currentY, maxWidth, 25);
         docP.line(55, currentY, 55, currentY + 25);
         docP.line(150, currentY, 150, currentY + 25);
@@ -291,7 +289,6 @@ window.generarReporteEstructural = async (id) => {
 
         currentY += 28;
 
-        // --- 2. DATOS DE IDENTIFICACIÓN ---
         drawRect(marginX, currentY, maxWidth, 15, true);
         docP.setFontSize(9);
         docP.text(`APELLIDOS Y NOMBRES: ${(pac.nombre || 'N/A').toUpperCase()}`, marginX + 3, currentY + 6);
@@ -301,7 +298,6 @@ window.generarReporteEstructural = async (id) => {
 
         currentY += 18;
 
-        // --- 3. SIGNOS VITALES ---
         addPageIfNeeded(15);
         drawRect(marginX, currentY, maxWidth, 10);
         docP.line(marginX + 40, currentY, marginX + 40, currentY + 10);
@@ -318,7 +314,6 @@ window.generarReporteEstructural = async (id) => {
 
         currentY += 12;
 
-        // --- 4. SECCIONES DE TEXTO ---
         const renderSection = (title, content) => {
             addPageIfNeeded(12);
             docP.setFont("helvetica", "bold");
@@ -340,11 +335,9 @@ window.generarReporteEstructural = async (id) => {
         renderSection("MOTIVO DE CONSULTA", c.anam?.mot || "");
         renderSection("ENFERMEDAD ACTUAL", c.anam?.enf || "");
         
-        // --- 5. EXAMEN MENTAL ---
         const mentalText = `PORTE Y ACTITUD: ${c.mental?.por || ''}\nPENSAMIENTO: ${c.mental?.pen || ''}\nAFECTO: ${c.mental?.afe || ''}\nJUICIO Y RACIOCINIO: ${c.mental?.jui || ''}\nRIESGO: ${c.mental?.rie || ''}`;
         renderSection("EXAMEN DEL ESTADO MENTAL", mentalText);
 
-        // --- 6. DIAGNÓSTICOS CIE-10 ---
         addPageIfNeeded(15);
         docP.setFont("helvetica", "bold");
         drawRect(marginX, currentY, maxWidth, 6, true);
@@ -363,7 +356,6 @@ window.generarReporteEstructural = async (id) => {
 
         renderSection("PLAN DE MANEJO Y RECOMENDACIONES", c.plan || "");
 
-        // --- 7. NOTAS ACLARATORIAS ---
         if(d.aclaratorias && d.aclaratorias.length > 0) {
             addPageIfNeeded(20);
             docP.setFont("helvetica", "bold");
@@ -388,7 +380,6 @@ window.generarReporteEstructural = async (id) => {
             currentY += notasHeight + 2;
         }
 
-        // --- 8. ANEXO FOTOGRÁFICO ---
         addPageIfNeeded(50);
         if (d.foto) {
             try {
@@ -402,7 +393,6 @@ window.generarReporteEstructural = async (id) => {
             }
         }
 
-        // --- 9. FIRMAS ---
         addPageIfNeeded(25);
         const footerY = currentY + 20;
         docP.line(marginX, footerY, marginX + 70, footerY);
@@ -416,7 +406,6 @@ window.generarReporteEstructural = async (id) => {
         docP.setTextColor(100);
         docP.text(`Documento generado electrónicamente. Hash: ${d.hash || 'N/A'}`, 105, 275, { align: "center" });
 
-        // --- GUARDAR PDF ---
         const nombreArchivo = `HC_FOLIO_${c.folio || '1'}_${(pac.nombre || 'paciente').replace(/ /g, "_")}.pdf`;
         docP.save(nombreArchivo);
         alert("✅ PDF generado correctamente: " + nombreArchivo);
@@ -449,10 +438,7 @@ window.generarReporteEstructural = async (id) => {
 
     window.cerrarModal = () => document.getElementById('modalMaestro').style.display='none';
     
-    // Verificación de sesión y carga inicial
-    // SEGURIDAD ELIMINADA PARA DEMOSTRACIÓN: Acceso directo
     console.log("✅ Acceso directo concedido a Módulo Psicológico (seguridad deshabilitada para demo).");
-    // Cargar datos del paciente y el resto de la interfaz directamente
     try {
         const pRef = await getDoc(doc(db, "pacientes", idPaciente)); 
         if(pRef.exists()) {

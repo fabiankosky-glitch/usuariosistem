@@ -28,6 +28,16 @@
         /* Estilo del Historial */
         .registro-item { background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: left; border-left: 6px solid #e67e22; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
     </style>
+    <script type="module">
+        import { auth } from './firebase-config.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
 </head>
 <body>
 
@@ -42,7 +52,7 @@
         <button class="btn-menu btn-add" onclick="abrirFormulario()">🩺 Nueva Consulta Médica</button>
         <button class="btn-menu btn-show" onclick="verHistorial()">📋 Ver Historial Clínico</button>
         <br><br>
-        <a href="historias.html" style="text-decoration:none; color:#7f8c8d; font-weight:bold;">⬅ Volver a Pacientes</a>
+        <a href="carpetas.html" style="text-decoration:none; color:#7f8c8d; font-weight:bold;">⬅ Volver a Carpetas</a>
     </div>
 
     <!-- 2. SECCIÓN: AGREGAR REGISTRO -->
@@ -75,15 +85,12 @@
     </div>
 
    <script type="module">
-        // Importa los servicios ya inicializados desde el archivo central
         import { db } from './firebase-config.js';
-        // Importa solo las funciones que necesitas para operar con esos servicios
-        import { collection, addDoc, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"; // Mantener imports para funcionalidad
+        import { collection, addDoc, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         let fotoBase64 = null;
         let streamActivo = null;
 
-        // 1. CARGAR NOMBRE DEL PACIENTE
         async function cargarNombre() {
             const idPaciente = new URLSearchParams(window.location.search).get("id");
             if (!idPaciente) return;
@@ -92,30 +99,27 @@
         }
         cargarNombre();
 
-        // 2. NAVEGACIÓN Y CÁMARA (Lógica Inteligente)
-window.abrirFormulario = () => {
-    document.getElementById("menuPrincipal").style.display = "none";
-    document.getElementById("seccionAgregar").style.display = "block";
-    
-    const video = document.getElementById('video');
+        window.abrirFormulario = () => {
+            document.getElementById("menuPrincipal").style.display = "none";
+            document.getElementById("seccionAgregar").style.display = "block";
+            
+            const video = document.getElementById('video');
 
-    // CONFIGURACIÓN SENCILLA: Forzar cámara trasera (environment)
-    navigator.mediaDevices.getUserMedia({ 
-        video: { facingMode: "environment" } 
-    })
-    .then(stream => { 
-        streamActivo = stream;
-        video.srcObject = stream; 
-    })
-    .catch(err => {
-        // Si falla la trasera (ej. en PC), intenta con cualquier cámara disponible
-        navigator.mediaDevices.getUserMedia({ video: true })
+            navigator.mediaDevices.getUserMedia({ 
+                video: { facingMode: "environment" } 
+            })
             .then(stream => { 
                 streamActivo = stream;
                 video.srcObject = stream; 
+            })
+            .catch(err => {
+                navigator.mediaDevices.getUserMedia({ video: true })
+                    .then(stream => { 
+                        streamActivo = stream;
+                        video.srcObject = stream; 
+                    });
             });
-    });
-};
+        };
 
         window.tomarFoto = () => {
             const video = document.getElementById('video');
@@ -131,7 +135,6 @@ window.abrirFormulario = () => {
             alert("📸 Captura médica lista");
         };
 
-        // 3. GUARDADO EN NUBE (Colección: evoluciones_medicas)
         window.guardarRegistro = async () => {
             const idPaciente = new URLSearchParams(window.location.search).get("id");
             const texto = document.getElementById("textoMedico").value;
@@ -152,7 +155,6 @@ window.abrirFormulario = () => {
             } catch (e) { alert("Error al guardar: " + e.message); }
         };
 
-        // 4. VER HISTORIAL MÉDICO
         window.verHistorial = async () => {
             const idPaciente = new URLSearchParams(window.location.search).get("id");
             if(!idPaciente) return alert("Error: ID no encontrado.");
@@ -162,16 +164,14 @@ window.abrirFormulario = () => {
             lista.innerHTML = "Buscando...";
 
             try {
-                // Simplificamos la consulta para evitar errores de índice inicial
                 const q = query(collection(db, "evoluciones_medicas"), where("idPaciente", "==", idPaciente));
                 const snap = await getDocs(q);
                 
                 lista.innerHTML = snap.empty ? "Sin registros médicos aún." : "";
                 
-                // Ordenamos manualmente en el código para que Firebase no se queje
                 const registros = [];
                 snap.forEach(doc => registros.push({id: doc.id, ...doc.data()}));
-                registros.sort((a, b) => b.fecha - a.fecha); // Del más nuevo al más viejo
+                registros.sort((a, b) => b.fecha - a.fecha);
 
                 registros.forEach(d => {
                     const fecha = new Date(d.fecha).toLocaleString();
@@ -197,7 +197,6 @@ window.abrirFormulario = () => {
             window.location.reload(); 
         };
 
-        // 5. REPORTE MÉDICO IMPRIMIBLE
         window.verDetalleMedico = (signos, fRaw, txt, foto) => {
             const win = window.open("", "_blank", "width=800,height=900");
             const fecha = new Date(Number(fRaw)).toLocaleString();
@@ -233,11 +232,4 @@ window.abrirFormulario = () => {
         };
     </script>
 </body>
-<!--
-    NOTA IMPORTANTE: Este archivo (detalle_clinico.html) no tenía una barrera de seguridad de autenticación
-    explícita al cargar la página, a diferencia de otros módulos. Su acceso estaba implícitamente
-    protegido por el flujo de navegación desde 'historias.html' y 'perfil_paciente.html',
-    que sí tenían seguridad. Al eliminar la seguridad de esas páginas, esta página
-    ya es directamente accesible. No se requieren cambios adicionales aquí para el bypass.
--->
 </html>

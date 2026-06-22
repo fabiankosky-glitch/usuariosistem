@@ -36,6 +36,16 @@
         .card-credencial { background: linear-gradient(135deg, #0f3460 0%, #16213e 100%); color: white; padding: 25px; border-radius: 20px; text-align: center; border: 4px solid #ffd700; }
         .pin-display { font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #ffd700; margin: 15px 0; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; }
     </style>
+    <script type="module">
+        import { auth } from './firebase-config.js';
+        import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+        onAuthStateChanged(auth, (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
 </head>
 <body>
 
@@ -47,7 +57,7 @@
         </div>
         <div style="display:flex; gap:10px;">
             <button class="btn-principal" onclick="abrirModalRegistro()">➕ VINCULACIÓN CIVIL INTEGRAL</button>
-            <button class="btn-principal" style="background:#6c757d" onclick="window.location.href='administracion.html'">⬅ VOLVER</button>
+            <button class="btn-principal" style="background:#6c757d" onclick="window.location.href='menu.html'">⬅ VOLVER</button>
         </div>
     </div>
 
@@ -138,12 +148,10 @@
 </div>
 
 <script type="module">
-    // Importamos los servicios desde el archivo centralizado
     import { db, auth } from './firebase-config.js';
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { collection, addDoc, getDocs, doc, getDoc, updateDoc, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const LLAVE_ADMIN_DESCIFRADO = "admin2024"; // Solo para descifrar datos, no para acceso
+    const LLAVE_ADMIN_DESCIFRADO = "admin2024";
     let soportesTemp = [];
 
     const cifrar = (t) => CryptoJS.AES.encrypt(t, LLAVE_ADMIN_DESCIFRADO).toString();
@@ -202,7 +210,6 @@
     };
 
     window.verCredencial = async (id) => {
-        // SEGURIDAD ELIMINADA PARA DEMOSTRACIÓN: Acceso directo a ver credencial
         console.log("✅ Acceso directo a ver Credencial (seguridad deshabilitada para demo).");
         try {
             const snap = await getDoc(doc(db, "talento_humano_cifrado", id));
@@ -230,8 +237,6 @@
         }
     };
 
-    // Envolvemos la carga inicial en la verificación de autenticación
-    // SEGURIDAD ELIMINADA PARA DEMOSTRACIÓN: Acceso directo
     console.log("✅ Acceso directo concedido a Gestión de Talento Humano (seguridad deshabilitada para demo).");
     const snap = await getDocs(query(collection(db, "talento_humano_cifrado"), orderBy("timestamp", "desc")));
     let h = "";
