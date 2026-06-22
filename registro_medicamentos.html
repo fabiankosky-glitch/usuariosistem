@@ -1,0 +1,182 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Medicamentos - RA22</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-back { background-color: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+        .btn-back:hover { background-color: #0056b3; }
+        .ra22-header { border: 1px solid #dee2e6; margin-bottom: 20px; }
+        .ra22-header table { width: 100%; border-collapse: collapse; }
+        .ra22-header th, .ra22-header td { border: 1px solid #dee2e6; padding: 8px; text-align: center; }
+        .ra22-header .title { font-weight: bold; font-size: 1.2em; }
+        .filter-container { background-color: #f8f9fa; padding: 15px; border-radius: 5px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .table-container { width: 100%; overflow-x: auto; }
+        table.log-table { width: 100%; border-collapse: collapse; }
+        .log-table th, .log-table td { border: 1px solid #dee2e6; padding: 10px; text-align: left; white-space: nowrap; }
+        .log-table thead { background-color: #e9ecef; }
+        .log-table tbody tr:nth-child(even) { background-color: #f8f9fa; }
+        #loading-state { text-align: center; padding: 20px; font-size: 1.2em; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header-controls">
+            <a href="libro_correcto.html" class="btn-back"><i class="fas fa-arrow-left"></i> Volver a Lista de Pacientes</a>
+        </div>
+
+        <div class="ra22-header">
+            <table>
+                <tr>
+                    <td rowspan="2"><strong>CENTRO DE REHABILITACION NUEVOS CAMINOS</strong></td>
+                    <td rowspan="2" class="title">REGISTRO CONTROL DE ENTRADA Y SALIDA DE MEDICAMENTOS</td>
+                    <td><strong>Código:</strong> RA-22</td>
+                </tr>
+                <tr>
+                    <td><strong>Versión:</strong> 1</td>
+                </tr>
+                <tr>
+                    <td colspan="3" id="paciente-header">Cargando paciente...</td>
+                </tr>
+            </table>
+        </div>
+
+        <div class="filter-container">
+            <label for="month-filter"><strong>Filtrar por Mes:</strong></label>
+            <input type="month" id="month-filter">
+        </div>
+
+        <div class="table-container">
+            <table class="log-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Nombre del Producto</th>
+                        <th>Presentación / Conc.</th>
+                        <th>Lote</th>
+                        <th>Fecha Venc.</th>
+                        <th>Entradas</th>
+                        <th>Salidas (Dosis)</th>
+                        <th>Saldo</th>
+                        <th>Firma (Administra)</th>
+                        <th>Observaciones</th>
+                    </tr>
+                </thead>
+                <tbody id="log-body">
+                </tbody>
+            </table>
+            <p id="loading-state">Cargando registros...</p>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from './firebase-config.js';
+        import { collection, getDoc, doc, query, where, getDocs, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const pacienteHeader = document.getElementById('paciente-header');
+        const logBody = document.getElementById('log-body');
+        const loadingState = document.getElementById('loading-state');
+        const monthFilter = document.getElementById('month-filter');
+        let allRecords = [];
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const pacienteId = urlParams.get('id');
+
+        async function cargarDatos() {
+            if (!pacienteId) {
+                pacienteHeader.textContent = "Error: No se especificó un paciente.";
+                loadingState.textContent = "";
+                return;
+            }
+
+            try {
+                const pacienteRef = doc(db, "pacientes", pacienteId);
+                const pacienteSnap = await getDoc(pacienteRef);
+                if (pacienteSnap.exists()) {
+                    pacienteHeader.innerHTML = `<strong>PACIENTE:</strong> ${pacienteSnap.data().nombre}`;
+                } else {
+                    pacienteHeader.textContent = "Paciente no encontrado.";
+                }
+            } catch (error) {
+                console.error("Error cargando paciente:", error);
+                pacienteHeader.textContent = "Error al cargar datos del paciente.";
+            }
+
+            try {
+                const q = query(collection(db, "medicamentos"), where("pacienteId", "==", pacienteId), orderBy("fecha", "desc"));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    loadingState.textContent = 'No hay registros de medicamentos para este paciente.';
+                    return;
+                }
+                
+                allRecords = [];
+                querySnapshot.forEach(doc => allRecords.push(doc.data()));
+                renderTable(allRecords);
+
+            } catch (e) {
+                loadingState.textContent = 'Error al cargar el historial de medicamentos.';
+                console.error("Error fetching history: ", e);
+            }
+        }
+        
+        function renderTable(records) {
+            logBody.innerHTML = '';
+            if(records.length === 0){
+                 loadingState.textContent = 'No hay registros para el mes seleccionado.';
+                 return;
+            }
+
+            let currentSaldo = 0;
+            const sortedRecords = [...records].sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
+            
+            const recordsWithSaldo = sortedRecords.map(data => {
+                const entradas = parseFloat(data.entradas) || 0;
+                const salidas = parseFloat(data.salidas) || 0;
+                currentSaldo += entradas - salidas;
+                return {...data, saldo: currentSaldo};
+            });
+
+            logBody.innerHTML = recordsWithSaldo.reverse().map(data => {
+                const fecha = new Date(data.fecha).toLocaleString('es-CO', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
+                return `
+                    <tr>
+                        <td>${fecha}</td>
+                        <td>${data.nombreProducto || ''}</td>
+                        <td>${data.presentacion || ''}</td>
+                        <td>${data.lote || ''}</td>
+                        <td>${data.fechaVencimiento || ''}</td>
+                        <td>${data.entradas || 0}</td>
+                        <td>${data.salidas || 0}</td>
+                        <td><strong>${data.saldo}</strong></td>
+                        <td>${data.firma || ''}</td>
+                        <td>${data.observaciones || ''}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            loadingState.textContent = '';
+        }
+
+        monthFilter.addEventListener('change', () => {
+            const selectedMonth = monthFilter.value;
+            if (!selectedMonth) {
+                renderTable(allRecords);
+                return;
+            }
+            const filteredRecords = allRecords.filter(record => record.fecha && record.fecha.startsWith(selectedMonth));
+            renderTable(filteredRecords);
+        });
+
+        cargarDatos();
+    </script>
+</body>
+</html>

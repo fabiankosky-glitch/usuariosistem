@@ -3,286 +3,87 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Libro de Turno - RA22</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Libro de Turno - Bitácora General</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; padding: 20px; }
-        .header-container {
-            max-width: 1200px;
-            margin: 0 auto 20px auto;
-            padding: 10px;
-            background: white;
-            border: 1px solid #ccc;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .header-table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: center;
-        }
-        .header-table td {
-            border: 1px solid #000;
-            padding: 5px;
-            vertical-align: middle;
-        }
-        .header-table .logo-cell {
-            width: 20%;
-            font-weight: bold;
-        }
-        .header-table .title-cell {
-            width: 60%;
-        }
-        .header-table .info-cell {
-            width: 20%;
-            text-align: left;
-            padding-left: 10px;
-            font-size: 12px;
-        }
-        .title-cell h3 { margin: 0; font-size: 16px; }
-        .title-cell p { margin: 0; font-size: 14px; }
-
-        .main-content {
-            max-width: 1200px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-        .filter-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid #eee;
-        }
-        .filter-section label { font-weight: bold; margin-right: 10px; }
-        .filter-section select, .filter-section input {
-            padding: 8px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            font-size: 14px;
-        }
-        #tabla-container {
-            width: 100%;
-            overflow-x: auto; /* Para tablas anchas en móviles */
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-        }
-        th, td {
-            border: 1px solid #ccc;
-            padding: 8px;
-            text-align: left;
-        }
-        th { background-color: #f2f2f2; font-weight: bold; }
-        .btn-menu {
-            display: inline-block;
-            background: #007bff;
-            color: white;
-            padding: 10px 15px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-weight: bold;
-            margin-bottom: 20px;
-        }
-        .btn-menu:hover { background: #0056b3; }
-        .firma-cell { height: 60px; } /* Espacio para la firma */
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f4f7f6; margin: 0; padding: 20px; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .header-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .btn-back { background-color: #007bff; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; }
+        h2 { color: #2c3e50; text-align: center; border-bottom: 2px solid #ccc; padding-bottom: 10px;}
+        .entry-form textarea { width: 100%; height: 100px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; font-size: 16px; margin-bottom: 10px; }
+        .entry-form button { background-color: #28a745; color: white; border: none; padding: 12px 20px; font-size: 16px; border-radius: 5px; cursor: pointer; float: right;}
+        .entry-form button:hover { background-color: #218838; }
+        #entries-container { margin-top: 60px; }
+        .entry { background-color: #fff; border: 1px solid #e0e0e0; border-left: 5px solid #007bff; padding: 15px; margin-bottom: 15px; border-radius: 5px; }
+        .entry-header { font-size: 12px; color: #888; margin-bottom: 5px; }
+        .entry-content { font-size: 16px; }
     </style>
 </head>
 <body>
-
-    <a href="menu.html" class="btn-menu">&larr; Volver al Menú</a>
-
-    <div class="header-container">
-        <table class="header-table">
-            <tr>
-                <td class="logo-cell" rowspan="2">
-                    CENTRO DE REHABILITACION<br>NUEVOS CAMINOS
-                </td>
-                <td class="title-cell">
-                    <h3>REGISTRO CONTROL DE ENTRADA Y SALIDA DE MEDICAMENTOS</h3>
-                </td>
-                <td class="info-cell">
-                    <strong>Código:</strong> RA-22
-                </td>
-            </tr>
-            <tr>
-                <td class="title-cell">
-                    <p id="info-paciente">Cargando paciente...</p>
-                </td>
-                <td class="info-cell">
-                    <strong>Versión:</strong> 1
-                </td>
-            </tr>
-        </table>
-    </div>
-
-    <div class="main-content">
-        <div class="filter-section">
-            <div>
-                <label for="mesFiltro">Filtrar por Mes:</label>
-                <input type="month" id="mesFiltro">
-            </div>
+    <div class="container">
+        <div class="header-controls">
+            <a href="libros.html" class="btn-back"><i class="fas fa-arrow-left"></i> Volver al Menú de Libros</a>
         </div>
 
-        <div id="tabla-container">
-            <!-- La tabla se generará dinámicamente aquí -->
+        <h2><i class="fas fa-book"></i> Libro de Turno - Bitácora de Actividades</h2>
+
+        <div class="entry-form">
+            <textarea id="new-entry-content" placeholder="Escriba aquí la novedad o actividad del turno..."></textarea>
+            <button onclick="addEntry()"><i class="fas fa-plus-circle"></i> Agregar a la Bitácora</button>
+        </div>
+
+        <div id="entries-container">
+            <!-- Las entradas de la bitácora se cargarán aquí -->
         </div>
     </div>
 
     <script type="module">
         import { db } from './firebase-config.js';
-        import { collection, query, where, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        const pacienteId = new URLSearchParams(window.location.search).get('id');
+        const entriesContainer = document.getElementById('entries-container');
+        const newEntryContent = document.getElementById('new-entry-content');
 
-        async function cargarInfoPaciente() {
-            const infoPacienteEl = document.getElementById('info-paciente');
-            if (!pacienteId) {
-                infoPacienteEl.textContent = "ID de paciente no especificado.";
-                return;
+        // Cargar y mostrar las entradas en tiempo real
+        const q = query(collection(db, "bitacora_turno"), orderBy("timestamp", "desc"));
+        onSnapshot(q, (querySnapshot) => {
+            entriesContainer.innerHTML = '';
+            if(querySnapshot.empty){
+                entriesContainer.innerHTML = '<p>No hay entradas en la bitácora todavía.</p>';
             }
-
-            try {
-                const pacienteRef = doc(db, "pacientes", pacienteId);
-                const pacienteSnap = await getDoc(pacienteRef);
-
-                if (pacienteSnap.exists()) {
-                    const pacienteData = pacienteSnap.data();
-                    infoPacienteEl.innerHTML = `<strong>${pacienteData.nombre.toUpperCase()}</strong> FOLIO: <strong>${pacienteData.cedula}</strong>`;
-                } else {
-                    infoPacienteEl.textContent = "Paciente no encontrado.";
-                }
-            } catch (error) {
-                console.error("Error al cargar datos del paciente:", error);
-                infoPacienteEl.textContent = "Error al cargar la información.";
-            }
-        }
-        
-        function generarTabla(registros) {
-            const container = document.getElementById('tabla-container');
-            if (registros.length === 0) {
-                container.innerHTML = "<p>No hay registros de medicamentos para el mes seleccionado.</p>";
-                return;
-            }
-
-            let html = `
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Fecha</th>
-                            <th>Nombre del Producto</th>
-                            <th>Unidad, Presentación, Concentración</th>
-                            <th>Componente Activo</th>
-                            <th>Registro Invima</th>
-                            <th>No. de Lote</th>
-                            <th>Fecha de Vencimiento</th>
-                            <th>Casa Matriz o Fabricante</th>
-                            <th>Proveedor</th>
-                            <th colspan="2">Entradas</th>
-                            <th>Salidas</th>
-                            <th>Saldo</th>
-                            <th>Firma</th>
-                        </tr>
-                        <tr>
-                            <th colspan="9"></th>
-                            <th>Presentación, Empaque, Etiquetas EN BUEN ESTADO</th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                         <tr>
-                            <th colspan="9"></th>
-                            <th>SI / NO</th>
-                            <th></th>
-                             <th></th>
-                            <th></th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-            `;
-
-            registros.forEach(reg => {
-                 html += \`
-                    <tr>
-                        <td>\${new Date(reg.fecha).toLocaleDateString()}</td>
-                        <td>\${reg.nombreProducto || ''}</td>
-                        <td>\${reg.presentacion || ''}</td>
-                        <td>\${reg.componenteActivo || ''}</td>
-                        <td>\${reg.registroInvima || ''}</td>
-                        <td>\${reg.lote || ''}</td>
-                        <td>\${reg.fechaVencimiento ? new Date(reg.fechaVencimiento).toLocaleDateString() : ''}</td>
-                        <td>\${reg.fabricante || ''}</td>
-                        <td>\${reg.proveedor || ''}</td>
-                        <td>\${reg.buenEstado ? 'SI' : 'NO'}</td>
-                        <td>\${reg.entradas || ''}</td>
-                        <td>\${reg.salidas || ''}</td>
-                        <td>\${reg.saldo || ''}</td>
-                        <td class="firma-cell"></td>
-                    </tr>
-                \`;
+            querySnapshot.forEach((doc) => {
+                const entry = doc.data();
+                const entryElement = document.createElement('div');
+                entryElement.className = 'entry';
+                entryElement.innerHTML = `
+                    <div class="entry-header">${new Date(entry.timestamp.seconds * 1000).toLocaleString('es-CO')}</div>
+                    <div class="entry-content">${entry.content}</div>
+                `;
+                entriesContainer.appendChild(entryElement);
             });
-
-            html += \`</tbody></table>\`;
-            container.innerHTML = html;
-        }
-
-        async function cargarRegistros(year, month) {
-            if (!pacienteId) return;
-
-            const startDate = new Date(year, month - 1, 1);
-            const endDate = new Date(year, month, 0, 23, 59, 59);
-
-            try {
-                const q = query(collection(db, "medicamentos"),
-                    where("pacienteId", "==", pacienteId),
-                    where("fecha", ">=", startDate.getTime()),
-                    where("fecha", "<=", endDate.getTime())
-                );
-                
-                const querySnapshot = await getDocs(q);
-                const registros = [];
-                querySnapshot.forEach((doc) => {
-                    registros.push({ id: doc.id, ...doc.data() });
-                });
-
-                // Ordenar por fecha por si acaso
-                registros.sort((a, b) => a.fecha - b.fecha);
-                
-                generarTabla(registros);
-
-            } catch (error) {
-                console.error("Error cargando registros de medicamentos:", error);
-                document.getElementById('tabla-container').innerHTML = \`<p>Error al cargar los datos: \${error.message}</p>\`;
-            }
-        }
-        
-        document.getElementById('mesFiltro').addEventListener('change', (e) => {
-            const [year, month] = e.target.value.split('-').map(Number);
-            if(year && month) {
-                cargarRegistros(year, month);
-            }
         });
 
-        function init() {
-            // Establecer el mes actual por defecto
-            const today = new Date();
-            const year = today.getFullYear();
-            const month = (today.getMonth() + 1).toString().padStart(2, '0');
-            const monthInput = document.getElementById('mesFiltro');
-            monthInput.value = \`\${year}-\${month}\`;
-            
-            cargarInfoPaciente();
-            cargarRegistros(year, parseInt(month));
+        // Añadir nueva entrada
+        window.addEntry = async () => {
+            const content = newEntryContent.value;
+            if (content.trim() === '') {
+                alert('Por favor, escriba algo en la bitácora.');
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "bitacora_turno"), {
+                    content: content,
+                    timestamp: new Date()
+                });
+                newEntryContent.value = ''; // Limpiar el textarea
+            } catch (error) {
+                console.error("Error al añadir la entrada: ", error);
+                alert('No se pudo guardar la entrada. Inténtelo de nuevo.');
+            }
         }
-
-        init();
-
     </script>
 </body>
 </html>
